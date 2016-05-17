@@ -56,6 +56,17 @@ public class PublisherPlugin extends StallionJavaPlugin {
             EndpointsRegistry.instance().addEndpoints(converter.convert(resource).toArray(new RestEndpointBase[]{}));
         }
 
+        DefinedBundle.register(
+                new DefinedBundle("publisher:admin2.js", ".js",
+                        new BundleFile()
+                                .setPluginName("stallion")
+                                .setLiveUrl("always/jquery-1.11.3.min.js"),
+                        new BundleFile().setPluginName("stallion").setLiveUrl("always/riot-and-compiler.js").setDebugUrl("always/riot-and-compiler.min.js"),
+                        new BundleFile().setPluginName("stallion").setLiveUrl("always/stallion.js"),
+                        new BundleFile().setPluginName("stallion").setLiveUrl("admin/moment.min.js"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin-riot.tag").setProcessor("riot")
+                        )
+        );
 
         DefinedBundle.register(
                 new DefinedBundle("publisher:admin.js", ".js",
@@ -91,6 +102,18 @@ public class PublisherPlugin extends StallionJavaPlugin {
         DefinedBundle.register(
                 new DefinedBundle("publisher:admin.css", ".css",
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap.min.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/simplemde.min.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
+                        //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/admin.css")
+                )
+        );
+
+        DefinedBundle.register(
+                new DefinedBundle("publisher:admin2.css", ".css",
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap.min.css"),
+                        new BundleFile().setPluginName("stallion").setLiveUrl("always/pure-min.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/simplemde.min.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
                         //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),

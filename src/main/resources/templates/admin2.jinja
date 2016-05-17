@@ -1,0 +1,51 @@
+{% extends "stallion:common-base.jinja" %}
+{% block builtin_head_bundles %}
+
+{% endblock %}
+{% block extra_meta %}
+
+{% endblock %}
+
+{% block body_content %}
+<!--
+  ~ Copyright (c) 2015-2016 Patrick Fitzsimmons
+  ~
+  ~ This file is part of Stallion Publisher.
+  ~
+  ~ Stallion Publisher is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+      <div class="logo-wrap">
+        <img class="stallion-logo" src="https://stallion.io/st-assets/stallion-rearing-red-299.png?ts=1456278540000" />
+      </div>
+      <sidebar-menu></sidebar-menu>
+      <p>&nbsp;</p>
+      <div id="sidebar-config-container"></div>
+      <ul class="nav nav-sidebar">
+      </ul>
+    </div>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      <div id="riot-app">
+      </div>
+    </div>
+  </div>
+</div>  
+{% endblock %}
+
+{%-- block builtin_footer_bundles --%}
+
+{%-- endblock --%}

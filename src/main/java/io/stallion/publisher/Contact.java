@@ -72,6 +72,7 @@ public class Contact extends ModelBase implements Contactable {
         return this;
     }
 
+    @Column
     @UniqueKey
     public String getEmail() {
         return email;

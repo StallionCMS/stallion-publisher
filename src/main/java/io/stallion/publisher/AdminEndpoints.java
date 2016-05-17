@@ -26,6 +26,9 @@ import io.stallion.templating.TemplateRenderer;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
@@ -36,8 +39,19 @@ public class AdminEndpoints implements EndpointResource {
     @Path("/admin")
     @Produces("text/html")
     public String adminPage() {
-        Context.getResponse().getPageFooterLiterals().addDefinedBundle("publisher:admin.js");
-        Context.getResponse().getPageHeadLiterals().addDefinedBundle("publisher:admin.css");
-        return TemplateRenderer.instance().renderTemplate("publisher:admin.jinja");
+        Context.getResponse().getPageFooterLiterals().addDefinedBundle("publisher:admin2.js");
+        Context.getResponse().getPageHeadLiterals().addDefinedBundle("publisher:admin2.css");
+        return TemplateRenderer.instance().renderTemplate("publisher:admin2.jinja");
+    }
+
+    @GET
+    @Path("/posts")
+    @Produces("application/json")
+    public Object getPosts(@QueryParam("page") Integer page) {
+        page = or(page, 1);
+        Map ctx =  map(val("pager", BlogPostController.instance().filterChain().pager(page)));
+        return ctx;
     }
 }
+
+

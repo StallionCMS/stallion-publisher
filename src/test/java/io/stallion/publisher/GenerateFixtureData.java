@@ -19,6 +19,7 @@
 
 package io.stallion.publisher;
 
+import io.stallion.services.Log;
 import io.stallion.tools.SampleDataGenerator;
 import io.stallion.users.IUser;
 import io.stallion.users.Role;
@@ -152,6 +153,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
                 publishDate = futureTime.plusDays(x);
             }
             BlogPost post = new BlogPost()
+                    .setUpdatedAt(baseTime.plusDays(x).toInstant().toEpochMilli())
                     .setContent(content)
                     .setOriginalContent(content.replace("<p>", "").replace("</p>", "\n\n"))
                     .setTitle(title)
@@ -159,6 +161,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
                     .setDraft(x % 3 == 0)
                     .setPublishDate(publishDate)
                     .setId(newId(x));
+            Log.info("update blog post {0} {1}", getId(x), post.getUpdatedAt());
             BlogPostController.instance().save(post);
         }
     }
@@ -217,6 +220,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
             }
             Contact contact = ContactController.instance().forUniqueKey("email", email);
             if (contact == null) {
+                Log.info("conact is null {0}", email);
                 contact = new Contact()
                         .setEmail(email)
                         .setId(newId(x + 1000));

@@ -19,11 +19,13 @@
 
 package io.stallion.publisher;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import io.stallion.dal.base.Displayable;
 import io.stallion.dal.base.MappedModel;
 import io.stallion.dal.base.StandardDisplayableModel;
 import io.stallion.dal.file.TextItem;
 
+import javax.persistence.Column;
 import javax.persistence.Table;
 
 import static io.stallion.utils.Literals.*;
@@ -32,13 +34,38 @@ import static io.stallion.Context.*;
 @Table(name = "blog_posts")
 public class BlogPost extends StandardDisplayableModel {
     private Long authorId = 0L;
+    private Long updatedAt = 0L;
 
+    @Column
     public Long getAuthorId() {
         return authorId;
     }
 
     public BlogPost setAuthorId(Long authorId) {
         this.authorId = authorId;
+        return this;
+    }
+
+    @Column
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public BlogPost setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
+        return this;
+    }
+
+    //@JsonGetter("currentlyPublished")
+    //private boolean currentlyPublished = false;
+
+
+    public boolean isCurrentlyPublished() {
+        return isCurrentlyPublished();
+    }
+
+    public BlogPost setCurrentlyPublished(boolean currentlyPublished) {
+        //this.currentlyPublished = currentlyPublished;
         return this;
     }
 }

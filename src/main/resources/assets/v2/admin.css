@@ -1,2 +1,65 @@
 
 
+
+
+.preview-iframe {
+    border: 1px solid #CCC;
+    /*
+    -ms-zoom: 0.75;
+    -moz-transform: scale(0.75);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.75);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.75);
+    -webkit-transform-origin: 0 0;
+*/
+}
+
+.preview-iframe.dirty {
+    opacity: .2;
+}
+
+.preview-dirty-overlay {
+    position: absolute;
+    width: 75%;
+    padding: 40px 0px 0px 0px;
+    text-align: center;
+    background-color: transparent;
+    height: 200px;
+    z-index: 100;
+    font-size: 24px;
+    display: none;
+}
+
+
+.CodeMirror-fullscreen, .editor-toolbar.fullscreen {
+    z-index: 3000;
+}
+
+
+.nav-sidebar > li > a.new-thing-link {
+    float: right;
+    border-left: 1px solid #ddd;
+    padding: 7px 0px 7px 4px;
+    width: 70px;
+
+}
+
+
+
+.line-widget {
+    background-color: #F9F9F9;
+    border-radius: 2px;
+    padding: 6px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border: 1px dotted #ccc;
+    height: 40px;
+}
+.line-widget .line-widget-delete.btn.btn-default {
+    color: #944;
+}
+.line-widget .widget-label {
+    font-weight: 600;
+}
+

@@ -19,9 +19,9 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
@@ -29,14 +29,14 @@ import static io.stallion.Context.*;
 
 public class ContactController extends StandardModelController<Contact> {
     public static ContactController instance() {
-        return (ContactController) DalRegistry.instance().get("contacts");
+        return (ContactController) DataAccessRegistry.instance().get("contacts");
     }
 
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("contacts")
                 .setModelClass(Contact.class)
                 .setControllerClass(ContactController.class);
-        DalRegistry.instance().registerDal(registration);
+        DataAccessRegistry.instance().register(registration);
     }
 }

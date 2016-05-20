@@ -2,28 +2,3 @@ body {
 
 }
 
-.nav-sidebar > li > a.new-thing-link {
-    float: right;
-    border-left: 1px solid #ddd;
-    padding: 7px 0px 7px 4px;
-    width: 70px;
-
-}
-
-
-
-.line-widget {
-    background-color: #F9F9F9;
-    border-radius: 2px;
-    padding: 6px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    border: 1px dotted #ccc;
-}
-.line-widget .line-widget-delete.btn.btn-default {
-    color: #944;
-}
-.line-widget .widget-label {
-    font-weight: 600;
-}
-

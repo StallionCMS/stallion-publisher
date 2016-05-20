@@ -19,8 +19,8 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.UniqueKey;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.UniqueKey;
 
 import javax.persistence.Column;
 import javax.persistence.Table;

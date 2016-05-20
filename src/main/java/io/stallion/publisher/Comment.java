@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.stallion.Context;
-import io.stallion.dal.base.*;
+import io.stallion.dataAccess.*;
 import io.stallion.users.Role;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
@@ -114,7 +114,6 @@ public class Comment extends MappedModel {
 
 
     @Column
-    @Setable(value = SettableOptions.OwnerUpdateable.class, creatable = true)
     public String getAuthorFirstName() {
         return authorFirstName;
     }
@@ -126,7 +125,6 @@ public class Comment extends MappedModel {
 
 
     @Column
-    @Setable(value = SettableOptions.AnyUpdateable.class, creatable = true)
     public String getAuthorLastName() {
         return authorLastName;
     }
@@ -138,7 +136,6 @@ public class Comment extends MappedModel {
 
 
 
-    @Setable(value = SettableOptions.AnyUpdateable.class, creatable = true)
     @JsonView(RestrictedViews.Public.class)
     @Column
     public String getAuthorDisplayName() {
@@ -166,7 +163,6 @@ public class Comment extends MappedModel {
 
 
     @JsonView(RestrictedViews.Member.class)
-    @Setable(value = SettableOptions.Immutable.class, creatable = true)
     @Column
     public String getAuthorEmail() {
         return authorEmail;
@@ -177,8 +173,6 @@ public class Comment extends MappedModel {
         return this;
     }
 
-
-    @Setable(value = SettableOptions.AnyUpdateable.class, creatable = true)
     @JsonView(RestrictedViews.Public.class)
     @Column
     public String getAuthorWebSite() {
@@ -252,7 +246,6 @@ public class Comment extends MappedModel {
 
 
     @JsonView(RestrictedViews.Public.class)
-    @Setable(value = SettableOptions.Immutable.class, creatable = true)
     @Column
     public Long getParentId() {
         return parentId;
@@ -265,7 +258,6 @@ public class Comment extends MappedModel {
 
 
     @JsonView(RestrictedViews.Public.class)
-    @Setable(value = SettableOptions.Immutable.class, creatable = true)
     @AlternativeKey
     @Column
     public Long getThreadId() {
@@ -288,7 +280,6 @@ public class Comment extends MappedModel {
     }
 
     @Column
-    @Setable(value = SettableOptions.Immutable.class, creatable = true)
     public String getParentPermalink() {
         return parentPermalink;
     }
@@ -300,7 +291,6 @@ public class Comment extends MappedModel {
 
 
     @Column
-    @Setable(value = SettableOptions.Immutable.class, creatable = true)
     public String getCaptchaResponse() {
         return captchaResponse;
     }
@@ -385,7 +375,6 @@ public class Comment extends MappedModel {
 
 
     @JsonView(RestrictedViews.Public.class)
-    @Setable(value = SettableOptions.Immutable.class, creatable = true)
     @Column
     public String getParentTitle() {
         return parentTitle;
@@ -461,7 +450,6 @@ public class Comment extends MappedModel {
     }
 
     @JsonView(RestrictedViews.Member.class)
-    @Setable(value = SettableOptions.Immutable.class, creatable = true)
     @Column
     public Boolean getThreadSubscribe() {
         return threadSubscribe;
@@ -473,7 +461,6 @@ public class Comment extends MappedModel {
     }
 
     @JsonView(RestrictedViews.Member.class)
-    @Setable(value = SettableOptions.Immutable.class, creatable = true)
     @Column
     public Boolean getMentionSubscribe() {
         return mentionSubscribe;
@@ -485,7 +472,6 @@ public class Comment extends MappedModel {
     }
 
     @JsonView(RestrictedViews.Member.class)
-    @Setable(value = SettableOptions.AnyUpdateable.class, creatable = true)
     @Column
     public String getBodyMarkdown() {
         return bodyMarkdown;

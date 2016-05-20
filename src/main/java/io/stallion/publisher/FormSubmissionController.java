@@ -19,9 +19,9 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
@@ -29,13 +29,13 @@ import static io.stallion.Context.*;
 
 public class FormSubmissionController extends StandardModelController<FormSubmission> {
     public static FormSubmissionController instance() {
-        return (FormSubmissionController) DalRegistry.instance().get("form_submissions");
+        return (FormSubmissionController) DataAccessRegistry.instance().get("form_submissions");
     }
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("form_submissions")
                 .setModelClass(FormSubmission.class)
                 .setControllerClass(FormSubmissionController.class);
-        DalRegistry.instance().registerDal(registration);
+        DataAccessRegistry.instance().register(registration);
     }
 }

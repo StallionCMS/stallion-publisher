@@ -19,7 +19,7 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.base.MappedModel;
+import io.stallion.dataAccess.MappedModel;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;

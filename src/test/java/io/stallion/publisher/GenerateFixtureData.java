@@ -147,7 +147,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
         for(int x = 100; x<225; x++) {
             String content = makeContent(x);
             String title = makeTitle(x);
-            String slug = GeneralUtils.slugify(title) + "-" + x;
+            String slug = "/" + GeneralUtils.slugify(title) + "-" + x;
             ZonedDateTime publishDate = baseTime.plusDays(x);
             if (x % 7 == 0) {
                 publishDate = futureTime.plusDays(x);
@@ -173,7 +173,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
         for(int x = 153; x<170; x++) {
             String content = makeContent(x);
             String title = makeTitle(x);
-            String slug = GeneralUtils.slugify(title) + "-" + x;
+            String slug = "/" + GeneralUtils.slugify(title) + "-" + x;
             ZonedDateTime publishDate = baseTime.plusDays(x);
             if (x % 7 == 0) {
                 publishDate = futureTime.plusDays(x);

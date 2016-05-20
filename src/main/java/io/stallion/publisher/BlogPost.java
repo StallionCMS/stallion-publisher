@@ -20,10 +20,12 @@
 package io.stallion.publisher;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import io.stallion.dal.base.Displayable;
-import io.stallion.dal.base.MappedModel;
-import io.stallion.dal.base.StandardDisplayableModel;
-import io.stallion.dal.file.TextItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.stallion.dataAccess.Displayable;
+import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.ModelController;
+import io.stallion.dataAccess.StandardDisplayableModel;
+import io.stallion.dataAccess.file.TextItem;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -61,11 +63,17 @@ public class BlogPost extends StandardDisplayableModel {
 
 
     public boolean isCurrentlyPublished() {
-        return isCurrentlyPublished();
+        return getPublished();
     }
 
     public BlogPost setCurrentlyPublished(boolean currentlyPublished) {
         //this.currentlyPublished = currentlyPublished;
         return this;
+    }
+
+    @Override
+    @JsonIgnore
+    public ModelController getController() {
+        return BlogPostController.instance();
     }
 }

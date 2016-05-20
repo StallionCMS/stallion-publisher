@@ -19,20 +19,20 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
 
 
 public class PageController extends StandardModelController<Page> {
     public static PageController instance() {
-        return (PageController) DalRegistry.instance().get("publisher_pages");
+        return (PageController) DataAccessRegistry.instance().get("publisher_pages");
     }
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("publisher_pages")
                 .setModelClass(Page.class)
                 .setControllerClass(PageController.class);
-        DalRegistry.instance().registerDal(registration);
+        DataAccessRegistry.instance().register(registration);
     }
 }

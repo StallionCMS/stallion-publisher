@@ -20,13 +20,13 @@
 package io.stallion.publisher;
 
 import io.stallion.Context;
+import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.EndpointResource;
+import io.stallion.restfulEndpoints.ObjectParam;
 import io.stallion.templating.TemplateRenderer;
+import io.stallion.utils.Markdown;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 
 import java.util.Map;
 
@@ -51,6 +51,24 @@ public class AdminEndpoints implements EndpointResource {
         page = or(page, 1);
         Map ctx =  map(val("pager", BlogPostController.instance().filterChain().pager(page)));
         return ctx;
+    }
+
+    @GET
+    @Path("/posts/:postId")
+    @Produces("application/json")
+    public Object getPost(@PathParam("postId") Long postId) {
+        return BlogPostController.instance().forId(postId);
+    }
+
+
+    @POST
+    @Path("/posts/:postId/update-draft")
+    public Object updateDraft(@PathParam("postId") Long postId, @ObjectParam BlogPost updatedPost) {
+        BlogPost post = BlogPostController.instance().forId(postId);
+        SafeMerger.with().optional("title", "originalContent").merge(updatedPost, post);
+        post.setContent(Markdown.instance().process(post.getOriginalContent()));
+        BlogPostController.instance().save(post);
+        return post;
     }
 }
 

@@ -19,8 +19,8 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.base.StandardDisplayableModel;
-import io.stallion.dal.file.TextItem;
+import io.stallion.dataAccess.StandardDisplayableModel;
+import io.stallion.dataAccess.file.TextItem;
 
 import javax.persistence.Table;
 

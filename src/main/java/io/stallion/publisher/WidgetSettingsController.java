@@ -19,11 +19,11 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.DalRegistry;
+import io.stallion.dataAccess.DataAccessRegistry;
 
 
 public class WidgetSettingsController {
     public static WidgetSettingsController instance() {
-        return (WidgetSettingsController) DalRegistry.instance().get("widgetSettings");
+        return (WidgetSettingsController) DataAccessRegistry.instance().get("widgetSettings");
     }
 }

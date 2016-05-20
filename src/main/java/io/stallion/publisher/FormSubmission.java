@@ -19,12 +19,10 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.base.AlternativeKey;
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.Setable;
-import io.stallion.dal.base.SettableOptions;
-import io.stallion.dal.db.Converter;
-import io.stallion.dal.db.converters.JsonMapConverter;
+import io.stallion.dataAccess.AlternativeKey;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.db.Converter;
+import io.stallion.dataAccess.db.converters.JsonMapConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -49,7 +47,6 @@ public class FormSubmission extends ModelBase {
 
 
     @AlternativeKey
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     @Column
     public String getEmail() {
         return email;
@@ -83,7 +80,6 @@ public class FormSubmission extends ModelBase {
     }
 
 
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     @Column(columnDefinition = "longtext")
     @Converter(cls= JsonMapConverter.class)
     public Map<String, Object> getData() {
@@ -95,8 +91,6 @@ public class FormSubmission extends ModelBase {
         return this;
     }
 
-
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     @Column
     public String getFormName() {
         return formName;
@@ -108,7 +102,6 @@ public class FormSubmission extends ModelBase {
     }
 
 
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     @Column
     public String getPageUrl() {
         return pageUrl;
@@ -119,7 +112,6 @@ public class FormSubmission extends ModelBase {
         return this;
     }
 
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     @Column
     public String getPageTitle() {
         return pageTitle;
@@ -131,7 +123,6 @@ public class FormSubmission extends ModelBase {
     }
 
     @Column(length = 50)
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     public String getFormId() {
         return formId;
     }

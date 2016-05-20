@@ -19,21 +19,21 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
 
 
 public class AuthorProfileController extends StandardModelController<AuthorProfile> {
     public static AuthorProfileController instance() {
-        return (AuthorProfileController) DalRegistry.instance().get("authors");
+        return (AuthorProfileController) DataAccessRegistry.instance().get("authors");
     }
 
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("authors")
                 .setModelClass(AuthorProfile.class)
                 .setControllerClass(AuthorProfileController.class);
-        DalRegistry.instance().registerDal(registration);
+        DataAccessRegistry.instance().register(registration);
     }
 }

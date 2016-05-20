@@ -19,23 +19,23 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
 
 import javax.persistence.Table;
 
 @Table(name="comments")
 public class CommentController extends StandardModelController<Comment> {
     public static CommentController instance() {
-        return (CommentController) DalRegistry.instance().get("comments");
+        return (CommentController) DataAccessRegistry.instance().get("comments");
     }
 
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("comments")
                 .setModelClass(Comment.class)
                 .setControllerClass(CommentController.class);
-        DalRegistry.instance().registerDal(registration);
+        DataAccessRegistry.instance().register(registration);
     }
 }

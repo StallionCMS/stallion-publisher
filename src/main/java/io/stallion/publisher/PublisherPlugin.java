@@ -58,9 +58,8 @@ public class PublisherPlugin extends StallionJavaPlugin {
 
         DefinedBundle.register(
                 new DefinedBundle("publisher:admin2.js", ".js",
-                        new BundleFile()
-                                .setPluginName("stallion")
-                                .setLiveUrl("always/jquery-1.11.3.min.js"),
+                        new BundleFile().setPluginName("stallion").setLiveUrl("always/jquery-1.11.3.min.js"),
+                        new BundleFile().setPluginName("stallion").setLiveUrl("admin/simplemde.min.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/riot-and-compiler.js").setDebugUrl("always/riot-and-compiler.min.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/stallion.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/moment.min.js"),
@@ -118,7 +117,8 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
                         //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.css"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/admin.css")
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/admin.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin.css")
                 )
         );
     }

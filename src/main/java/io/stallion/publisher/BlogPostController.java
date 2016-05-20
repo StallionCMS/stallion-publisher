@@ -19,21 +19,25 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.DisplayableModelController;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.restfulEndpoints.SlugRegistry;
+import io.stallion.services.Log;
 
 
-public class BlogPostController extends StandardModelController<BlogPost> {
+public class BlogPostController extends DisplayableModelController<BlogPost> {
     public static BlogPostController instance() {
-        return (BlogPostController) DalRegistry.instance().get("posts");
+        return (BlogPostController) DataAccessRegistry.instance().get("blog_posts");
     }
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setModelClass(BlogPost.class)
                 .setControllerClass(BlogPostController.class)
-                .setBucket("posts");
-        DalRegistry.instance().registerDal(registration);
+                .setBucket("blog_posts");
+        DataAccessRegistry.instance().register(registration);
 
     }
+
 }

@@ -21,9 +21,13 @@ package io.stallion.publisher;
 
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.UniqueKey;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+
+import static io.stallion.utils.Literals.list;
 
 @Table(name="author_profiles")
 public class AuthorProfile extends ModelBase {

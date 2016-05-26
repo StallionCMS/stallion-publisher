@@ -20,7 +20,10 @@ import io.stallion.Context;
 import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.ObjectParam;
+import io.stallion.restfulEndpoints.SlugRegistry;
+import io.stallion.services.Log;
 import io.stallion.templating.TemplateRenderer;
+import io.stallion.testing.TestClient;
 import io.stallion.utils.Markdown;
 
 import javax.ws.rs.*;
@@ -62,9 +65,22 @@ public class AdminEndpoints implements EndpointResource {
     @Path("/posts/:postId/update-draft")
     public Object updateDraft(@PathParam("postId") Long postId, @ObjectParam BlogPost updatedPost) {
         BlogPost post = BlogPostController.instance().forId(postId);
-        SafeMerger.with().optional("title", "originalContent").merge(updatedPost, post);
+        SafeMerger.with().nonNull("title", "originalContent", "widgets").merge(updatedPost, post);
         post.setContent(Markdown.instance().process(post.getOriginalContent()));
         BlogPostController.instance().save(post);
+
+        BlogPost retrieved = BlogPostController.instance().originalForId(postId);
+        BlogPost fromSlug = (BlogPost)SlugRegistry.instance().lookup(post.getSlug());
+        Log.info("param: {0} forId: {1} orgForId: {2} fromSlug: {3}",
+                System.identityHashCode(updatedPost),
+                System.identityHashCode(post),
+                System.identityHashCode(retrieved),
+                System.identityHashCode(fromSlug)
+                );
+
+        //TestClient client = new TestClient();
+        //Log.info("Content: {0}", client.get(post.getSlug()).getContent());
+
         return post;
     }
 }

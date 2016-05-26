@@ -22,6 +22,7 @@ import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.StandardModelController;
 import io.stallion.restfulEndpoints.SlugRegistry;
 import io.stallion.services.Log;
+import org.parboiled.common.FileUtils;
 
 
 public class BlogPostController extends DisplayableModelController<BlogPost> {

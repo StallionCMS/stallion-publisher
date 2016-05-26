@@ -29,10 +29,6 @@ public class CommentController extends StandardModelController<Comment> {
     }
 
     public static void register() {
-        DataAccessRegistration registration = new DataAccessRegistration()
-                .setBucket("comments")
-                .setModelClass(Comment.class)
-                .setControllerClass(CommentController.class);
-        DataAccessRegistry.instance().register(registration);
+        DataAccessRegistry.instance().registerDbModel(Comment.class, CommentController.class, false);
     }
 }

@@ -1,4 +1,17 @@
 
+.line-widget-image {
+    height: 50px;
+    
+}
+.line-widget-image .widget-preview {
+    text-align: right;
+    float: right;
+}
+.line-widget-image .widget-preview img {
+    max-height: 38px;
+    max-width: 120px;
+    border: 1px solid #999;
+}
 
 
 

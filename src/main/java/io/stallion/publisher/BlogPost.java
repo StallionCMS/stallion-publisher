@@ -22,10 +22,16 @@ import io.stallion.dataAccess.Displayable;
 import io.stallion.dataAccess.MappedModel;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.dataAccess.StandardDisplayableModel;
+import io.stallion.dataAccess.db.Converter;
+import io.stallion.dataAccess.db.converters.JsonAttributeConverter;
+import io.stallion.dataAccess.db.converters.JsonListConverter;
 import io.stallion.dataAccess.file.TextItem;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+
+import java.util.List;
+import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
@@ -34,6 +40,7 @@ import static io.stallion.Context.*;
 public class BlogPost extends StandardDisplayableModel {
     private Long authorId = 0L;
     private Long updatedAt = 0L;
+    private List<Map> widgets = list();
 
     @Column
     public Long getAuthorId() {
@@ -72,5 +79,16 @@ public class BlogPost extends StandardDisplayableModel {
     @JsonIgnore
     public ModelController getController() {
         return BlogPostController.instance();
+    }
+
+    @Column(columnDefinition = "longtext")
+    @Converter(cls= JsonListConverter.class)
+    public List<Map> getWidgets() {
+        return widgets;
+    }
+
+    public BlogPost setWidgets(List<Map> widgets) {
+        this.widgets = widgets;
+        return this;
     }
 }

@@ -17,6 +17,7 @@
 package io.stallion.publisher;
 
 import io.stallion.dataAccess.ModelBase;
+import io.stallion.settings.Settings;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -42,6 +43,10 @@ public class UploadedFile extends ModelBase {
     public UploadedFile setName(String name) {
         this.name = name;
         return this;
+    }
+
+    public String getFullUrl() {
+        return url.replace("{cdnUrl}", Settings.instance().getCdnUrl());
     }
 
     @Column

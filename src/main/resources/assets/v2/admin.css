@@ -13,7 +13,19 @@
     border: 1px solid #999;
 }
 
+.CodeMirror-widget {
 
+    padding: 0px;
+    margin: 0px;
+    margin-top: -16px;
+    display: block;
+
+}
+.editor-line-with-widget .CodeMirror-line {
+    padding: 0px;
+    padding-top: 10px;
+    line-height: 1em;
+}
 
 .preview-iframe {
     border: 1px solid #CCC;
@@ -68,6 +80,7 @@
     margin-bottom: 5px;
     border: 1px dotted #ccc;
     height: 40px;
+    display: block;
 }
 .line-widget .line-widget-delete.btn.btn-default {
     color: #944;
@@ -76,3 +89,10 @@
     font-weight: 600;
 }
 
+.dropzone {
+    max-width: 600px;
+    background-color: #FCFCFC;
+}
+.dropzone .dz-message {
+    font-size: 18px;
+}

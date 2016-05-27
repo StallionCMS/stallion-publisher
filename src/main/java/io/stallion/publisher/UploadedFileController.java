@@ -21,6 +21,8 @@ import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.StandardDisplayableModel;
 import io.stallion.dataAccess.StandardModelController;
 
+import java.util.Map;
+
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
@@ -36,4 +38,21 @@ public class UploadedFileController extends StandardModelController<UploadedFile
                 .setControllerClass(UploadedFileController.class);
         DataAccessRegistry.instance().register(registration);
     }
+
+    public static String getTypeForExtension(String ext) {
+        return extensionToFileType.getOrDefault(ext.toLowerCase(), "other");
+    }
+
+    public static Map<String, String> extensionToFileType = map(
+            val("png", "image"),
+            val("svg", "image"),
+            val("jpg", "image"),
+            val("gif", "image"),
+            val("doc", "document"),
+            val("pdf", "document"),
+            val("docx", "document"),
+            val("xls", "document"),
+            val("xlsx", "document"),
+            val("numbers", "document")
+    );
 }

@@ -61,8 +61,10 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/riot-and-compiler.js").setDebugUrl("always/riot-and-compiler.min.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/stallion.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/moment.min.js"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin-riot.tag").setProcessor("riot"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/editor.tag").setProcessor("riot")
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/editor.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/file-library.tag").setProcessor("riot")
                         )
         );
 
@@ -101,6 +103,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
                 new DefinedBundle("publisher:admin.css", ".css",
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap.min.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/simplemde.min.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
                         //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.css"),
@@ -117,6 +120,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/admin.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin.css")
                 )
         );

@@ -1,6 +1,5 @@
 
 
-
 <edit-post>
     <div if={loading}>
         <loading-div></loading-div>
@@ -17,10 +16,12 @@
                 <label>Post body</label>
                 <textarea name="originalContent" class="form-control">{post.originalContent}</textarea>
             </div>
-            <div class="col-md-6">
-                <label>Live preview</label>
-                <div class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
-                <iframe class="preview-iframe" style="width: 100%; height: 100%; min-height: 600px; " name="previewIframe"></iframe>
+            <div class="col-md-6" >
+                <div id="live-preview-column">
+                    <label>Live preview</label>
+                    <div class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
+                    <iframe class="preview-iframe" style="width: 100%; height: 100%; min-height: 600px; " name="previewIframe"></iframe>
+                </div>
             </div>
         </div><!-- end pure-g -->
     </div>
@@ -48,18 +49,56 @@
          });
          self.lineWidgets = [];
          self.post.widgets.forEach(function(widgetData) {
-             addLineWidget(widgetData);
+             addLineWidget(widgetData, false);
          });
      };
 
-     function addLineWidget(widgetData) {
-         var line = widgetData.line; 
-         var $node = $('<div class="line-widget line-widget-' + widgetData.type + '"><span class="widget-label">' + widgetData.label + '</span> <span class="line-widget-edit btn btn-default btn-xs">Edit widget</span> <span class="line-widget-delete btn btn-xs btn-default">remove &#xd7;</span><span class="widget-preview">' + (widgetData.previewHtml || '') + '</span></div>').addClass('line-widget');
-         var widget = self.simplemde.codemirror.addLineWidget(line, $node.get(0), {});
-         widget.deleted = false;
-         self.lineWidgets.push(widget);
-         self.lineWidgetByGuid[widgetData.guid] = widget;
+
+     function addLineWidget(widgetData, atCursor) {
+         var cm = self.simplemde.codemirror;
+         var $node = $('<span class="line-widget line-widget-' + widgetData.type + '"><span class="widget-label">' + widgetData.label + '</span> <span class="line-widget-edit btn btn-default btn-xs">Edit widget</span> <span class="line-widget-delete btn btn-xs btn-default">remove &#xd7;</span><span class="widget-preview">' + (widgetData.previewHtml || '') + '</span></span>').addClass('line-widget');
+         //var widget = self.simplemde.codemirror.addLineWidget(line, $node.get(0), {});
+         var cursor = self.simplemde.codemirror.doc.getCursor();
+         var line = widgetData.line;
+         if (line === undefined || atCursor) {
+             line = cursor.line;
+             var thisLine = cm.getRange({line: line, ch:0}, {line: line+1, ch: 0}).trim('\n');
+             console.log('line is ', thisLine);
+             if (thisLine.length > 0) {
+                 if (cursor.ch > 0) {
+                     cm.replaceRange("\n", {line:line, ch:999999});
+                     line = line + 1;
+                     cm.execCommand('goLineDown');
+                 } else {
+                     cm.replaceRange("\n", {line:line, ch:0});
+                     cm.execCommand('goLineUp');
+                 }
+             }
+         }
+         cm.replaceRange("", {line:line, ch:0});
+         cm.doc.addLineClass(line, 'wrap', 'editor-line-with-widget');
+         var insertLeft = false;
+         if (line < 1 || line <= (cm.doc.lineCount() / 2)) {
+             insertLeft = true;
+         }
+         
+         var marker = self.simplemde.codemirror.markText(
+             {line: line, ch:0}, {line: line, ch:0},
+             {
+                 replacedWith: $node.get(0),
+                 clearWhenEmpty: false,
+                 insertLeft: insertLeft,
+                 widgetGuid: widgetData.guid,
+                 //handleMouseEvents: true,
+                 readOnly: true
+             });
+         marker.widgetGuid = widgetData.guid;
+         cm.execCommand('goLineDown');
+         marker.deleted = false;
+         self.lineWidgets.push(marker);
+         self.lineWidgetByGuid[widgetData.guid] = marker;
          $node.find('.line-widget-delete').click(function() {
+             cm.doc.removeLineClass(line, 'wrap', 'editor-line-with-widget');
              var newWidgets = [];
              self.post.widgets.forEach(function(existing) {
                  if (existing.guid && existing.guid !== widgetData.guid) {
@@ -67,8 +106,8 @@
                  }
              });
              self.post.widgets = newWidgets;
-             widget.deleted = true;
-             widget.clear();
+             marker.deleted = true;
+             marker.clear();
              widgetData.deleted = true;
              reloadPreview();
          });
@@ -78,9 +117,7 @@
                      widgetData: widgetData,
                      callback: function(widgetData) {
                          self.post.widgets.forEach(function(existing) {
-                             console.log('existing, updated ', existing.guid, widgetData.guid);
                              if (existing.guid === widgetData.guid) {
-                                 console.log('updating existing widget');
                                  existing.data = widgetData.data;
                                  existing.html = widgetData.html;
                                  existing.isBlock = widgetData.isBlock;
@@ -92,17 +129,23 @@
                  }
              });         
          });
-     };
+         return line;
+         
+     }
+    
      
      
      function insertWidget() {
-         var line = self.simplemde.codemirror.doc.getCursor().line || 1;
+         //var $node = $("<button>BOOKMARK</button>");
+         //self.simplemde.codemirror.setBookmark({line: line, ch: 0}, {widget: $node.get(0)});
+         //return;
+         
          showRiotModal({
              mountOpts: {
                  callback: function(widgetData) {
-                     widgetData.line = line;
+                     var line = addLineWidget(widgetData, true);
                      self.post.widgets.push(widgetData);
-                     addLineWidget(widgetData);
+                     widgetData.line = line;                     
                      reloadPreview();
                  }
              }
@@ -149,7 +192,6 @@
                  continue;
              }
              widgets.forEach(function(widgetData) {
-                 console.log('is block ? ', widgetData.isBlock);
                  var html = '<rawHtml><!--widget:' + widgetData.guid + '-->' + widgetData.html + '<!--end-widget:' + widgetData.guid + '--></rawHtml>';
                  if (widgetData.isBlock) {
                      html = "  \n" + html + "";
@@ -159,7 +201,6 @@
              newLines.push(line);
          };
          var content = newLines.join('\n');
-         console.log('content with widgets ', content);
          return content;
      };
 
@@ -173,6 +214,7 @@
          }
          console.log('save draft, reload the preview!');
          self.lastWidgetCount = self.post.widgets.length;
+         syncWidgetInformationWithCodeMirror();
          var content = getContentWithWidgetHtml();
          stallion.request({
              url: '/st-publisher/posts/' + self.postId + '/update-draft',
@@ -188,11 +230,107 @@
              }
          });
      };
-     
 
+     /**
+      * Removes all widgets that have been deleted in the editor from the self.post object.
+      * Syncs the line numbers for each widget in self.post.widgets with the actual line number in the editor
+     */
+     function syncWidgetInformationWithCodeMirror() {
+         var cm = self.simplemde.codemirror;
+         var newWidgets = []
+         var widgetByGuid = {};
+         self.post.widgets.forEach(function(widget) {
+             widgetByGuid[widget.guid] = widget;
+         });
+         cm.getAllMarks().forEach(function(mark) {
+             var widget = widgetByGuid[mark.widgetGuid];
+             console.log('mark widget guid ', mark.widgetGuid, ' widget data', widget, 'mark ', mark);
+             if (!widget) {
+                 return;
+             }
+             if (!mark.lines) {
+                 return;
+             }
+             widget.line = cm.doc.getLineNumber(mark.lines[0]);
+             newWidgets.push(widget);
+         });
+         self.post.widgets = newWidgets;
+     }
+
+
+     
+     var lastLine = 0;
+     function cursorMoves() {
+         console.log('cursor moves');
+         var cm = self.simplemde.codemirror;
+         var cursor = cm.doc.getCursor();
+         var lineInfo = cm.lineInfo(cursor.line);
+         console.log(cursor.line, cm.doc.lineCount(), lineInfo, lineInfo.widgets);
+         var marks = cm.doc.findMarks({line: cursor.line, ch: 0}, {line: cursor.line, ch: 1000});
+         console.log('marks ', marks);
+         if (marks && marks.length) {
+             if (cursor.line + 1 === cm.doc.lineCount()) {
+                 cm.replaceRange("\n", {line:cursor.line+1, ch:999999});
+             } else if (cursor.line === 0) {
+                 cm.replaceRange("\n", {line:0, ch:0});
+             }
+             if (cursor.line > lastLine) {
+                 //cm.doc.setCursor({line: cursor.line + 1, ch: cursor.ch});
+                 console.log('move cursor down');                 
+                 cm.execCommand('goLineDown');
+                 lastLine = cursor.line + 1;
+             } else {
+                 var newLine = cursor.line -1;
+                 console.log('newLien ', newLine);
+                 cm.execCommand('goLineUp');
+                 lastLine = cursor.line - 1;
+             }
+         } else {
+             lastLine = cursor.line;
+         }
+     };
+
+     function beforeChange(cm, change) {
+         var marks = cm.doc.findMarks({line: change.from.line, ch: 0}, {line: change.to.line, ch: 999999});
+         //console.log('beforeChange, marks ', marks, change.from.line, change.to.line);
+         if (marks && marks.length > 0) {
+             change.cancel();
+         }
+     };
 
      this.on('mount', function(){
+         self.editorToolbarTop = 140;
+         self.editorToolbarWidth = 500;
+         self.previewTop = 140;
+         self.previewWidth = 500;
          self.simplemde = new SimpleMDE({toolbar: makeToolbar(), element: self.originalContent });
+         self.simplemde.codemirror.on('beforeChange', beforeChange);                  
+         self.simplemde.codemirror.on('cursorActivity', cursorMoves);
+         setTimeout(function() {
+             self.editorToolbarTop = $('.editor-toolbar').offset().top;
+             self.editorToolbarWidth = $('.editor-toolbar').width() + 22;
+             self.previewTop = $('#live-preview-column').offset().top;
+             self.previewWidth = $('#live-preview-column').width();
+             var viewPortHeight = $(window).height();
+             console.log('viewportHeight ', $(window).height());
+             var newHeight = $(window).height() - self.previewTop - 30;
+             console.log('new frame height ', newHeight);
+             $('.preview-iframe').css({'height': newHeight + 'px'});
+         }, 100);
+         $(window).scroll(function() {
+             if ($(window).scrollTop() > self.editorToolbarTop) {
+                 $('.editor-toolbar').css({'background-color': 'white', 'opacity': 1, 'border-bottom': '1px solid #999', 'position': 'fixed', 'z-index': 1000, 'top': '0px', 'width': self.editorToolbarWidth + 'px'});
+             } else {
+                 $('.editor-toolbar').css({'position': 'static', 'width': '100%'});
+             }
+             if ($(window).scrollTop() > self.previewTop) {
+                 $('#live-preview-column').css({'position': 'fixed', 'width': self.previewWidth + 'px', 'top': '0px'});
+             } else {
+                 $('#live-preview-column').css({'position': 'static', 'width': '100%'});
+             }
+             console.log('scrolling');
+         });
+         
          if (!self.postId) {
              this.simplemde.value(self.post.originalContent);
              return;
@@ -397,21 +535,32 @@
 </embed-widget-configure>
 
 <image-widget-configure>
-    <div>
-        <a href="javascript:;" onclick={showLibrary}>Image Library</a>
-        <a href="javascript:;" onclick={showUpload}>Upload</a>
-        <a href="javascript:;" onclick={showWebAddress}>Web Address (URL)</a>
+    <div if={tab!=='formatting'}>
+        <ul class="nav nav-tabs" role="tablist">        
+            <li role="presentation" class="active"><a class="" href="javascript:;" onclick={showTab.bind(this, 'library')}>Image Library</a></li>
+            <li role="presentation"><a href="javascript:;"  onclick={showTab.bind(this, 'upload')}>Upload</a></li>
+            <li role="presentation"><a href="javascript:;" onclick={showTab.bind(this, 'url')}>Web Address (URL)</a></li>
+        </ul>
     </div>
     <div if={tab==="library"}>
-        You do not have any images in your library. <a href="javascript:;" onclick={showUpload}>Upload an image now.</a>
+        <image-library></image-library>
     </div>
-    <div>
+    <div if={tab==="upload"}>
+        <image-uploader></image-uploader>
+    </div>
+    <div if={tab==="url"}>
         <div class="form-group">
             <label>Insert the URL of the image here:</label>
             <input type="text" class="form-control" name="src" >
         </div>
     </div>
-    <div>
+    
+    <div if={tab==='formatting'}>
+        <div style="border-bottom: 1px solid #F4F4F4; padding-bottom: 1em; margin-bottom: 1em;">
+            <img src="{imageUrl}"" style="max-width: 50px; max-width: 50px; display:inline-block; margin-right: 20px; border: 1px solid #CCC;">
+            <a target="_blank" href="{imageUrl}">{imageUrl}</a>
+            <a class="btn btn-default btn-sm" href="javascript;" onclick={showTab.bind(this, 'library')}>Change Image</a>
+        </div>
         <h3>Formatting</h3>
 
         <div class="row">
@@ -487,10 +636,10 @@
     <script>
      var self = this;
      self.mixin('databind');
-     self.tab = 'web-address';
+     self.tab = 'library';
+     self.imageUrl = '';
      self.widgetData = self.widgetData || {data: {}};
      var data = self.widgetData.data;
-     console.log('alignment ', data.alignment);
      data.alignment = data.alignment || 'center';
      data.borderColor = data.borderColor || '#777';
      data.borderWidth = data.borderWidth === undefined ? 1 : data.borderWidth;
@@ -507,15 +656,22 @@
      data.maxHeight = data.maxHeight || 1000;     
      data.constrain100 = data.constrain100 === undefined ? true : data.constrain100;
      data.link = data.link;
-     console.log(data.constrain100);
      self.opts.formData = data;
+
+     self.selectImageCallback = function(url) {
+         self.update({tab: 'formatting', imageUrl: url});
+     }
+
+     self.showTab = function(tabName) {
+         self.tab = tabName;
+     }
+     
 
      self.buildData = function() {
          var newData = self.getFormData();
+         newData.src = self.imageUrl;
          var isBlock = (newData.title || newData.caption || newData.alignment !== 'inline') ? true : false;
          var html = buildHtml(newData, isBlock);
-         console.log('data ', newData);
-         console.log('buildHtml ', html);
          var widgetData = {
              isBlock: isBlock,
              label: 'Image',
@@ -603,3 +759,109 @@
      
     </script>
 </image-widget-configure>
+
+<image-uploader>
+    <div>
+        <h3>Upload file</h3>
+        <form action="/st-publisher/upload-file"
+              class="dropzone"
+              id="my-awesome-dropzone">
+            
+        </form>        
+    </div>
+    <script>
+     var self = this;
+
+     self.on('mount', function() {
+         self.dropzone = new Dropzone(".dropzone", {
+             dictDefaultMessage: "Drag one more more files here. Or click to open a file picker."
+         });
+     });
+   
+    </script>
+
+</image-uploader>
+
+
+<image-library>
+    <div>
+        <h3>File Library</h3>
+        <h3 if={loading}>Loading &hellip;</h3>
+        <h3 if={!loading && !items.length}>No posts yet</h3>
+        <table if={!loading && items.length} class="pure-table comments-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>                    
+                    <th>Name</th>
+                    <th></th>                    
+                    <th>Uploaded</th>     
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr each={item in items}>
+                    <td>
+                        <a class="btn btn-primary" href="javascript:;" onclick={selectImage.bind(this, item)}>Choose</a>
+                    </td>
+                    <td>
+                        <img src="{item.fullUrl}" style="max-width: 100px; max-height: 100px;">
+                    </td>
+                    <td>
+                        {item.name}
+                    </td>
+                    <td>
+                        {item.extension}
+                    </td>
+                    <td>
+                        {moment(item.uploadedAt * 1000).fromNow()}
+                    </td>
+                    <td>
+                        <a href="{item.fullUrl}" target="_blank">open</a>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+     var self = this;
+     self.loading = true;
+     self.items = null;
+     self.pager = null;
+     self.page = 1;
+     self.withDeleted = false;
+
+     self.selectImage = function(item) {
+         self.parent.selectImageCallback(item.fullUrl);
+     };
+
+     smartFormatDate = function(date) {
+         var m = moment(date);
+         return m.fromNow();
+     }
+     
+     
+     this.fetchData = function() {
+         stallion.request({
+             url: '/st-publisher/images?page=' + self.page + '&deleted=' + self.withDeleted,
+             success: function (o) {
+                 self.pager = o.pager;
+                 self.items = o.pager.items;
+                 self.loading = false;
+                 self.update();
+             },
+             error: function(o, form, xhr) {
+                 console.log('error loading dashboard', o, xhr);
+             }
+         });
+
+     };
+     
+     this.on('mount', function(){
+         self.fetchData();
+     });     
+
+    </script>
+    
+</image-library>

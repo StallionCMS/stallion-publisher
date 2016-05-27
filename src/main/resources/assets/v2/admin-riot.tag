@@ -36,6 +36,17 @@
            makeContentRoute('/pages', function() {
                return mount('view-pages', {});
            });
+
+           makeContentRoute('/files', function() {
+               console.log('/files');
+               return mount('file-library', {});
+           });
+
+           makeContentRoute('/file-upload', function() {
+               console.log('/files');
+               return mount('file-uploader', {});
+           });
+           
            
        };
 

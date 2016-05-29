@@ -38,6 +38,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
     public void boot() throws Exception {
         BlogConfigController.register();
         BlogPostController.register();
+        BlogPostVersionController.register();
         CommentController.register();
         ContactController.register();
         AuthorProfileController.register();

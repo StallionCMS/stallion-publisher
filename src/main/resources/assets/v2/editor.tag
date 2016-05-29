@@ -1,26 +1,115 @@
 
 
 <edit-post>
-    <div if={loading}>
+    <div show={loading}>
         <loading-div></loading-div>
     </div>
-    <div if={!loading}>
-        <h3 if={!postId}>New Post</h3>
-        <h3 if={postId}>Edit Post</h3>
-        <div>
-            <label>Post title</label>
-            <input name="title" type="text" value={post.title} class="form-control">
+    <div show={!loading}>
+        <div class="row">
+            <div class="col-md-6 editor-header">
+                <h3 style="float:left;" if={postId}>Edit Post</h3>
+                <button onclick={publishPost} style="float:right" class="btn btn-primary btn-xl" disabled={dirty}>
+                    <span if={!post.currentlyPublished}>Publish</span>
+                    <span if={post.currentlyPublished}>Update Published Post</span>
+                </button>
+                <div style="float:right; padding-right: 10px; color: #777; padding-top: 6px;">{lastAutosaveAt}</div>                
+            </div>
+            <div class="col-md-6">
+                &nbsp;
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <label>Post title</label>
+                <input name="title" type="text" value={post.title} class="form-control">
+            </div>
         </div>
         <div class="row">
             <div class="col-md-6">
-                <label>Post body</label>
-                <textarea name="originalContent" class="form-control">{post.originalContent}</textarea>
+                <div style="margin-top: 1em; margin-bottom: 1em; text-align: center;">
+                    <div style="" class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default btn-sm active">
+                            <input type="radio" name="options" id="option1" autocomplete="off"  onchange={showTab.bind(this, 'editor')} checked> Editor
+                        </label>
+                        <label class="btn btn-default btn-sm">
+                            <input type="radio" name="options" id="option1" autocomplete="off"  onchange={showTab.bind(this, 'versions')} > Versions
+                        </label>                        
+                        <label class="btn btn-default btn-sm">
+                            <input type="radio" name="options" id="option2" autocomplete="off" onchange={showTab.bind(this, 'options')}> Options
+                        </label>                    
+                    </div>
+                    &nbsp; &nbsp; <a href="{post.slug}" target="_blank"">Preview in new tab</a>
+                </div>
+                <div show={tab==='editor'}>
+                    <textarea name="originalContent" class="form-control">{post.originalContent}</textarea>
+                </div>
+                <div show={tab==="versions"}>
+                    <div if={tab==='versions'}>
+                        <version-history></version-history>
+                    </div>
+                </div>
+                <div show={tab==='options'}>
+                    <div class="form-group">
+                        <label>URL</label>
+                        <input type="text" class="form-control" name="slug" value={post.slug}>
+                    </div>
+                    <div class="form-group">
+                        <label>Meta Description</label>
+                        <textarea name="metaDescription" class="form-control" value={post.metaDescription}></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Publish At</label>
+                        <input type="date" class="form-control" value={post.publishDate}>
+                    </div>
+                    <div class="form-group">
+                        <label>Custom Head HTML</label>
+                        <textarea name="headHtml" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Custom Footer HTML</label>
+                        <textarea name="footerHtml" class="form-control"></textarea>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6" >
-                <div id="live-preview-column">
-                    <label>Live preview</label>
-                    <div class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
-                    <iframe class="preview-iframe" style="width: 100%; height: 100%; min-height: 600px; " name="previewIframe"></iframe>
+            <div class="col-md-6" id="preview-bootstrap-col" >
+                <div class="menu-link-group">
+                    <a class={'active': previewOrCollaborate==='preview'} href="javascript:;" onclick={switchPreviewOrCollaborate.bind(this, 'preview')}>Live preview</a> | 
+                    <a class={'active': previewOrCollaborate==='collaborate'} href="javascript:;" onclick={switchPreviewOrCollaborate.bind(this, 'collaborate')}>Collaboration</a>
+                </div>
+                <div id="above-preview-row"></div>
+                <div show={previewOrCollaborate==='collaborate'}>
+                    <h3>Collaboration</h3>
+                    <div>No collaborators</div>
+                    <button class="btn btn-default btn-xs">Invite Collaborator</button>
+                    <h3>Comments</h3>
+                    <div style="margin-bottom: 1em;">
+                        No comments.
+                    </div>
+                    <form onsubmit={self.addComment}>
+                        <div class="form-group">
+                            <textarea class="form-control"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Add a comment</button>
+                        </div>
+                    </form>
+                </div>
+                <div show={previewOrCollaborate==='preview'} id="live-preview-column">
+                    <div style="margin-bottom: 1em; margin-top: 1em; text-align: center;">
+                        <div style="" class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default btn-xs active">
+                                <input type="radio" name="options" id="option1" autocomplete="off"  onchange={switchPreviewMode.bind(this, 'mobile')} checked> Mobile
+                            </label>
+                            <label class="btn btn-default btn-xs">
+                                <input type="radio" name="options" id="option2" autocomplete="off" onchange={switchPreviewMode.bind(this, 'tablet')}> Tablet
+                            </label>
+                            <label class="btn btn-default btn-xs">
+                                <input type="radio" name="options" id="option3" autocomplete="off" onchange={switchPreviewMode.bind(this, 'desktop')}> Desktop
+                            </label>
+                        </div>
+                    </div>
+                    <div show={dirty} class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
+                    <iframe class="preview-iframe mobile" style="width: 100%; height: 100%; min-height: 600px; " name="previewIframe"></iframe>
                 </div>
             </div>
         </div><!-- end pure-g -->
@@ -40,7 +129,59 @@
      self.widgetDatas = [];
      self.lineWidgets = [];
      self.lineWidgetByGuid = {};
+     self.previewMode = 'mobile';
+     self.tab = 'editor';
+     self.versionId = null;
+     self.previewOrCollaborate = 'preview'
+     self.lastAutosaveAt = '';
+     self.loading = true;
+
+     self.switchPreviewOrCollaborate = function(mode) {
+         self.update({previewOrCollaborate: mode});
+     };
+
+     self.showTab = function(tab) {
+         self.update({tab: tab});
+     }
+
+     self.addComment = function(evt) {
+         evt.stopPropagation();
+         evt.preventDefault();
+
+         //
+
+         return false;
+     }
      
+     
+     self.switchPreviewMode = function(mode) {
+         self.previewMode = mode;
+         console.log('new frame mode is ', mode);
+         $frame = $('.preview-iframe');
+         $column = $('#preview-bootstrap-col');
+         $frame.removeClass('fifty').removeClass('seventy-five').removeClass('tablet').removeClass('mobile').removeClass('desktop');
+         var width = $column.width();
+         console.log('column width ', width);
+         $frame.css({width: $column.width() + 'px', height: self.calculatedFrameHeight + "px"});
+         if (mode === 'mobile') {
+             $frame.addClass('mobile');
+         } else if (mode === 'tablet') {
+             $frame.addClass('tablet');             
+             if (width < 700) {
+                 $frame.css({width: width * 1.33 + 'px', height: self.calculatedFrameHeight * 1.33 + 'px'});
+                 $frame.addClass('seventy-five');
+             }
+         } else if (mode === 'desktop') {
+             $frame.addClass('desktop');             
+             if (width < 570) {
+                 $frame.addClass('fifty');
+                 $frame.css({width: width * 2 + 'px', height: self.calculatedFrameHeight * 2 + 'px'});
+             } else if (width < 900) {
+                 $frame.addClass('seventy-five');
+                 $frame.css({width: width * 1.33 + 'px', height: self.calculatedFrameHeight * 1.33 + 'px'});
+             }
+         }
+     };
 
      function loadAllLineWidgetsFromPost() {
          console.log('load all line widgets for post');
@@ -121,9 +262,11 @@
                                  existing.data = widgetData.data;
                                  existing.html = widgetData.html;
                                  existing.isBlock = widgetData.isBlock;
+                                 existing.previewHtml = widgetData.previewHtml;
                                  return false;
                              }
                          });
+                         $node.find('.widget-preview').html(widgetData.previewHtml);
                          reloadPreview(true);
                      }
                  }
@@ -204,6 +347,22 @@
          return content;
      };
 
+     self.publishPost = function() {
+         console.log("unsaved pages, can't publish yet.");
+         if (self.dirty) {
+             return;
+         }
+         console.log('publish post ');
+         stallion.request({
+             url: '/st-publisher/posts/' + self.postId + '/publish/' + self.versionId,
+             method: 'POST',
+             success: function(post) {
+                 stallion.showSuccess("Post " + post.title + " has been published.");
+                 window.location.hash = "/posts";
+             }
+         });
+     };
+
      function reloadPreview(force) {
          var title = self.title.value;
          var originalContent = self.simplemde.value();
@@ -224,8 +383,9 @@
                  originalContent: content,
                  widgets: self.post.widgets
              },
-             success: function(post) {
-                 self.previewIframe.contentWindow.location.reload();
+             success: function(postVersion) {
+                 self.update({versionId: postVersion.id, lastAutosaveAt: 'Last auto-saved at ' + moment().format('hh:mm:ss a')});
+                 self.previewIframe.contentWindow.location.href = '/st-publisher/posts/' + self.postId + '/view-version/' + self.versionId;
                  previewNotDirty();
              }
          });
@@ -261,13 +421,10 @@
      
      var lastLine = 0;
      function cursorMoves() {
-         console.log('cursor moves');
          var cm = self.simplemde.codemirror;
          var cursor = cm.doc.getCursor();
          var lineInfo = cm.lineInfo(cursor.line);
-         console.log(cursor.line, cm.doc.lineCount(), lineInfo, lineInfo.widgets);
          var marks = cm.doc.findMarks({line: cursor.line, ch: 0}, {line: cursor.line, ch: 1000});
-         console.log('marks ', marks);
          if (marks && marks.length) {
              if (cursor.line + 1 === cm.doc.lineCount()) {
                  cm.replaceRange("\n", {line:cursor.line+1, ch:999999});
@@ -303,18 +460,25 @@
          self.editorToolbarWidth = 500;
          self.previewTop = 140;
          self.previewWidth = 500;
-         self.simplemde = new SimpleMDE({toolbar: makeToolbar(), element: self.originalContent });
+         //CodeMirror.defaults.lineNumbers = true;
+         //CodeMirror.defaults.gutters = ;
+         self.simplemde = new SimpleMDE({
+             toolbar: makeToolbar(), 
+             element: self.originalContent
+         });
+         //self.simplemde.codemirror.setOption('gutters', ['commentsGutter']);
+         self.simplemde.codemirror.setOption('lineNumbers', true);
          self.simplemde.codemirror.on('beforeChange', beforeChange);                  
          self.simplemde.codemirror.on('cursorActivity', cursorMoves);
+         self.calculatedFrameHeight = $(window).height() - 150;
          setTimeout(function() {
              self.editorToolbarTop = $('.editor-toolbar').offset().top;
              self.editorToolbarWidth = $('.editor-toolbar').width() + 22;
              self.previewTop = $('#live-preview-column').offset().top;
              self.previewWidth = $('#live-preview-column').width();
              var viewPortHeight = $(window).height();
-             console.log('viewportHeight ', $(window).height());
              var newHeight = $(window).height() - self.previewTop - 30;
-             console.log('new frame height ', newHeight);
+             self.calculatedFrameHeight = newHeight;
              $('.preview-iframe').css({'height': newHeight + 'px'});
          }, 100);
          $(window).scroll(function() {
@@ -347,21 +511,28 @@
          
          self.simplemde.value('Loading...');
          
+         var url = '/st-publisher/posts/new-for-editing';
+         if (self.postId) {
+             url = '/st-publisher/posts/' + self.postId + "/latest-draft"
+         }
          stallion.request({
-             url: '/st-publisher/posts/' + self.postId,
+             url: url,
              success: function (o) {
                  self.post = o;
+                 self.postId = o.postId;
+                 self.versionId = o.id;
                  self.loading = false;
                  self.update();
                  self.post.originalContent = parseOutWidgetHtmlFromContent(self.post.originalContent);
                  self.simplemde.value(self.post.originalContent);
                  self.lastWidgetCount = self.post.widgets.length;
-                 self.previewIframe.src = self.post.slug + "?stPreview=yes";
+                 self.previewIframe.src = '/st-publisher/posts/' + self.postId + '/view-version/' + self.versionId;
                  previewNotDirty();
                  loadAllLineWidgetsFromPost();
              }
          });
-         self.simplemde.codemirror.on("change", onEditorChange);         
+         self.simplemde.codemirror.on("change", onEditorChange);     
+
      });
 
 
@@ -386,14 +557,14 @@
 
      var showPreviewDirty = function() {
          $(self.previewIframe).addClass("dirty");
-         self.dirty = true;
-         $('.preview-dirty-overlay').css({'display': 'block'});
+         self.update({dirty: true});
+         //$('.preview-dirty-overlay').css({'display': 'block'});
      }
 
      var previewNotDirty = function() {
          $(self.previewIframe).removeClass("dirty");
-         self.dirty = false;
-         $('.preview-dirty-overlay').hide();
+         self.update({dirty: false});
+         //$('.preview-dirty-overlay').hide();
      };
 
 
@@ -421,7 +592,7 @@
                      // Add your own code
                      insertWidget();
                  },
-                 className: "fa fa-cube",
+                 className: "editor-insert-button",
                  title: "Insert Widget",
              },
              "|", // Separator
@@ -432,7 +603,56 @@
     </script>
 </edit-post>
 
+<version-history>
+    <div>
+        <h3>Version history</h3>
+        <table class="table table-striped" >
+            <thead>
+                <th></th>
+                <th>Date</th>
+                <th>Author</th>
+                <th>Word Count</th>
+                <th>Diff</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs">view</a><br>
+                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs">diff</a><br>
+                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-danger btn-xs">re-open</a><br>
+                        <a style="width:100px;margin-bottom:.5em;"  class="btn btn-primary btn-xs">selective restore</a>
+                    </td>
+                    <td>12 minutes ago</td>
+                    <td>John Adams</td>
+                    <td>103</td>
+                    <td>+ it was the best of times, it was the worst &hellip;</td>
+                </tr>
+                <tr>
+                    <td>
+                        <a class="btn btn-default btn-xs">view</a>
+                        <a class="btn btn-default btn-xs">revert</a>
+                        <a class="btn btn-default btn-xs">selective revert</a>
+                    </td>
 
+                    <td>12 minutes ago</td>
+                    <td>John Adams</td>
+                    <td>103</td>
+                    <td>+ it was the best of times, it was the worst &hellip;
+
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <script>
+     var self = this;
+     console.log('init version history');
+     self.on('mount', function() {
+         console.log('mounted version history');
+     });
+    </script>
+</version-history>
 
 <widget-modal>
     <div if={!widgetType} class="widget-chooser">
@@ -549,9 +769,13 @@
         <image-uploader></image-uploader>
     </div>
     <div if={tab==="url"}>
+        <div class="form-group"></div>
         <div class="form-group">
             <label>Insert the URL of the image here:</label>
             <input type="text" class="form-control" name="src" >
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" onclick={urlChange}>Use this image</button>
         </div>
     </div>
     
@@ -658,6 +882,14 @@
      data.link = data.link;
      self.opts.formData = data;
 
+     self.urlChange = function() {
+         console.log('url change ');
+         var url = self.src.value;
+         if (url.indexOf('://') > -1) {
+             self.selectImageCallback(url);
+         }
+     };
+
      self.selectImageCallback = function(url) {
          self.update({tab: 'formatting', imageUrl: url});
      }
@@ -760,12 +992,14 @@
     </script>
 </image-widget-configure>
 
+
+
 <image-uploader>
     <div>
         <h3>Upload file</h3>
         <form action="/st-publisher/upload-file"
-              class="dropzone"
-              id="my-awesome-dropzone">
+              class="image-dropzone dropzone"
+              id="my-image-dropzone">
             
         </form>        
     </div>
@@ -773,8 +1007,20 @@
      var self = this;
 
      self.on('mount', function() {
-         self.dropzone = new Dropzone(".dropzone", {
-             dictDefaultMessage: "Drag one more more files here. Or click to open a file picker."
+         self.dropzone = new Dropzone(".image-dropzone", {
+             dictDefaultMessage: "Drag one more more files here. Or click to open a file picker.",
+             uploadMultiple: false,
+//             parallelUploads: true,
+             maxFiles: 1,
+             acceptedFiles: 'image/*,.jpg,.png,.svg,.gif',
+             init: function() {
+                 this.on("success", function(file, response) { 
+                     console.log(file, response);
+                     //var o = JSON.parse(response);
+                     self.parent.selectImageCallback(response.fullUrl);
+                     this.removeFile(file);
+                 });
+             },
          });
      });
    

@@ -23,3 +23,4 @@ target
 site-pro-spec.txt
 nohup
 stallion.local.toml
+src/test/resources/example_site/app-data

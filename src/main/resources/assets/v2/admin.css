@@ -29,7 +29,10 @@
 
 .preview-iframe {
     border: 1px solid #CCC;
-    /*
+
+}
+
+.preview-iframe.seventy-five {
     -ms-zoom: 0.75;
     -moz-transform: scale(0.75);
     -moz-transform-origin: 0 0;
@@ -37,11 +40,37 @@
     -o-transform-origin: 0 0;
     -webkit-transform: scale(0.75);
     -webkit-transform-origin: 0 0;
-*/
+
+}
+
+.preview-iframe.fifty {
+    -ms-zoom: 0.5;
+    -moz-transform: scale(0.5);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.5);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.5);
+    -webkit-transform-origin: 0 0;
+
 }
 
 .preview-iframe.dirty {
     opacity: .2;
+}
+
+.preview-iframe.mobile {
+    max-width: 500px;
+}
+.menu-link-group {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    text-align: center;
+}
+.menu-link-group a, .menu-link-group a:hover, .menu-link-group a:active {
+    text-decoration: none;
+}
+.menu-link-group .active {
+    color: #888;
 }
 
 .preview-dirty-overlay {
@@ -56,11 +85,27 @@
     display: none;
 }
 
+.CodeMirror {
+    padding: 0px 10px 10px 0px;
+}
+.CodeMirror-linenumber.CodeMirror-gutter-elt {
+    visibility: hidden;
+}
 
 .CodeMirror-fullscreen, .editor-toolbar.fullscreen {
     z-index: 3000;
 }
 
+.CodeMirror-gutter.CodeMirror-linenumbers {
+    margin-left: -5px;
+    margin-top: -5px;
+}
+.commentsGutter {
+    width: 35px;
+    margin-left: -5px;
+    margin-top: -5px;
+    background-color: #CCC;
+}
 
 .nav-sidebar > li > a.new-thing-link {
     float: right;
@@ -70,8 +115,18 @@
 
 }
 
-
-
+.widget-option > a {
+    display: block;
+    border: 1px solid #CCC;
+    border-width: 1px 3px 1px 1px;
+    border-left: 3px solid #CCC;
+    padding: 10px 10px 10px 10px;
+    font-size: 18px;
+}
+.widget-option > a:hover {
+    text-decoration: none;
+    background-color: #F0F0F0;
+}
 .line-widget {
     background-color: #F9F9F9;
     border-radius: 2px;
@@ -95,4 +150,23 @@
 }
 .dropzone .dz-message {
     font-size: 18px;
+}
+
+.editor-toolbar a.editor-insert-button {
+    width: 55px;
+}
+
+.editor-toolbar a.editor-insert-button:before {
+    content: "Insert +";
+
+}
+
+.editor-header {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.editor-header h3 {
+    margin: 0px;
+    padding: 0px;
 }

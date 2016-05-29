@@ -16,16 +16,11 @@
 
 package io.stallion.publisher;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.stallion.dataAccess.Displayable;
-import io.stallion.dataAccess.MappedModel;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.dataAccess.StandardDisplayableModel;
 import io.stallion.dataAccess.db.Converter;
-import io.stallion.dataAccess.db.converters.JsonAttributeConverter;
 import io.stallion.dataAccess.db.converters.JsonListConverter;
-import io.stallion.dataAccess.file.TextItem;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -34,13 +29,13 @@ import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 @Table(name = "blog_posts")
 public class BlogPost extends StandardDisplayableModel {
     private Long authorId = 0L;
     private Long updatedAt = 0L;
     private List<Map> widgets = list();
+    private Boolean initialized = true;
 
     @Column
     public Long getAuthorId() {
@@ -89,6 +84,16 @@ public class BlogPost extends StandardDisplayableModel {
 
     public BlogPost setWidgets(List<Map> widgets) {
         this.widgets = widgets;
+        return this;
+    }
+
+    @Column
+    public Boolean getInitialized() {
+        return initialized;
+    }
+
+    public BlogPost setInitialized(Boolean initialized) {
+        this.initialized = initialized;
         return this;
     }
 }

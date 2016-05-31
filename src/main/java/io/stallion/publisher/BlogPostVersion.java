@@ -33,6 +33,8 @@ public class BlogPostVersion extends BlogPost {
     private Long versionAuthorId = 0L;
     private String versionAuthorName = "";
     private Boolean permanentCheckpoint = false;
+    private String diff = "";
+    private Integer wordCount = 0;
 
     @Column
     public String getSlug() {
@@ -105,6 +107,26 @@ public class BlogPostVersion extends BlogPost {
 
     public BlogPostVersion setPermanentCheckpoint(Boolean permanentCheckpoint) {
         this.permanentCheckpoint = permanentCheckpoint;
+        return this;
+    }
+
+    @Column
+    public String getDiff() {
+        return diff;
+    }
+
+    public BlogPostVersion setDiff(String diff) {
+        this.diff = diff;
+        return this;
+    }
+
+    @Column()
+    public Integer getWordCount() {
+        return wordCount;
+    }
+
+    public BlogPostVersion setWordCount(Integer wordCount) {
+        this.wordCount = wordCount;
         return this;
     }
 }

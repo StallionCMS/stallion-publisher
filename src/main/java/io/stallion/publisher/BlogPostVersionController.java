@@ -26,7 +26,10 @@ import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.utils.DateUtils;
+import io.stallion.utils.GeneralUtils;
+import io.stallion.utils.Sanitize;
 import io.stallion.utils.json.JSON;
+import org.apache.commons.lang3.StringUtils;
 
 
 public class BlogPostVersionController extends DisplayableModelController<BlogPostVersion> {
@@ -38,7 +41,7 @@ public class BlogPostVersionController extends DisplayableModelController<BlogPo
         _instance = (BlogPostVersionController)DataAccessRegistry.instance().registerDbModel(BlogPostVersion.class, BlogPostVersionController.class, false);
     }
 
-    private static Set<String> ignoreUpdateFields = set("id", "versionDate", "postId", "checkpoint");
+    private static Set<String> ignoreUpdateFields = set("id", "versionDate", "postId", "checkpoint", "oldUrls");
     public void updatePostWithVersion(BlogPost post, BlogPostVersion version) {
         for(Map.Entry<String, Object> prop: PropertyUtils.getProperties(version).entrySet()) {
             if (ignoreUpdateFields.contains(prop.getKey())) {
@@ -75,6 +78,8 @@ public class BlogPostVersionController extends DisplayableModelController<BlogPo
         version.setVersionDate(DateUtils.utcNow());
         version.setCheckpoint(true);
         version.setPermanentCheckpoint(false);
+        version.setWordCount(StringUtils.countMatches(version.getOriginalContent(), ' '));
+
         return version;
     }
 }

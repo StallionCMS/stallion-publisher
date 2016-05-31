@@ -21,20 +21,20 @@
         <div class="row">
             <div class="col-sm-12">
                 <label>Post title</label>
-                <input name="title" type="text" value={post.title} class="form-control">
+                <input name="title" type="text" value={post.title} placeholder="Untitled Post" class="form-control">
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
                 <div style="margin-top: 1em; margin-bottom: 1em; text-align: center;">
-                    <div style="" class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-default btn-sm active">
+                    <div style="" class="btn-group editor-options-buttons" data-toggle="buttons">
+                        <label class="btn btn-default btn-sm active btn-tab-editor">
                             <input type="radio" name="options" id="option1" autocomplete="off"  onchange={showTab.bind(this, 'editor')} checked> Editor
                         </label>
-                        <label class="btn btn-default btn-sm">
+                        <label class="btn btn-default btn-sm btn-tab-versions">
                             <input type="radio" name="options" id="option1" autocomplete="off"  onchange={showTab.bind(this, 'versions')} > Versions
                         </label>                        
-                        <label class="btn btn-default btn-sm">
+                        <label class="btn btn-default btn-sm btn-tab-options">
                             <input type="radio" name="options" id="option2" autocomplete="off" onchange={showTab.bind(this, 'options')}> Options
                         </label>                    
                     </div>
@@ -45,29 +45,29 @@
                 </div>
                 <div show={tab==="versions"}>
                     <div if={tab==='versions'}>
-                        <version-history></version-history>
+                        <version-history name="versionHistoryTab"></version-history>
                     </div>
                 </div>
-                <div show={tab==='options'}>
+                <div show={tab==='options'} class="options">
                     <div class="form-group">
                         <label>URL</label>
-                        <input type="text" class="form-control" name="slug" value={post.slug}>
+                        <input type="text" class="form-control" name="slug" onkeypress={onUrlTouched} onclick={onUrlTouched} onchange={onUrlTouched} value={post.slug || calculateSlug()} >
                     </div>
                     <div class="form-group">
                         <label>Meta Description</label>
-                        <textarea name="metaDescription" class="form-control" value={post.metaDescription}></textarea>
+                        <textarea name="metaDescription" class="form-control" value={post.metaDescription} onkeypress={optionsChange} onchange={optionsChange}></textarea>
                     </div>
                     <div class="form-group">
                         <label>Publish At</label>
-                        <input type="date" class="form-control" value={post.publishDate}>
+                        <input type="date" class="form-control" name="publishDate" value={post.publishDate} onchange={optionsChange}>
                     </div>
                     <div class="form-group">
                         <label>Custom Head HTML</label>
-                        <textarea name="headHtml" class="form-control"></textarea>
+                        <textarea name="headHtml" class="form-control" onkeypress={optionsChange} onchange={optionsChange}></textarea>
                     </div>
                     <div class="form-group">
                         <label>Custom Footer HTML</label>
-                        <textarea name="footerHtml" class="form-control"></textarea>
+                        <textarea name="footerHtml" class="form-control"  onkeypress={optionsChange} onchange={optionsChange}></textarea>
                     </div>
                 </div>
             </div>
@@ -135,12 +135,17 @@
      self.previewOrCollaborate = 'preview'
      self.lastAutosaveAt = '';
      self.loading = true;
+     self.optionsDirty = false;
+     self.loading = true;
 
      self.switchPreviewOrCollaborate = function(mode) {
          self.update({previewOrCollaborate: mode});
      };
 
      self.showTab = function(tab) {
+         if (tab === 'versions' && self.tags.versionHistoryTab &&  self.tags.versionHistoryTab.reloadVersions) {
+             self.tags.versionHistoryTab.reloadVersions();
+         }
          self.update({tab: tab});
      }
 
@@ -203,17 +208,17 @@
          var line = widgetData.line;
          if (line === undefined || atCursor) {
              line = cursor.line;
-             var thisLine = cm.getRange({line: line, ch:0}, {line: line+1, ch: 0}).trim('\n');
-             console.log('line is ', thisLine);
-             if (thisLine.length > 0) {
-                 if (cursor.ch > 0) {
-                     cm.replaceRange("\n", {line:line, ch:999999});
-                     line = line + 1;
-                     cm.execCommand('goLineDown');
-                 } else {
-                     cm.replaceRange("\n", {line:line, ch:0});
-                     cm.execCommand('goLineUp');
-                 }
+         }
+         var thisLine = cm.getRange({line: line, ch:0}, {line: line+1, ch: 0}).trim('\n');
+         console.log('line is ', thisLine);
+         if (thisLine.length > 0) {
+             if (cursor.ch > 0) {
+                 cm.replaceRange("\n", {line:line, ch:999999});
+                 line = line + 1;
+                 cm.execCommand('goLineDown');
+             } else {
+                 cm.replaceRange("\n", {line:line, ch:0});
+                 cm.execCommand('goLineUp');
              }
          }
          cm.replaceRange("", {line:line, ch:0});
@@ -228,10 +233,12 @@
              {
                  replacedWith: $node.get(0),
                  clearWhenEmpty: false,
+                 clearOnEnter: false,
+                 inclusiveRight: false,
+                 inclusiveLeft: false,
                  insertLeft: insertLeft,
-                 widgetGuid: widgetData.guid,
-                 //handleMouseEvents: true,
-                 readOnly: true
+                 addToHistory: false,
+                 widgetGuid: widgetData.guid
              });
          marker.widgetGuid = widgetData.guid;
          cm.execCommand('goLineDown');
@@ -297,11 +304,6 @@
          
      }
      
-     if (!self.postId) {
-         self.loading = false;
-     } else {
-         self.loading = true;
-     }
 
      function onEditorChange () {
          if (self.dirty === false && !self.loading) {
@@ -312,7 +314,7 @@
      };
 
      function parseOutWidgetHtmlFromContent(content) {
-         return content.replace(/<rawHtml><!\-\-widget:[\w\-]*\-\->[\s\S]*?<!\-\-end-widget:[\w\-]*\-\-><\/rawHtml>/g, '');
+         return content.replace(/(\s\s\n|)<rawHtml><!\-\-widget:[\w\-]*\-\->[\s\S]*?<!\-\-end-widget:[\w\-]*\-\-><\/rawHtml>/g, '');
      }
 
 
@@ -337,7 +339,7 @@
              widgets.forEach(function(widgetData) {
                  var html = '<rawHtml><!--widget:' + widgetData.guid + '-->' + widgetData.html + '<!--end-widget:' + widgetData.guid + '--></rawHtml>';
                  if (widgetData.isBlock) {
-                     html = "  \n" + html + "";
+                     html = "" + html + "";
                  }
                  line += html;
              });
@@ -363,10 +365,28 @@
          });
      };
 
+     self.onUrlTouched = function() {
+         self.urlTouched = true;
+         debouncedReload();
+     }
+
+     self.calculateSlug = function() {
+         return self.post.title.toLowerCase();
+     }
+
+     self.optionsChange = function() {
+         self.optionsDirty = true;
+         debouncedReload();
+         return true;
+     }
+
+
+
      function reloadPreview(force) {
-         var title = self.title.value;
+         var postData = {};
+         postData.title = self.title.value;
          var originalContent = self.simplemde.value();
-         if (!force && title === self.post.title && originalContent === self.post.originalContent && self.post.widgets.length === self.lastWidgetCount) {
+         if (!force && !self.optionsDirty && postData.title === self.post.title && originalContent === self.post.originalContent && self.post.widgets.length === self.lastWidgetCount) {
              previewNotDirty();
              console.log('nothing changed, no reload');
              return;
@@ -374,18 +394,25 @@
          console.log('save draft, reload the preview!');
          self.lastWidgetCount = self.post.widgets.length;
          syncWidgetInformationWithCodeMirror();
-         var content = getContentWithWidgetHtml();
+         postData.originalContent = getContentWithWidgetHtml();
+         postData.widgets = self.post.widgets;
+         if (self.urlTouched) {
+             postData.slug = self.slug.value;
+         }
+         postData.metaDescription = self.metaDescription.value;
+         if (self.publishDate.value) {
+             postData.publishDate = self.publishDate.value;
+         }
+         postData.headHtml = self.headHtml.value;
+         postData.footerHtml = self.footerHtml.value;
          stallion.request({
              url: '/st-publisher/posts/' + self.postId + '/update-draft',
              method: 'POST',
-             data: {
-                 title: self.title.value,
-                 originalContent: content,
-                 widgets: self.post.widgets
-             },
+             data: postData,
              success: function(postVersion) {
                  self.update({versionId: postVersion.id, lastAutosaveAt: 'Last auto-saved at ' + moment().format('hh:mm:ss a')});
                  self.previewIframe.contentWindow.location.href = '/st-publisher/posts/' + self.postId + '/view-version/' + self.versionId;
+                 self.optionsDirty = false;
                  previewNotDirty();
              }
          });
@@ -421,6 +448,7 @@
      
      var lastLine = 0;
      function cursorMoves() {
+         return;
          var cm = self.simplemde.codemirror;
          var cursor = cm.doc.getCursor();
          var lineInfo = cm.lineInfo(cursor.line);
@@ -447,13 +475,74 @@
          }
      };
 
+     self.forceAllowChange = false;
      function beforeChange(cm, change) {
+         if (self.forceAllowChange) {
+             self.forceAllowChange = false;
+             return;
+         }
+         console.log('beforeChange');
+         //if (change.from.line === change.to.line) {
+         //    return;
+         //}
+
          var marks = cm.doc.findMarks({line: change.from.line, ch: 0}, {line: change.to.line, ch: 999999});
+         if (marks && marks.length > 0) {
+             //debugger;
+         }
          //console.log('beforeChange, marks ', marks, change.from.line, change.to.line);
          if (marks && marks.length > 0) {
              change.cancel();
+             if (change.origin === '+input' && change.text.length == 2 && change.text[0] === '' && change.text[1] === '') {
+                 //cm.replaceRange("\n\n", {line:change.to.line-1, ch:99999});
+                 if (change.to.line === 0) {
+                     //cm.replaceRange("\n", {line:change.to.line, ch:0});
+                     //cm.doc.setValue("\n" + cm.doc.getValue());
+                     //loadAllLineWidgetsFromPost();
+                     console.log('insert line at 0');
+                     insertLine(cm, 0);
+                 } else {
+                     console.log('add line after ', change.to.line);
+                     insertLine(cm, change.to.line + 1);
+                     //self.forceAllowChange = true;
+                     //cm.doc.setValue(cm.doc.getValue() + "\n");
+                     //loadAllLineWidgetsFromPost();
+                     //m.doc.setCursor({line:cm.doc.lineCount(), ch:0});
+                     //cm.replaceRange("\n\n", {line:change.to.line, ch:99999});
+                     
+                 }
+             }
          }
      };
+
+     function insertLine(cm, index) {
+         
+         var lines = cm.doc.getValue().split('\n');
+         if (index >= lines.length) {
+             lines.push('');
+             index = lines.length -1;
+         } else {
+             lines.splice(index, 0, '');
+         }
+
+         var newValue = lines.join('\n');
+         self.forceAllowChange = true;
+         
+         self.post.widgets.forEach(function(widgetData) {
+             if (widgetData.line >= index) {
+                 widgetData.line++;
+             }
+         });
+
+         cm.doc.setValue(newValue);
+         loadAllLineWidgetsFromPost();
+         //var cursor = cm.doc.getCursor();
+         
+         cm.doc.setCursor({line: index, ch: 0});
+         
+         
+
+     }
 
      this.on('mount', function(){
          self.editorToolbarTop = 140;
@@ -467,7 +556,7 @@
              element: self.originalContent
          });
          //self.simplemde.codemirror.setOption('gutters', ['commentsGutter']);
-         self.simplemde.codemirror.setOption('lineNumbers', true);
+         //self.simplemde.codemirror.setOption('lineNumbers', true);
          self.simplemde.codemirror.on('beforeChange', beforeChange);                  
          self.simplemde.codemirror.on('cursorActivity', cursorMoves);
          self.calculatedFrameHeight = $(window).height() - 150;
@@ -495,10 +584,6 @@
              console.log('scrolling');
          });
          
-         if (!self.postId) {
-             this.simplemde.value(self.post.originalContent);
-             return;
-         }
 
          $(self.title).change(function() {
              reloadPreview();
@@ -511,12 +596,30 @@
          
          self.simplemde.value('Loading...');
          
+         self.simplemde.codemirror.on("change", onEditorChange);     
+
+
+         self.loadPost();
+     });
+
+     self.onRestoreVersion = function(version) {
+         self.tab = 'editor';       
+         $('.editor-options-buttons label.btn-tab-editor').click();
+         //$('.btn-tab-editor').addClass('active');
+         self.loadPost();
+     };
+
+     self.loadPost = function() {
+         self.update({loading: true});
          var url = '/st-publisher/posts/new-for-editing';
+         var method = 'POST';
          if (self.postId) {
              url = '/st-publisher/posts/' + self.postId + "/latest-draft"
+             method = 'GET';
          }
          stallion.request({
              url: url,
+             method: method,
              success: function (o) {
                  self.post = o;
                  self.postId = o.postId;
@@ -524,6 +627,10 @@
                  self.loading = false;
                  self.update();
                  self.post.originalContent = parseOutWidgetHtmlFromContent(self.post.originalContent);
+                 // Clear all existing line widgets, bookmarks
+                 self.simplemde.codemirror.doc.getAllMarks().forEach(function(tm) {
+                     tm.clear();
+                 });
                  self.simplemde.value(self.post.originalContent);
                  self.lastWidgetCount = self.post.widgets.length;
                  self.previewIframe.src = '/st-publisher/posts/' + self.postId + '/view-version/' + self.versionId;
@@ -531,9 +638,8 @@
                  loadAllLineWidgetsFromPost();
              }
          });
-         self.simplemde.codemirror.on("change", onEditorChange);     
 
-     });
+     };
 
 
      // Returns a function, that, as long as it continues to be invoked, will not
@@ -604,7 +710,10 @@
 </edit-post>
 
 <version-history>
-    <div>
+    <div show={loading}>
+        <h3>Loading old versions</h3>
+    </div>
+    <div show={!loading}>
         <h3>Version history</h3>
         <table class="table table-striped" >
             <thead>
@@ -615,41 +724,60 @@
                 <th>Diff</th>
             </thead>
             <tbody>
-                <tr>
+                <tr each={item in pager.items}>
                     <td>
-                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs">view</a><br>
-                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs">diff</a><br>
-                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-danger btn-xs">re-open</a><br>
-                        <a style="width:100px;margin-bottom:.5em;"  class="btn btn-primary btn-xs">selective restore</a>
+                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" href="/st-publisher/posts/{item.postId}/view-version/{item.id}" target="_blank">view</a><br>
+                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" onclick={restoreVersion.bind(this, item)}>restore as draft</a><br>
                     </td>
-                    <td>12 minutes ago</td>
-                    <td>John Adams</td>
-                    <td>103</td>
-                    <td>+ it was the best of times, it was the worst &hellip;</td>
+                    <td>{ moment(item.versionDate * 1000).fromNow() }</td>
+                    <td>{ item.versionAuthorName }</td>
+                    <td>{ item.wordCount }</td>
+                    <td>{ item.diff }</td>
                 </tr>
-                <tr>
-                    <td>
-                        <a class="btn btn-default btn-xs">view</a>
-                        <a class="btn btn-default btn-xs">revert</a>
-                        <a class="btn btn-default btn-xs">selective revert</a>
-                    </td>
-
-                    <td>12 minutes ago</td>
-                    <td>John Adams</td>
-                    <td>103</td>
-                    <td>+ it was the best of times, it was the worst &hellip;
-
-                    </td>
-                </tr>
-
             </tbody>
         </table>
     </div>
     <script>
      var self = this;
+     self.loading = true;
+     self.loadAll = 'false';
+     self.pager = null;
      console.log('init version history');
+
+     self.reopen = function() {
+         
+     };
+
+     self.restoreVersion = function(version) {
+         stallion.request({
+             method: 'POST',
+             url: '/st-publisher/posts/make-version-most-recent',
+             data: {
+                 postId: version.postId,
+                 versionId: version.id
+             },
+             success: function(version) {
+                 self.parent.onRestoreVersion(version);
+             }
+         });
+     };
+
+     self.reloadVersions = function() {
+         if (!self.parent.postId) {
+             return;
+         }
+         self.update({loading: true});
+         stallion.request({
+             url: '/st-publisher/posts/' + self.parent.postId + '/load-versions?loadAll=' + self.loadAll,
+             success: function(result) {
+                 self.update({pager: result.pager, loading: false});
+             }
+         });
+     }
+
      self.on('mount', function() {
          console.log('mounted version history');
+         self.reloadVersions();
      });
     </script>
 </version-history>
@@ -791,10 +919,11 @@
             <div class="col-sm-6">
                 <h5>Align</h5>                
                 <div class="form-group">
-                    <label for="alignInline">Inline <input type="radio"  name="alignment" value="inline"></label>
-                    <label for="alignLeft">Left <input type="radio"  name="alignment" value="left"></label>
-                    <label for="alignRight">Right <input type="radio" name="alignment" value="right"></label>
-                    <label for="alignCenter">Center <input type="radio" name="alignment" value="center"></label>            
+                    <label for="alignInline">Inline<br> <input type="radio"  name="alignment" value="inline"></label>
+                    <label for="alignCenter">Center <br><input type="radio" name="alignment" value="center"></label>        
+                    <label for="alignLeft">Left <br><input type="radio"  name="alignment" value="left"></label>
+                    <label for="alignRight">Right <br><input type="radio" name="alignment" value="right"></label>
+                        
                 </div>
             </div>
             <div class="col-sm-6">
@@ -809,6 +938,12 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-sm-12">
+                <a show={!advancedVisible} href="javascript:;" onclick={toggleAdvancedOptions}>Show advanced options &#171;</a>
+                <a show={advancedVisible} href="javascript:;" onclick={toggleAdvancedOptions}>&#187; Hide advanced options</a>
+            </div>
+        </div>
+        <div class="row" show={advancedVisible}>
             <div class="col-sm-6">
                 <div class="form-group">
                     <label>Title/Header (appears above image)</label>
@@ -897,7 +1032,11 @@
      self.showTab = function(tabName) {
          self.tab = tabName;
      }
-     
+
+     self.advancedVisible = false;
+     self.toggleAdvancedOptions = function() {
+         self.update({advancedVisible: !self.advancedVisible});
+     }
 
      self.buildData = function() {
          var newData = self.getFormData();

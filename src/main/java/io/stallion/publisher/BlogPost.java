@@ -36,6 +36,10 @@ public class BlogPost extends StandardDisplayableModel {
     private Long updatedAt = 0L;
     private List<Map> widgets = list();
     private Boolean initialized = true;
+    private String type = "post";
+    private Long blogId = 0L;
+    private String headHtml = "";
+    private String footerHtml = "";
 
     @Column
     public Long getAuthorId() {
@@ -56,6 +60,27 @@ public class BlogPost extends StandardDisplayableModel {
         this.updatedAt = updatedAt;
         return this;
     }
+
+    @Column(columnDefinition = "longtext")
+    public String getHeadHtml() {
+        return headHtml;
+    }
+
+    public BlogPost setHeadHtml(String headHtml) {
+        this.headHtml = headHtml;
+        return this;
+    }
+
+    @Column(columnDefinition = "longtext")
+    public String getFooterHtml() {
+        return footerHtml;
+    }
+
+    public BlogPost setFooterHtml(String footerHtml) {
+        this.footerHtml = footerHtml;
+        return this;
+    }
+
 
     //@JsonGetter("currentlyPublished")
     //private boolean currentlyPublished = false;
@@ -94,6 +119,27 @@ public class BlogPost extends StandardDisplayableModel {
 
     public BlogPost setInitialized(Boolean initialized) {
         this.initialized = initialized;
+        return this;
+    }
+
+    @Column
+    public String getType() {
+        return type;
+    }
+
+
+    public BlogPost setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    @Column
+    public Long getBlogId() {
+        return blogId;
+    }
+
+    public BlogPost setBlogId(Long blogId) {
+        this.blogId = blogId;
         return this;
     }
 }

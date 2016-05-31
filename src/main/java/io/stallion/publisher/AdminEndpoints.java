@@ -21,9 +21,13 @@ import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.filtering.FilterChain;
+import io.stallion.dataAccess.filtering.Or;
+import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.requests.ResponseComplete;
 import io.stallion.requests.StResponse;
 import io.stallion.requests.validators.SafeMerger;
+import io.stallion.restfulEndpoints.BodyParam;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.ObjectParam;
 import io.stallion.settings.Settings;
@@ -31,7 +35,10 @@ import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.Markdown;
+import io.stallion.utils.Sanitize;
+import org.apache.commons.lang3.StringUtils;
 
+import javax.management.Query;
 import javax.servlet.ServletOutputStream;
 import javax.ws.rs.*;
 
@@ -40,6 +47,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
@@ -171,7 +179,7 @@ public class AdminEndpoints implements EndpointResource {
     @Produces("application/json")
     public Object getPosts(@QueryParam("page") Integer page) {
         page = or(page, 1);
-        Map ctx =  map(val("pager", BlogPostController.instance().filterChain().pager(page)));
+        Map ctx =  map(val("pager", BlogPostController.instance().filter("initialized", true).pager(page)));
         return ctx;
     }
 
@@ -193,11 +201,22 @@ public class AdminEndpoints implements EndpointResource {
     @POST
     @Path("/posts/new-for-editing")
     @Produces("application/json")
-    public Object newPostForEditing() {
+    public Object newPostForEditing(@BodyParam(value = "blogId", allowEmpty = true) Long blogId, @BodyParam(value = "type", allowEmpty = true) String type) {
+        type = or(type, "post");
+        if ("post".equals("type") && empty(blogId)) {
+            BlogConfig blogConfig = BlogConfigController.instance().filterChain().sort("id", "ASC").first();
+            if (blogConfig != null) {
+                blogId = blogConfig.getId();
+            }
+        }
         BlogPost post = new BlogPost()
                 .setInitialized(false)
+                .setBlogId(blogId)
+                .setType(type)
                 .setAuthorId(Context.getUser().getId())
                 .setAuthor(Context.getUser().getDisplayName())
+                .setContent("")
+                .setOriginalContent("")
                 .setDraft(true)
                 .setPreviewKey(GeneralUtils.randomTokenBase32(16))
                 .setId(DataAccessRegistry.instance().getTickets().nextId());
@@ -207,6 +226,21 @@ public class AdminEndpoints implements EndpointResource {
         return newVersion;
     }
 
+
+    @GET
+    @Path("/posts/:postId/load-versions")
+    @Produces("application/json")
+    public Map loadVersions(@PathParam("postId") Long postId, @QueryParam("loadAll") Boolean loadAll) {
+
+        FilterChain<BlogPostVersion> chain = BlogPostVersionController.instance().filter("postId", postId);
+        if (loadAll != true) {
+            chain = chain.andAnyOf(new Or("checkpoint", true), new Or("versionDate", DateUtils.utcNow().minusMinutes(30), ">"));
+        }
+        Pager<BlogPostVersion> pager = chain.sort("id", "desc").pager(1, 200);
+        Map ctx = map(val("pager", pager));
+        return ctx;
+
+    }
 
     @GET
     @Path("/posts/:postId/view-version/:versionId")
@@ -249,7 +283,11 @@ public class AdminEndpoints implements EndpointResource {
         BlogPostVersionController.instance().save(lastVersion);
 
         BlogPost post = BlogPostController.instance().forId(postId);
+        if (post.getPublished()  && !post.getSlug().equals(lastVersion.getSlug())) {
+            post.getOldUrls().add(post.getSlug());
+        }
         BlogPostVersionController.instance().updatePostWithVersion(post, lastVersion);
+
         if (post.getPublishDate() == null) {
             post.setPublishDate(DateUtils.utcNow().minusMinutes(1));
         }
@@ -259,6 +297,29 @@ public class AdminEndpoints implements EndpointResource {
         BlogPostController.instance().save(post);
 
         return post;
+    }
+
+    @POST
+    @Path("/posts/make-version-most-recent")
+    @Produces("application/json")
+    public Object makeVersionMostRecent(@BodyParam("postId") Long postId, @BodyParam("versionId") Long versionId) {
+        BlogPostVersion version = BlogPostVersionController.instance().forId(versionId);
+        BlogPostVersion newVersion = BlogPostVersionController.instance().newVersionFromPostVersion(version);
+        newVersion.setPermanentCheckpoint(true);
+        newVersion.setDiff("Restoration of version " + DateUtils.formatLocalDate(version.getVersionDate()));
+        BlogPostVersionController.instance().save(newVersion);
+
+        // If the blog post is a draft, then we always sync the new version to the post
+        BlogPost post = BlogPostController.instance().forId(postId);
+        if (post.getDraft()) {
+            BlogPostVersionController.instance().updatePostWithVersion(post, newVersion);
+            if (post.getInitialized() != true && !empty(post.getTitle()) && !empty(post.getAuthor())) {
+                post.setInitialized(true);
+            }
+            BlogPostController.instance().save(post);
+        }
+
+        return newVersion;
     }
 
     @POST
@@ -275,8 +336,11 @@ public class AdminEndpoints implements EndpointResource {
             newVersion = BlogPostVersionController.instance().newVersionFromPostVersion(lastVersion);
         }
 
-
-        SafeMerger.with().nonNull("title", "originalContent", "widgets").merge(updatedVersion, newVersion);
+        newVersion.setDiff(truncateSmart(Sanitize.stripAll(StringUtils.difference(newVersion.getOriginalContent(), updatedVersion.getOriginalContent())), 250));
+        SafeMerger.with()
+                .nonNull("title", "originalContent", "widgets", "metaDescription", "headHtml", "footerHtml")
+                .optional("slug", "")
+                .merge(updatedVersion, newVersion);
 
 
 

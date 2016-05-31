@@ -1,4 +1,13 @@
 
+ .fade {
+   opacity: 0;
+   -webkit-transition: opacity 0.1s linear;
+      -moz-transition: opacity 0.1s linear;
+       -ms-transition: opacity 0.1s linear;
+        -o-transition: opacity 0.1s linear;
+           transition: opacity 0.1s linear;
+ }
+
 .line-widget-image {
     height: 50px;
     
@@ -82,7 +91,6 @@
     height: 200px;
     z-index: 100;
     font-size: 24px;
-    display: none;
 }
 
 .CodeMirror {

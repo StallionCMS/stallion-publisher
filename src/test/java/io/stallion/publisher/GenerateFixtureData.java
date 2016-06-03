@@ -49,6 +49,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
     @Override
     public void generate() {
         makeAuthors();
+        makeBlogConfigs();
         makePosts();
         makePages();
         makeComments();
@@ -65,18 +66,21 @@ public class GenerateFixtureData extends SampleDataGenerator {
                         .setDisplayName("Patrick Henry")
                         .setGivenName("Patrick")
                         .setFamilyName("Henry")
+                        .setRole(Role.STAFF)
                         .setId(newId(10)),
                 new User()
                         .setEmail("testing1+thomas@stallion.io")
                         .setDisplayName("Thomas Paine")
                         .setGivenName("Thomas")
                         .setFamilyName("Paine")
+                        .setRole(Role.STAFF)
                         .setId(newId(11)),
                 new User()
                         .setEmail("testing1+ben@stallion.io")
                         .setDisplayName("Benjamin Franklin")
                         .setGivenName("Benjamin")
                         .setFamilyName("Franklin")
+                        .setRole(Role.STAFF_LIMITED)
                         .setId(newId(12))
         };
         for (int x = 0; x<users.length; x++) {
@@ -85,9 +89,8 @@ public class GenerateFixtureData extends SampleDataGenerator {
             user.setEmailVerified(true);
             user.setUsername(user.getEmail());
             user.setEncryptionSecret(GeneralUtils.md5Hash(user.getEmail()));
-            if (user.getRole() == null) {
-                user.setRole(Role.STAFF);
-            }
+
+
             UserController.instance().save(user);
         }
 
@@ -105,6 +108,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
     }
 
     private String[] titleParts = {"Acme", "Build", "Bark", "Cover", "Light", "Shine", "Spear", "Drive", "Flower"};
+    private String[] pageTitleParts = {"Front", "Chaos", "Park", "Pillage", "Plucky", "Perfidious", "Pilfer", "Panda", "Struck"};
 
     private String[] contents = {
             "<p>\"Much this way had it been with the Town-Ho; so when her leak was found gaining once more, there was in truth some small concern manifested by several of her company; especially by Radney the mate. He commanded the upper sails to be well hoisted, sheeted home anew, and every way expanded to the breeze. Now this Radney, I suppose, was as little of a coward, and as little inclined to any sort of nervous apprehensiveness touching his own person as any fearless, unthinking creature on land or on sea that you can conveniently imagine, gentlemen. Therefore when he betrayed this solicitude about the safety of the ship, some of the seamen declared that it was only on account of his being a part owner in her. So when they were working that evening at the pumps, there was on this head no small gamesomeness slily going on among them, as they stood with their feet continually overflowed by the rippling clear water; clear as any mountain spring, gentlemen&mdash;that bubbling from the pumps ran across the deck, and poured itself out in steady spouts at the lee scupper-holes.</p>",
@@ -133,12 +137,44 @@ public class GenerateFixtureData extends SampleDataGenerator {
                 titleParts[(int)(x3 % titleParts.length)];
     }
 
+    private String makePageTitle(long x) {
+        long x2 = new Double(Math.pow(x, 1.7)).longValue();
+        long x3 = new Double(Math.pow(x, 1.2)).longValue();
+        return pageTitleParts[(int)(x % pageTitleParts.length)] + " " +
+                pageTitleParts[(int)(x2 % pageTitleParts.length)]+ " " +
+                pageTitleParts[(int)(x3 % pageTitleParts.length)];
+    }
+
     private String makeContent(long x) {
         String content = contents[(int) (x % contents.length)];
         return content;
     }
 
+    protected void makeBlogConfigs() {
+                           /*
+        BlogConfig b1 = new BlogConfig()
+                .setInternalName("Corporate News")
+                .setMetaDescription("Corporation news in our company")
+                .setTitle("Acme Corporation News")
+                .setListingTemplate("blog.listing.jinja")
+                .setListingTemplate("blog.post.jinja")
+                .setSlug("/news")
+                .setId(newId(90));
 
+        BlogConfig b2 = new BlogConfig()
+                .setInternalName("Product Blog")
+                .setTitle("Acme Product Blog")
+                .setMetaDescription("Our wizamabong products")
+                .setListingTemplate("blog.listing.jinja")
+                .setListingTemplate("blog.post.jinja")
+                .setSlug("/news")
+                .setId(newId(91));
+
+        BlogConfigController.instance().save(b1);
+        BlogConfigController.instance().save(b2);
+                         */
+
+    }
 
     protected void makePosts() {
         ZonedDateTime baseTime = ZonedDateTime.of(2015, 5, 1, 12, 0, 0, 0, ZoneId.of("UTC"));
@@ -152,12 +188,20 @@ public class GenerateFixtureData extends SampleDataGenerator {
             if (x % 7 == 0) {
                 publishDate = futureTime.plusDays(x);
             }
+            Long blogId = getId(90);
+            if (x % 4 == 0) {
+                blogId = getId(91);
+            }
             BlogPost post = new BlogPost()
+                    .setInitialized(true)
+                    .setType("post")
+                    .setBlogId(blogId)
                     .setUpdatedAt(baseTime.plusDays(x).toInstant().toEpochMilli())
                     .setContent(content)
                     .setOriginalContent(content.replace("<p>", "").replace("</p>", "\n\n"))
                     .setTitle(title)
                     .setSlug(slug)
+                    .setPreviewKey(((Integer)x).toString())
                     .setDraft(x % 3 == 0)
                     .setPublishDate(publishDate)
                     .setId(newId(x));
@@ -166,27 +210,46 @@ public class GenerateFixtureData extends SampleDataGenerator {
         }
     }
 
+
+
     protected void makePages() {
         ZonedDateTime baseTime = ZonedDateTime.of(2015, 5, 1, 12, 0, 0, 0, ZoneId.of("UTC"));
         ZonedDateTime futureTime = ZonedDateTime.of(2099, 5, 1, 12, 0, 0, 0, ZoneId.of("UTC"));
 
-        for(int x = 153; x<170; x++) {
+        for(int x = 253; x<270; x++) {
             String content = makeContent(x);
-            String title = makeTitle(x);
+            String title = makePageTitle(x);
             String slug = "/" + GeneralUtils.slugify(title) + "-" + x;
             ZonedDateTime publishDate = baseTime.plusDays(x);
             if (x % 7 == 0) {
                 publishDate = futureTime.plusDays(x);
             }
+            BlogPost post = new BlogPost()
+                    .setInitialized(true)
+                    .setType("page")
+                    .setUpdatedAt(baseTime.plusDays(x).toInstant().toEpochMilli())
+                    .setContent(content)
+                    .setOriginalContent(content.replace("<p>", "").replace("</p>", "\n\n"))
+                    .setTitle(title)
+                    .setSlug(slug)
+                    .setPreviewKey(((Integer)x).toString())
+                    .setDraft(x % 3 == 0)
+                    .setPublishDate(publishDate)
+                    .setId(newId(x));
+            Log.info("update blog post {0} {1}", getId(x), post.getUpdatedAt());
+            BlogPostController.instance().save(post);
+            /*
             Page page = new Page()
                     .setContent(content)
                     .setOriginalContent(content.replace("<p>", "").replace("</p>", "\n\n"))
                     .setTitle(title)
                     .setSlug(slug)
+                    .setPreviewKey(((Integer)x).toString())
                     .setDraft(x % 3 == 0)
                     .setPublishDate(publishDate)
                     .setId(newId(x));
             PageController.instance().save(page);
+            */
         }
     }
 
@@ -239,6 +302,9 @@ public class GenerateFixtureData extends SampleDataGenerator {
                     .setAkismetApproved(true)
                     .setAkismetCheckedAt(100000L)
                     .setApproved(true)
+                    .setBodyMarkdown(body)
+                    .setBodyHtml(body)
+                    .setCreatedTicks(publishDate.toInstant().toEpochMilli())
                     .setApprovedAt(publishDate.toInstant().toEpochMilli())
                     .setAuthorDisplayName(name)
                     .setThreadId(getId((int)(x % 100 + 100)))

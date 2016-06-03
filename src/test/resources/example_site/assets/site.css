@@ -182,3 +182,38 @@ a {
         bottom: 0;
     }
 }
+
+.footer-menu {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.footer-menu ul {
+    padding: 0px;
+    margin: 0px;
+    text-align: left;
+}
+.footer-menu > ul {
+    text-align: center;
+    display: block;
+}
+.footer-menu > ul > li > ul {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+    text-align: left;
+}
+.footer-menu > ul > li > ul  li {
+    margin-top: .5em;
+    font-weight: normal;    
+}
+.footer-menu > ul > li {
+    display: inline-block;
+    vertical-align:  top;
+    text-align: left;
+    padding: 0px;
+    margin-right: 20px;
+    font-weight: bold;
+}

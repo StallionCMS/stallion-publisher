@@ -1,9 +1,9 @@
 {
   "deleted" : false,
-  "lastModifiedMillis" : 0,
+  "lastModifiedMillis" : 1464733911000,
   "username" : "maker@stallion.io",
   "displayName" : "Stallion Maker",
-  "givenName" : "Stallion",
+  "givenName" : "Stalliona",
   "familyName" : "Maker",
   "email" : "maker@stallion.io",
   "role" : "ADMIN",
@@ -15,7 +15,7 @@
   "bcryptedPassword" : "$2a$10$OdiNF/k8TYVpNDPcDH358ui2zcMlHSFHGviJTE1GABYQ8THbAQPPO",
   "filePath" : "maker-stallion-io-33178517010011.json",
   "predefined" : true,
-  "approved" : false,
+  "approved" : true,
   "emailVerified" : false,
   "resetToken" : "",
   "aliasForId" : 0,
@@ -24,7 +24,7 @@
   "totallyOptedOut" : false,
   "honorific" : "",
   "createdAt" : 1463689106818,
-  "authorized" : false,
+  "authorized" : true,
   "id" : 33178517010011,
-  "staff" : false
+  "staff" : true
 }

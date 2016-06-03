@@ -22,6 +22,7 @@ import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.filtering.FilterChain;
+import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.dataAccess.filtering.Or;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.requests.ResponseComplete;
@@ -29,14 +30,18 @@ import io.stallion.requests.StResponse;
 import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.BodyParam;
 import io.stallion.restfulEndpoints.EndpointResource;
+import io.stallion.restfulEndpoints.MapParam;
 import io.stallion.restfulEndpoints.ObjectParam;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
+import io.stallion.users.Role;
+import io.stallion.users.UserController;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.Markdown;
 import io.stallion.utils.Sanitize;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 
 import javax.management.Query;
 import javax.servlet.ServletOutputStream;
@@ -47,12 +52,14 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
 
+@Produces("application/json")
 public class AdminEndpoints implements EndpointResource {
     @GET
     @Path("/admin")
@@ -179,23 +186,52 @@ public class AdminEndpoints implements EndpointResource {
     @Produces("application/json")
     public Object getPosts(@QueryParam("page") Integer page) {
         page = or(page, 1);
-        Map ctx =  map(val("pager", BlogPostController.instance().filter("initialized", true).pager(page)));
+        Map ctx =  map(val("pager", BlogPostController.instance().filter("type", "post").filter("initialized", true).sort("updatedAt", "desc").pager(page)));
         return ctx;
     }
 
 
 
     @GET
+    @Path("/pages")
+    @Produces("application/json")
+    public Object getPages(@QueryParam("page") Integer page) {
+        page = or(page, 1);
+        Map ctx =  map(val("pager", BlogPostController.instance().filter("type", "page").filter("initialized", true).sort("updatedAt", "desc").pager(page)));
+        return ctx;
+    }
+
+    @GET
+    @Path("/list-blogs")
+    @Produces("application/json")
+    public Object listBlogs() {
+
+        Map ctx =  map(val("blogs", BlogConfigController.instance().filterChain().sort("id", "desc").all()));
+        return ctx;
+    }
+
+
+
+
+
+    @GET
     @Path("/posts/:postId/latest-draft")
     @Produces("application/json")
-    public BlogPostVersion getPostLatestDraft(@PathParam("postId") Long postId) {
+    public Map<String, Object> getPostLatestDraft(@PathParam("postId") Long postId) {
         BlogPostVersion newVersion = BlogPostVersionController.instance().filter("postId", postId).sort("id", "desc").first();
         if (newVersion == null) {
             BlogPost post = BlogPostController.instance().forIdOrNotFound(postId);
             newVersion = BlogPostVersionController.instance().newVersionFromPost(post);
             BlogPostVersionController.instance().save(newVersion);
         }
-        return newVersion;
+        List<PageElement> elements = list(
+                new PageElement()
+                .setName("features")
+                .setRawContent("### Features\n\n* Faster\n* Stronger\n\n")
+        );
+        Map context = map(val("post", newVersion));
+        context.put("templateElements", elements);
+        return context;
     }
 
     @POST
@@ -243,12 +279,26 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @GET
+    @Path("/posts/:postId/preview")
+    @Produces("text/html")
+    public String previewPost(@PathParam("postId") Long postId, @PathParam("versionId") Long versionId) {
+        return viewPostVersion(postId, 0L);
+    }
+
+
+    @GET
     @Path("/posts/:postId/view-version/:versionId")
     @Produces("text/html")
     public String viewPostVersion(@PathParam("postId") Long postId, @PathParam("versionId") Long versionId) {
-        BlogPostVersion version = BlogPostVersionController.instance().forIdOrNotFound(versionId);
-        BlogPost item = new BlogPost().setId(version.getPostId());
-        BlogPostVersionController.instance().updatePostWithVersion(item, version);
+        BlogPost item;
+        if (!empty(versionId)) {
+            BlogPostVersion version = BlogPostVersionController.instance().forIdOrNotFound(versionId);
+            item = new BlogPost().setId(version.getPostId());
+            BlogPostVersionController.instance().updatePostWithVersion(item, version);
+        } else {
+            item = BlogPostController.instance().forId(postId);
+        }
+
         // TODO: Share this logic with Stallion RequestProcessor??
         StResponse response = Context.getResponse();
         Map ctx = map(val("page", item), val("post", item), val("item", item));
@@ -359,14 +409,55 @@ public class AdminEndpoints implements EndpointResource {
         BlogPost post = BlogPostController.instance().forId(postId);
         if (post.getDraft()) {
             BlogPostVersionController.instance().updatePostWithVersion(post, newVersion);
-            if (post.getInitialized() != true && !empty(post.getTitle()) && !empty(post.getAuthor())) {
+            if (post.getInitialized() != true && !empty(post.getTitle())) {
                 post.setInitialized(true);
             }
+            post.setUpdatedAt(DateUtils.mils());
+            BlogPostController.instance().save(post);
+        } else {
+            post.setUpdatedAt(DateUtils.mils());
             BlogPostController.instance().save(post);
         }
 
         return newVersion;
     }
+
+
+    @GET
+    @Path("/list-global-modules")
+    public Object listGlobalModules() {
+        Map ctx = map(val("modules", TemplateConfig.instance().getGlobalModules()));
+        return ctx;
+    }
+
+
+    @GET
+    @Path("/authors")
+    @Produces("application/json")
+    public Object listAuthors(@QueryParam("page") Integer page, @QueryParam("withDeleted") Boolean withDeleted) {
+        page = or(page, 1);
+        Map ctx =  map(val("pager", UserController.instance()
+                .filterChain()
+                //.filterBy("role", Role.STAFF_LIMITED, FilterOperator.GREATER_THAN_OR_EQUAL)
+                .andAnyOf(new Or("role", Role.STAFF_LIMITED), new Or("role", Role.STAFF), new Or("role", Role.ADMIN), new Or("role", Role.HOST))
+                .pager(page, 100)));
+        return ctx;
+    }
+
+    @GET
+    @Path("/site-settings")
+    public Map getSiteSettings() {
+        return SiteSettingsStatic.getAllSettings();
+    }
+
+
+    @POST
+    @Path("/update-site-settings")
+    public Object updateSiteSettings(@MapParam Map<String, String> siteSettings) {
+        SiteSettingsStatic.putSettings(siteSettings);
+        return true;
+    }
+
 }
 
 

@@ -16,7 +16,10 @@
 
 package io.stallion.publisher;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.dataAccess.StandardDisplayableModel;
 import io.stallion.dataAccess.db.Converter;
@@ -40,6 +43,7 @@ public class BlogPost extends StandardDisplayableModel {
     private Long blogId = 0L;
     private String headHtml = "";
     private String footerHtml = "";
+    private List<PageElement> elements = list();
 
     @Column
     public Long getAuthorId() {
@@ -50,6 +54,16 @@ public class BlogPost extends StandardDisplayableModel {
         this.authorId = authorId;
         return this;
     }
+
+
+    public String getPreviewUrl() {
+        return getPermalink() + "?stPreview=" + getPreviewKey();
+    }
+
+    public BlogPost setPreviewUrl(String noop) {
+        return this;
+    }
+
 
     @Column
     public Long getUpdatedAt() {
@@ -140,6 +154,26 @@ public class BlogPost extends StandardDisplayableModel {
 
     public BlogPost setBlogId(Long blogId) {
         this.blogId = blogId;
+        return this;
+    }
+
+    public PageElement getElement(String name) {
+        for(PageElement el: getElements()) {
+            if (name.equals(el.getName())) {
+                return el;
+            }
+        }
+        return null;
+    }
+
+    @Column(columnDefinition = "longtext")
+    @Converter(cls=JsonListConverter.class)
+    public List<PageElement> getElements() {
+        return elements;
+    }
+
+    public BlogPost setElements(List<PageElement> elements) {
+        this.elements = elements;
         return this;
     }
 }

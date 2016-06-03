@@ -1,192 +1,128 @@
-
-
-<edit-post>
-    <div show={loading}>
-        <loading-div></loading-div>
-    </div>
-    <div show={!loading}>
-        <div class="row">
-            <div class="col-md-6 editor-header">
-                <h3 style="float:left;" if={postId}>Edit Post</h3>
-                <button onclick={publishPost} style="float:right" class="btn btn-primary btn-xl" disabled={dirty}>
-                    <span if={!post.currentlyPublished}>Publish</span>
-                    <span if={post.currentlyPublished}>Update Published Post</span>
-                </button>
-                <div style="float:right; padding-right: 10px; color: #777; padding-top: 6px;">{lastAutosaveAt}</div>                
-            </div>
-            <div class="col-md-6">
-                &nbsp;
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <label>Post title</label>
-                <input name="title" type="text" value={post.title} placeholder="Untitled Post" class="form-control">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div style="margin-top: 1em; margin-bottom: 1em; text-align: center;">
-                    <div style="" class="btn-group editor-options-buttons" data-toggle="buttons">
-                        <label class="btn btn-default btn-sm active btn-tab-editor">
-                            <input type="radio" name="options" id="option1" autocomplete="off"  onchange={showTab.bind(this, 'editor')} checked> Editor
-                        </label>
-                        <label class="btn btn-default btn-sm btn-tab-versions">
-                            <input type="radio" name="options" id="option1" autocomplete="off"  onchange={showTab.bind(this, 'versions')} > Versions
-                        </label>                        
-                        <label class="btn btn-default btn-sm btn-tab-options">
-                            <input type="radio" name="options" id="option2" autocomplete="off" onchange={showTab.bind(this, 'options')}> Options
-                        </label>                    
-                    </div>
-                    &nbsp; &nbsp; <a href="{post.slug}" target="_blank"">Preview in new tab</a>
-                </div>
-                <div show={tab==='editor'}>
-                    <textarea name="originalContent" class="form-control">{post.originalContent}</textarea>
-                </div>
-                <div show={tab==="versions"}>
-                    <div if={tab==='versions'}>
-                        <version-history name="versionHistoryTab"></version-history>
-                    </div>
-                </div>
-                <div show={tab==='options'} class="options">
-                    <div class="form-group">
-                        <label>URL</label>
-                        <input type="text" class="form-control" name="slug" onkeypress={onUrlTouched} onclick={onUrlTouched} onchange={onUrlTouched} value={post.slug || calculateSlug()} >
-                    </div>
-                    <div class="form-group">
-                        <label>Meta Description</label>
-                        <textarea name="metaDescription" class="form-control" value={post.metaDescription} onkeypress={optionsChange} onchange={optionsChange}></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Publish At</label>
-                        <input type="date" class="form-control" name="publishDate" value={post.publishDate} onchange={optionsChange}>
-                    </div>
-                    <div class="form-group">
-                        <label>Custom Head HTML</label>
-                        <textarea name="headHtml" class="form-control" onkeypress={optionsChange} onchange={optionsChange}></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Custom Footer HTML</label>
-                        <textarea name="footerHtml" class="form-control"  onkeypress={optionsChange} onchange={optionsChange}></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6" id="preview-bootstrap-col" >
-                <div class="menu-link-group">
-                    <a class={'active': previewOrCollaborate==='preview'} href="javascript:;" onclick={switchPreviewOrCollaborate.bind(this, 'preview')}>Live preview</a> | 
-                    <a class={'active': previewOrCollaborate==='collaborate'} href="javascript:;" onclick={switchPreviewOrCollaborate.bind(this, 'collaborate')}>Collaboration</a>
-                </div>
-                <div id="above-preview-row"></div>
-                <div show={previewOrCollaborate==='collaborate'}>
-                    <h3>Collaboration</h3>
-                    <div>No collaborators</div>
-                    <button class="btn btn-default btn-xs">Invite Collaborator</button>
-                    <h3>Comments</h3>
-                    <div style="margin-bottom: 1em;">
-                        No comments.
-                    </div>
-                    <form onsubmit={self.addComment}>
-                        <div class="form-group">
-                            <textarea class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Add a comment</button>
-                        </div>
-                    </form>
-                </div>
-                <div show={previewOrCollaborate==='preview'} id="live-preview-column">
-                    <div style="margin-bottom: 1em; margin-top: 1em; text-align: center;">
-                        <div style="" class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-default btn-xs active">
-                                <input type="radio" name="options" id="option1" autocomplete="off"  onchange={switchPreviewMode.bind(this, 'mobile')} checked> Mobile
-                            </label>
-                            <label class="btn btn-default btn-xs">
-                                <input type="radio" name="options" id="option2" autocomplete="off" onchange={switchPreviewMode.bind(this, 'tablet')}> Tablet
-                            </label>
-                            <label class="btn btn-default btn-xs">
-                                <input type="radio" name="options" id="option3" autocomplete="off" onchange={switchPreviewMode.bind(this, 'desktop')}> Desktop
-                            </label>
-                        </div>
-                    </div>
-                    <div show={dirty} class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
-                    <iframe class="preview-iframe mobile" style="width: 100%; height: 100%; min-height: 600px; " name="previewIframe"></iframe>
-                </div>
-            </div>
-        </div><!-- end pure-g -->
-    </div>
+<markdown-editor>
+    <textarea name="markdownTextarea" class="form-control"></textarea>
     <script>
-     var self = this;
-     self.postId = self.opts.postId;
-     self.post = {
-         title: 'A new blog post, click to edit this title',
-         originalContent: 'This is the post body. It supports **Markdown**.',
-         widgets: []
-     };
-     self.dirty = false;
-     self.lastContent = self.post.originalContent;
-     self.lastTitle = self.post.title;
-     self.lastWidgetCount = 0;
-     self.widgetDatas = [];
+     var self= this;
+     self.markdown = self.opts.markdown || null;
+     self.oldMarkdown = self.markdown;
+     self.widgets = self.opts.widgets ? JSON.parse(JSON.stringify(self.opts.widgets)) : [];
      self.lineWidgets = [];
      self.lineWidgetByGuid = {};
-     self.previewMode = 'mobile';
-     self.tab = 'editor';
-     self.versionId = null;
-     self.previewOrCollaborate = 'preview'
-     self.lastAutosaveAt = '';
-     self.loading = true;
-     self.optionsDirty = false;
-     self.loading = true;
+     self.editorToolbarTop = 140;
+     self.editorToolbarWidth = 500;
+     self.simplemde = null;
+     self.loaded = false;
+     var cm = null;
+     console.log('editor markdown ', self.markdown);
 
-     self.switchPreviewOrCollaborate = function(mode) {
-         self.update({previewOrCollaborate: mode});
-     };
-
-     self.showTab = function(tab) {
-         if (tab === 'versions' && self.tags.versionHistoryTab &&  self.tags.versionHistoryTab.reloadVersions) {
-             self.tags.versionHistoryTab.reloadVersions();
+     
+     /**************************/
+     /* On load                */
+     
+     this.on('mount', function(){
+         self.simplemde = new SimpleMDE({
+             toolbar: makeToolbar(), 
+             element: self.markdownTextarea
+         });
+         cm = self.simplemde.codemirror;
+         //self.simplemde.codemirror.setOption('gutters', ['commentsGutter']);
+         //self.simplemde.codemirror.setOption('lineNumbers', true);
+         self.simplemde.codemirror.on('beforeChange', beforeChange);
+         self.simplemde.codemirror.on("change", onEditorChange);
+         self.simplemde.codemirror.on('cursorActivity', cursorMoves);
+         self.calculatedFrameHeight = $(window).height() - 150;
+         setTimeout(function() {
+             self.editorToolbarTop = $('.editor-toolbar').offset().top;
+             self.editorToolbarWidth = $('.editor-toolbar').width() + 22;
+         }, 100);
+         $(window).scroll(function() {
+             if ($(window).scrollTop() > self.editorToolbarTop) {
+                 $('.editor-toolbar').css({'background-color': 'white', 'opacity': 1, 'border-bottom': '1px solid #999', 'position': 'fixed', 'z-index': 1000, 'top': '0px', 'width': self.editorToolbarWidth + 'px'});
+             } else {
+                 $('.editor-toolbar').css({'position': 'static', 'width': '100%'});
+             }
+             console.log('editor scrolling');
+         });
+         
+         if (self.markdown === null) {
+             self.simplemde.value("Loading ...");
+         } else {
+             self.update({loaded: true});             
+             setTimeout(function() {
+                 self.simplemde.value(self.markdown);
+                 loadAllLineWidgetsFromPost();
+             }, 10);
          }
-         self.update({tab: tab});
+         console.log('i am mouneted ', self.opts);
+         
+     });
+
+     /*******************/
+     /* Public methods */
+
+     self.setData = function(markdown, widgets) {
+         self.markdown = parseOutWidgetHtmlFromContent(markdown);
+         if (widgets !== undefined) {
+             self.widgets = JSON.parse(JSON.stringify(widgets));
+         }
+         console.log('setData', markdown);
+         //self.simplemde.value(content);
+         self.update();
      }
 
-     self.addComment = function(evt) {
-         evt.stopPropagation();
-         evt.preventDefault();
+     self.getData = function() {
+         updateWidgetStateFromCodeMirror();
+         return {
+             markdown: getContentWithWidgetHtml(self.markdown),
+             widgets: JSON.parse(JSON.stringify(self.widgets))
+         };
+     };
 
-         //
 
-         return false;
-     }
-     
-     
-     self.switchPreviewMode = function(mode) {
-         self.previewMode = mode;
-         console.log('new frame mode is ', mode);
-         $frame = $('.preview-iframe');
-         $column = $('#preview-bootstrap-col');
-         $frame.removeClass('fifty').removeClass('seventy-five').removeClass('tablet').removeClass('mobile').removeClass('desktop');
-         var width = $column.width();
-         console.log('column width ', width);
-         $frame.css({width: $column.width() + 'px', height: self.calculatedFrameHeight + "px"});
-         if (mode === 'mobile') {
-             $frame.addClass('mobile');
-         } else if (mode === 'tablet') {
-             $frame.addClass('tablet');             
-             if (width < 700) {
-                 $frame.css({width: width * 1.33 + 'px', height: self.calculatedFrameHeight * 1.33 + 'px'});
-                 $frame.addClass('seventy-five');
+     /**************************/
+     /* Other Event Handlers */
+
+     self.on('update', function() {
+         if (self.simplemde) {
+             if (self.markdown === null) {
+                 self.simplemde.value('Loading...');
+             } else if (self.markdown != self.oldMarkdown) {
+                 console.log('iam updated', self.markdown);
+                 self.simplemde.value(self.markdown);
+                 loadAllLineWidgetsFromPost();
+                 self.oldMarkdown = self.markdown;
+                 self.loaded = true;
              }
-         } else if (mode === 'desktop') {
-             $frame.addClass('desktop');             
-             if (width < 570) {
-                 $frame.addClass('fifty');
-                 $frame.css({width: width * 2 + 'px', height: self.calculatedFrameHeight * 2 + 'px'});
-             } else if (width < 900) {
-                 $frame.addClass('seventy-five');
-                 $frame.css({width: width * 1.33 + 'px', height: self.calculatedFrameHeight * 1.33 + 'px'});
-             }
+             
+         }
+     });
+
+    
+
+     function onEditorChange(evt, b, c) {
+         if (!self.loaded) {
+             return;
+         }
+         console.log('editor try call callback');
+         if (self.opts.onchange) {
+             self.opts.onchange.call(evt);
          }
      };
+
+     /******************************/
+     /* Adding widgets to the page */
+
+     function insertWidget() {
+         showRiotModal({
+             mountOpts: {
+                 callback: function(widgetData) {
+                     var line = addLineWidget(widgetData, true);
+                     self.widgets.push(widgetData);
+                     widgetData.line = line;                     
+                     reloadPreview();
+                 }
+             }
+         });         
+     }
 
      function loadAllLineWidgetsFromPost() {
          console.log('load all line widgets for post');
@@ -194,7 +130,7 @@
              lineWidget.clear();
          });
          self.lineWidgets = [];
-         self.post.widgets.forEach(function(widgetData) {
+         self.widgets.forEach(function(widgetData) {
              addLineWidget(widgetData, false);
          });
      };
@@ -248,12 +184,12 @@
          $node.find('.line-widget-delete').click(function() {
              cm.doc.removeLineClass(line, 'wrap', 'editor-line-with-widget');
              var newWidgets = [];
-             self.post.widgets.forEach(function(existing) {
+             self.widgets.forEach(function(existing) {
                  if (existing.guid && existing.guid !== widgetData.guid) {
                      newWidgets.push(existing);
                  }
              });
-             self.post.widgets = newWidgets;
+             self.widgets = newWidgets;
              marker.deleted = true;
              marker.clear();
              widgetData.deleted = true;
@@ -264,7 +200,7 @@
                  mountOpts: {
                      widgetData: widgetData,
                      callback: function(widgetData) {
-                         self.post.widgets.forEach(function(existing) {
+                         self.widgets.forEach(function(existing) {
                              if (existing.guid === widgetData.guid) {
                                  existing.data = widgetData.data;
                                  existing.html = widgetData.html;
@@ -282,47 +218,19 @@
          return line;
          
      }
-    
-     
-     
-     function insertWidget() {
-         //var $node = $("<button>BOOKMARK</button>");
-         //self.simplemde.codemirror.setBookmark({line: line, ch: 0}, {widget: $node.get(0)});
-         //return;
-         
-         showRiotModal({
-             mountOpts: {
-                 callback: function(widgetData) {
-                     var line = addLineWidget(widgetData, true);
-                     self.post.widgets.push(widgetData);
-                     widgetData.line = line;                     
-                     reloadPreview();
-                 }
-             }
-         });         
-         return;
-         
-     }
-     
 
-     function onEditorChange () {
-         if (self.dirty === false && !self.loading) {
-             showPreviewDirty();             
-         };
-         debouncedReload();
-
-     };
+     /****************************************/
+     /* Widget to and from HTML         */
 
      function parseOutWidgetHtmlFromContent(content) {
          return content.replace(/(\s\s\n|)<rawHtml><!\-\-widget:[\w\-]*\-\->[\s\S]*?<!\-\-end-widget:[\w\-]*\-\-><\/rawHtml>/g, '');
      }
 
-
      function getContentWithWidgetHtml() {
          var content = self.simplemde.value();
          var lines = content.split('\n');
          var widgetByLine = {};
-         self.post.widgets.forEach(function(widgetData) {
+         self.widgets.forEach(function(widgetData) {
              if (widgetByLine[widgetData.line] === undefined) {
                  widgetByLine[widgetData.line] = [];
              }
@@ -349,84 +257,21 @@
          return content;
      };
 
-     self.publishPost = function() {
-         console.log("unsaved pages, can't publish yet.");
-         if (self.dirty) {
-             return;
-         }
-         console.log('publish post ');
-         stallion.request({
-             url: '/st-publisher/posts/' + self.postId + '/publish/' + self.versionId,
-             method: 'POST',
-             success: function(post) {
-                 stallion.showSuccess("Post " + post.title + " has been published.");
-                 window.location.hash = "/posts";
-             }
-         });
-     };
 
-     self.onUrlTouched = function() {
-         self.urlTouched = true;
-         debouncedReload();
-     }
-
-     self.calculateSlug = function() {
-         return self.post.title.toLowerCase();
-     }
-
-     self.optionsChange = function() {
-         self.optionsDirty = true;
-         debouncedReload();
-         return true;
-     }
-
-
-
-     function reloadPreview(force) {
-         var postData = {};
-         postData.title = self.title.value;
-         var originalContent = self.simplemde.value();
-         if (!force && !self.optionsDirty && postData.title === self.post.title && originalContent === self.post.originalContent && self.post.widgets.length === self.lastWidgetCount) {
-             previewNotDirty();
-             console.log('nothing changed, no reload');
-             return;
-         }
-         console.log('save draft, reload the preview!');
-         self.lastWidgetCount = self.post.widgets.length;
-         syncWidgetInformationWithCodeMirror();
-         postData.originalContent = getContentWithWidgetHtml();
-         postData.widgets = self.post.widgets;
-         if (self.urlTouched) {
-             postData.slug = self.slug.value;
-         }
-         postData.metaDescription = self.metaDescription.value;
-         if (self.publishDate.value) {
-             postData.publishDate = self.publishDate.value;
-         }
-         postData.headHtml = self.headHtml.value;
-         postData.footerHtml = self.footerHtml.value;
-         stallion.request({
-             url: '/st-publisher/posts/' + self.postId + '/update-draft',
-             method: 'POST',
-             data: postData,
-             success: function(postVersion) {
-                 self.update({versionId: postVersion.id, lastAutosaveAt: 'Last auto-saved at ' + moment().format('hh:mm:ss a')});
-                 self.previewIframe.contentWindow.location.href = '/st-publisher/posts/' + self.postId + '/view-version/' + self.versionId;
-                 self.optionsDirty = false;
-                 previewNotDirty();
-             }
-         });
-     };
+          
+     /****************************************/
+     /* Widget state and consistency         */
+ 
 
      /**
       * Removes all widgets that have been deleted in the editor from the self.post object.
-      * Syncs the line numbers for each widget in self.post.widgets with the actual line number in the editor
+      * Syncs the line numbers for each widget in self.widgets with the actual line number in the editor
      */
-     function syncWidgetInformationWithCodeMirror() {
+     function updateWidgetStateFromCodeMirror() {
          var cm = self.simplemde.codemirror;
          var newWidgets = []
          var widgetByGuid = {};
-         self.post.widgets.forEach(function(widget) {
+         self.widgets.forEach(function(widget) {
              widgetByGuid[widget.guid] = widget;
          });
          cm.getAllMarks().forEach(function(mark) {
@@ -441,11 +286,9 @@
              widget.line = cm.doc.getLineNumber(mark.lines[0]);
              newWidgets.push(widget);
          });
-         self.post.widgets = newWidgets;
+         self.widgets = newWidgets;
      }
 
-
-     
      var lastLine = 0;
      function cursorMoves() {
          return;
@@ -528,7 +371,7 @@
          var newValue = lines.join('\n');
          self.forceAllowChange = true;
          
-         self.post.widgets.forEach(function(widgetData) {
+         self.widgets.forEach(function(widgetData) {
              if (widgetData.line >= index) {
                  widgetData.line++;
              }
@@ -544,138 +387,8 @@
 
      }
 
-     this.on('mount', function(){
-         self.editorToolbarTop = 140;
-         self.editorToolbarWidth = 500;
-         self.previewTop = 140;
-         self.previewWidth = 500;
-         //CodeMirror.defaults.lineNumbers = true;
-         //CodeMirror.defaults.gutters = ;
-         self.simplemde = new SimpleMDE({
-             toolbar: makeToolbar(), 
-             element: self.originalContent
-         });
-         //self.simplemde.codemirror.setOption('gutters', ['commentsGutter']);
-         //self.simplemde.codemirror.setOption('lineNumbers', true);
-         self.simplemde.codemirror.on('beforeChange', beforeChange);                  
-         self.simplemde.codemirror.on('cursorActivity', cursorMoves);
-         self.calculatedFrameHeight = $(window).height() - 150;
-         setTimeout(function() {
-             self.editorToolbarTop = $('.editor-toolbar').offset().top;
-             self.editorToolbarWidth = $('.editor-toolbar').width() + 22;
-             self.previewTop = $('#live-preview-column').offset().top;
-             self.previewWidth = $('#live-preview-column').width();
-             var viewPortHeight = $(window).height();
-             var newHeight = $(window).height() - self.previewTop - 30;
-             self.calculatedFrameHeight = newHeight;
-             $('.preview-iframe').css({'height': newHeight + 'px'});
-         }, 100);
-         $(window).scroll(function() {
-             if ($(window).scrollTop() > self.editorToolbarTop) {
-                 $('.editor-toolbar').css({'background-color': 'white', 'opacity': 1, 'border-bottom': '1px solid #999', 'position': 'fixed', 'z-index': 1000, 'top': '0px', 'width': self.editorToolbarWidth + 'px'});
-             } else {
-                 $('.editor-toolbar').css({'position': 'static', 'width': '100%'});
-             }
-             if ($(window).scrollTop() > self.previewTop) {
-                 $('#live-preview-column').css({'position': 'fixed', 'width': self.previewWidth + 'px', 'top': '0px'});
-             } else {
-                 $('#live-preview-column').css({'position': 'static', 'width': '100%'});
-             }
-             console.log('scrolling');
-         });
-         
-
-         $(self.title).change(function() {
-             reloadPreview();
-         });
-
-         $(self.title).keypress(function() {
-             onEditorChange();
-         });
-
-         
-         self.simplemde.value('Loading...');
-         
-         self.simplemde.codemirror.on("change", onEditorChange);     
-
-
-         self.loadPost();
-     });
-
-     self.onRestoreVersion = function(version) {
-         self.tab = 'editor';       
-         $('.editor-options-buttons label.btn-tab-editor').click();
-         //$('.btn-tab-editor').addClass('active');
-         self.loadPost();
-     };
-
-     self.loadPost = function() {
-         self.update({loading: true});
-         var url = '/st-publisher/posts/new-for-editing';
-         var method = 'POST';
-         if (self.postId) {
-             url = '/st-publisher/posts/' + self.postId + "/latest-draft"
-             method = 'GET';
-         }
-         stallion.request({
-             url: url,
-             method: method,
-             success: function (o) {
-                 self.post = o;
-                 self.postId = o.postId;
-                 self.versionId = o.id;
-                 self.loading = false;
-                 self.update();
-                 self.post.originalContent = parseOutWidgetHtmlFromContent(self.post.originalContent);
-                 // Clear all existing line widgets, bookmarks
-                 self.simplemde.codemirror.doc.getAllMarks().forEach(function(tm) {
-                     tm.clear();
-                 });
-                 self.simplemde.value(self.post.originalContent);
-                 self.lastWidgetCount = self.post.widgets.length;
-                 self.previewIframe.src = '/st-publisher/posts/' + self.postId + '/view-version/' + self.versionId;
-                 previewNotDirty();
-                 loadAllLineWidgetsFromPost();
-             }
-         });
-
-     };
-
-
-     // Returns a function, that, as long as it continues to be invoked, will not
-     // be triggered. The function will be called after it stops being called for
-     // N milliseconds. If `immediate` is passed, trigger the function on the
-     // leading edge, instead of the trailing.
-     function debounce(func, wait, immediate) {
-	 var timeout;
-	 return function() {
-	     var context = this, args = arguments;
-	     var later = function() {
-		 timeout = null;
-		 if (!immediate) func.apply(context, args);
-	     };
-	     var callNow = immediate && !timeout;
-	     clearTimeout(timeout);
-	     timeout = setTimeout(later, wait);
-	     if (callNow) func.apply(context, args);
-	 };
-     };
-
-     var showPreviewDirty = function() {
-         $(self.previewIframe).addClass("dirty");
-         self.update({dirty: true});
-         //$('.preview-dirty-overlay').css({'display': 'block'});
-     }
-
-     var previewNotDirty = function() {
-         $(self.previewIframe).removeClass("dirty");
-         self.update({dirty: false});
-         //$('.preview-dirty-overlay').hide();
-     };
-
-
-     var debouncedReload = debounce(reloadPreview, 1000, false);
-
+     /*****************************/
+     /* Editor Helpers            */
 
      function makeToolbar() {
          var toolbar = [
@@ -706,81 +419,14 @@
          return toolbar;
      };
 
+     
+     
+     
+     
     </script>
-</edit-post>
+</markdown-editor>
 
-<version-history>
-    <div show={loading}>
-        <h3>Loading old versions</h3>
-    </div>
-    <div show={!loading}>
-        <h3>Version history</h3>
-        <table class="table table-striped" >
-            <thead>
-                <th></th>
-                <th>Date</th>
-                <th>Author</th>
-                <th>Word Count</th>
-                <th>Diff</th>
-            </thead>
-            <tbody>
-                <tr each={item in pager.items}>
-                    <td>
-                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" href="/st-publisher/posts/{item.postId}/view-version/{item.id}" target="_blank">view</a><br>
-                        <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" onclick={restoreVersion.bind(this, item)}>restore as draft</a><br>
-                    </td>
-                    <td>{ moment(item.versionDate * 1000).fromNow() }</td>
-                    <td>{ item.versionAuthorName }</td>
-                    <td>{ item.wordCount }</td>
-                    <td>{ item.diff }</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <script>
-     var self = this;
-     self.loading = true;
-     self.loadAll = 'false';
-     self.pager = null;
-     console.log('init version history');
 
-     self.reopen = function() {
-         
-     };
-
-     self.restoreVersion = function(version) {
-         stallion.request({
-             method: 'POST',
-             url: '/st-publisher/posts/make-version-most-recent',
-             data: {
-                 postId: version.postId,
-                 versionId: version.id
-             },
-             success: function(version) {
-                 self.parent.onRestoreVersion(version);
-             }
-         });
-     };
-
-     self.reloadVersions = function() {
-         if (!self.parent.postId) {
-             return;
-         }
-         self.update({loading: true});
-         stallion.request({
-             url: '/st-publisher/posts/' + self.parent.postId + '/load-versions?loadAll=' + self.loadAll,
-             success: function(result) {
-                 self.update({pager: result.pager, loading: false});
-             }
-         });
-     }
-
-     self.on('mount', function() {
-         console.log('mounted version history');
-         self.reloadVersions();
-     });
-    </script>
-</version-history>
 
 <widget-modal>
     <div if={!widgetType} class="widget-chooser">

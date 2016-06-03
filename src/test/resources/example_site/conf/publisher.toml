@@ -1,4 +1,5 @@
 
+
 # Get an akismet account and put in the key here for automatic spam filtering -- https://akismet.com/
 #akismetKey = ""
 # Automatically close comments on posts after these number of days
@@ -10,8 +11,19 @@
 #moderatorEmails = ["someone@somwehere.com"]
 #notifyEmails = ["maker@stallion.io"]
 
+
 [[blogs]]
-rootUrl = "/blog"
-folder = "posts"
+slug = "/corporate-news"
 listingTemplate = "blog.listing.jinja"
 postTemplate = "blog.post.jinja"
+title = "Corporation news in ourt company"
+internalName = "Corporate News"
+id = 1090
+
+[[blogs]]
+title = "Acme Product Blog"
+internalName = "Product Blog"
+slug = "/product-news"
+listingTemplate = "blog.listing.jinja"
+postTemplate = "blog.post.jinja"
+id = 1091

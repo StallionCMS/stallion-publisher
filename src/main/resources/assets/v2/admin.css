@@ -178,3 +178,8 @@
     margin: 0px;
     padding: 0px;
 }
+
+
+.page-actions .btn-open {
+    width: 60px;
+}

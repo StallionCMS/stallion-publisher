@@ -19,6 +19,29 @@ package io.stallion.publisher;
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
+import java.util.List;
+import java.util.Map;
 
-public class WidgetDefinition {
+import io.stallion.restfulEndpoints.EndpointResource;
+import io.stallion.services.Log;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+
+public class ContactsEndpoints implements EndpointResource {
+
+
+    @GET
+    @Path("/contacts/list")
+    @Produces("application/json")
+    public Object getContacts(@QueryParam("page") Integer page) {
+        page = or(page, 1);
+        Map ctx =  map(val("pager", ContactController.instance().filterChain().exclude("deleted", true).sort("id", "desc").pager(page)));
+        return ctx;
+    }
+
+
 }

@@ -26,9 +26,13 @@
                return mount('view-posts', {});
            });
            makeContentRoute('/new-post', function() {
-               return mount('edit-post', {});
+               return mount('new-post', {});
            });
-           makeContentRoute('/edit-post/*', function(postId) {
+           makeContentRoute('/new-page', function() {
+               return mount('new-page', {});
+           });
+           
+           makeContentRoute('/edit-content/*', function(postId) {
                return mount('edit-post', {postId: parseInt(postId, 10)});
            });
 
@@ -37,6 +41,15 @@
                return mount('view-pages', {});
            });
 
+           makeContentRoute('/comments', function() {
+               return mount('comments-table', {});
+           });
+
+
+           makeContentRoute('/contacts', function() {
+               return mount('contacts-table', {});
+           });
+           
            makeContentRoute('/files', function() {
                console.log('/files');
                return mount('file-library', {});
@@ -46,6 +59,47 @@
                console.log('/files');
                return mount('file-uploader', {});
            });
+
+           makeContentRoute('/settings/authors', function() {
+               return mount('authors-config', {});
+           });
+
+           makeContentRoute('/settings/author/*', function(userId) {
+               return mount('user-view', {userId: parseInt(userId, 10)});
+           });
+
+           makeContentRoute('/settings/new-author', function() {
+               return mount('user-view', {userId: null});
+           });
+           
+
+           makeContentRoute('/settings/blogs', function() {
+               return mount('blog-configs', {});
+           });
+
+           makeContentRoute('/settings/extra-html', function() {
+               return mount('extra-html-config', {});
+           });
+
+
+
+           makeContentRoute('/settings/widgets', function() {
+               return mount('template-widgets-config', {});
+           });
+
+           makeContentRoute('/settings/edit-widget/*', function(name) {
+               return mount('template-widgets-edit', {name: name});
+           });
+
+           
+           makeContentRoute('/settings/sitemap', function() {
+               return mount('sitemap-config', {});
+           });
+
+           makeContentRoute('/settings/site-information', function() {
+               return mount('site-information-config', {});
+           });
+
            
            
        };
@@ -162,13 +216,19 @@
 
 //</script>
 
+<view-pages>
+    <view-posts ispages=true></view-posts>
+</view-pages>
+
 <view-posts>
-    <h3>Posts</h3>
+    <h3 if={!isPages}>Posts</h3>
+    <h3 if={isPages}>Pages</h3>    
     <h3 if={loading}>Loading &hellip;</h3>
     <h3 if={!loading && !items.length}>No posts yet</h3>
-    <table if={!loading && items.length} class="pure-table comments-table">
+    <table if={!loading && items.length} class="pure-table comments-table table table-striped">
         <thead>
             <tr>
+                <th></th>
                 <th>Last updated</th>
                 <th>Title</th>
                 <th>Status</th>
@@ -176,8 +236,10 @@
         </thead>
         <tbody>
             <tr each={post in items}>
-                <td>
-                    <a href="#/edit-post/{post.id}">Edit</a>
+                <td class="page-actions">
+                    <a class="btn btn-xs btn-default" href="#/edit-content/{post.id}">Edit</a>
+                    <a if={!post.currentlyPublished} class="btn-open btn btn-xs btn-default" target="_blank" href="/st-publisher/posts/{ post.id }/preview">Preview</a>
+                    <a if={post.currentlyPublished} class="btn-open btn btn-xs btn-default" target="_blank" href="{ post.previewUrl }">View</a>
                 </td>
                 <td>
                     {moment(post.updatedAt).fromNow()}
@@ -201,6 +263,7 @@
      self.pager = null;
      self.page = 1;
      self.withDeleted = false;
+     self.isPages = self.opts.ispages +'' === 'true';
 
      smartFormatDate = function(date) {
          var m = moment(date);
@@ -209,8 +272,14 @@
      
      
      this.fetchData = function() {
+         var url = '/st-publisher/posts'
+         if (self.isPages) {
+             url = '/st-publisher/pages'
+         }
+         url += '?page=' + self.page + '&deleted=' + self.withDeleted;
+         
          stallion.request({
-             url: '/st-publisher/posts?page=' + self.page + '&deleted=' + self.withDeleted,
+             url: url,
              success: function (o) {
                  self.pager = o.pager;
                  self.items = o.pager.items;
@@ -232,16 +301,10 @@
 </view-posts>
 
 
-<view-pages>
-    <h3>Pages</h3>
-    <script>
-     var self = this;
-    </script>
-</view-pages>
 
 <sidebar-menu>
     <ul class="nav nav-sidebar">
-        <li class="dashboard"><a href="#/"><span class="icon-map2"></span> Overview <span class="sr-only">(current)</span></a></li>
+        <!--<li class="dashboard"><a href="#/"><span class="icon-map2"></span> Overview <span class="sr-only">(current)</span></a></li>-->
         <li class="newPost posts"><a class="partial-width" href="#/posts"><span class="icon-newspaper"></span> Posts</a> <a class="new-thing-link" href="#/new-post">new post</a></li>
         <li class="pages newPage">
             <a class="partial-width" href="#/pages">
@@ -257,10 +320,8 @@
         <a onclick={toggleConfigShown} if={configMenuShown} href="javascript:;" className="show-config-link shown" onClick={this.toggleConfigShown}>Configuration 	&#9662;</a>
         <ul if={configMenuShown} className="nav nav-sidebar config-options">
             <li><a href="#/settings/authors">Authors</a></li>
-            <li><a href="#/settings/blogs">Blogs</a></li>
             <li><a href="#/settings/extra-html">Extra HTML and CSS</a></li>
-            <li className="widgets"><a href="#/settings/widgets">Template Widgets</a></li>
-            <li className="sitemap"><a href="#/settings/sitemap">Sitemap</a></li>
+            <li className="widgets"><a href="#/settings/widgets">Global Modules</a></li>
             <li><a href="#/settings/site-information">Site Information</a></li>
         </ul>
     </div>
@@ -274,3 +335,91 @@
      
     </script>
 </sidebar-menu>
+
+<new-page>
+    <h1>Creating page &hellip;</h1>
+    <script>
+     var self = this;
+     self.mixin('databind');
+
+     this.on('mount', function(){
+         stallion.request({
+             url:'/st-publisher/posts/new-for-editing',
+             method: 'POST',
+             data: {type: 'page'},
+             success: function(o) {
+                 window.location.hash = '/edit-content/' + o.postId;
+             }
+         });
+     });     
+
+    </script>
+    
+</new-page>
+   
+
+<new-post>
+    <h2 show={loading}>Loading &hellip;</h2>
+    
+    <form show={!loading} onsubmit={blogFormSubmit}>
+        <h2>Select a blog to post on:</h2>
+        <div class="radio" each={blog in blogs}>
+            <label><input type="radio" name="blogId" value={blog.id} checked={blog.id === selectedBlogId}> {blog.internalName}</label>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Create new post</button>
+        </div>
+    </form>
+    <script>
+     var self = this;
+     self.mixin('databind');
+     self.blogs = [];
+     self.loading = true;
+
+     self.blogFormSubmit = function() {
+         self.createNewPostAndRedirect();
+     }
+     
+     self.createNewPostAndRedirect = function(blogId) {
+         if (!blogId) {
+             blogId = self.getFormData().blogId;
+         }
+         localStorage.stLastSelectedBlogId = blogId;
+         stallion.request({
+             url:'/st-publisher/posts/new-for-editing',
+             method: 'POST',
+             data: {
+                 type: 'post',
+                 blogId: blogId
+             },             
+             success: function(o) {
+                 window.location.hash = '/edit-content/' + o.postId;
+             }
+         });
+     };
+
+     this.on('mount', function(){
+         stallion.request({
+             url: '/st-publisher/list-blogs',
+             method: 'GET',
+             success: function(o) {
+                 if (o.blogs && o.blogs.length === 1) {
+                     self.createNewPostAndRedirect(self.blogs[0].id);
+                 } else if (!o.blogs) {
+                     self.createNewPostAndRedirect(null);
+                 } else {
+                     var selectedBlogId = localStorage.stLastSelectedBlogId;
+                     if (selectedBlogId) {
+                         selectedBlogId = parseInt(selectedBlogId, 10);
+                     }
+                     if (!selectedBlogId) {
+                         selectedBlogId = o.blogs[0].id;
+                     }
+                     self.update({loading: false, blogs: o.blogs, selectedBlogId: selectedBlogId});
+                 }
+             }
+         });
+     });     
+
+    </script>
+</new-post>

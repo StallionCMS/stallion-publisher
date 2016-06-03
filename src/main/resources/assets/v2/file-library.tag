@@ -27,19 +27,20 @@
         <div class="form-group">
             <a href="#/file-upload" class="btn btn-primary btn-xl">Upload new file</a>
         </div>
-        <table if={!loading && items.length} class="pure-table comments-table">
+        <table if={!loading && items.length} class="pure-table table table-striped">
             <thead>
                 <tr>
                     <th></th>                    
                     <th>Name</th>
                     <th></th>                    
-                    <th>Uploaded</th>                    
+                    <th>Uploaded</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr each={item in items}>
                     <td>
-                        <a href="{item.fullUrl}" target="_blank">open</a>
+                        <a class="btn btn-xs btn-default" href="{item.fullUrl}" target="_blank">open</a>
                     </td>
                     <td>
                         {item.name}
@@ -49,6 +50,9 @@
                     </td>
                     <td>
                         {moment(item.uploadedAt * 1000).fromNow()}
+                    </td>
+                    <td style="height: 70px;">
+                        <img if={item.type==="image"} src="{item.fullUrl}" style="max-height: 50px; max-width:50px;">
                     </td>
                 </tr>
             </tbody>

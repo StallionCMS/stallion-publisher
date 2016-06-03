@@ -19,10 +19,15 @@ package io.stallion.publisher;
 import io.stallion.plugins.BasePluginSettings;
 import io.stallion.settings.SettingMeta;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class PublisherSettings extends BasePluginSettings {
     @SettingMeta(valBoolean = false, help="If true, will display a gravtar image next to users images.")
     private boolean commentsUseGravatar = false;
+    @SettingMeta(cls=ArrayList.class)
+    public List<BlogConfig> blogs;
 
     public static PublisherSettings getInstance() {
         return getInstance(PublisherSettings.class, "publisher");
@@ -38,6 +43,15 @@ public class PublisherSettings extends BasePluginSettings {
 
     public PublisherSettings setCommentsUseGravatar(boolean commentsUseGravatar) {
         this.commentsUseGravatar = commentsUseGravatar;
+        return this;
+    }
+
+    public List<BlogConfig> getBlogs() {
+        return blogs;
+    }
+
+    public PublisherSettings setBlogs(List<BlogConfig> blogs) {
+        this.blogs = blogs;
         return this;
     }
 }

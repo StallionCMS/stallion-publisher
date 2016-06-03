@@ -20,6 +20,8 @@ import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.StandardModelController;
 
+import static io.stallion.utils.Literals.empty;
+
 
 public class BlogConfigController extends StandardModelController<BlogConfig> {
     public static BlogConfigController instance() {
@@ -32,5 +34,19 @@ public class BlogConfigController extends StandardModelController<BlogConfig> {
                 .setModelClass(BlogConfig.class)
                 .setControllerClass(BlogConfigController.class);
         DataAccessRegistry.instance().register(registration);
+        for (BlogConfig config: PublisherSettings.getInstance().getBlogs()) {
+            BlogConfig existing = null;
+            if (!empty(config.getId())) {
+                existing = instance().forId(config.getId());
+            } else {
+                existing = instance().forUniqueKey("slug", config.getSlug());
+            }
+            if (existing != null) {
+                continue;
+            }
+            instance().save(config);
+        }
     }
+
+
 }

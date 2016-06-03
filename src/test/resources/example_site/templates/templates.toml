@@ -1,0 +1,31 @@
+
+[[globalModules]]
+name = "sidebar_links"
+label = "Sidebar Links"
+rawContent = """
+[Yahoo!](https://www.yahoo.com)
+[Google](http://www.google.com)
+"""
+
+[[globalModules]]
+name = "footer"
+label = "Footer"
+rawContent = """
+Copyright 2016 Big Company Inc.
+"""
+
+
+[[pageTemplates]]
+template = "page.jinja"
+thumbnail = "page.png"
+
+[[pageTemplates]]
+template = "landing-page.jinja"
+thumbnail = "landing-page.png"
+
+
+
+[[pageTemplates]]
+template = "home.jinja"
+special = true
+

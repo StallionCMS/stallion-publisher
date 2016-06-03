@@ -17,10 +17,15 @@
 package io.stallion.publisher;
 
 import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.StandardModelController;
 
 
-public class WidgetSettingsController {
-    public static WidgetSettingsController instance() {
-        return (WidgetSettingsController) DataAccessRegistry.instance().get("widgetSettings");
+public class SiteSettingsController extends StandardModelController<SiteSettingRecord> {
+    public static SiteSettingsController instance() {
+        return (SiteSettingsController) DataAccessRegistry.instance().get("site_settings");
+    }
+
+    public static void register() {
+        DataAccessRegistry.instance().registerDbModel(SiteSettingRecord.class, SiteSettingsController.class, true);
     }
 }

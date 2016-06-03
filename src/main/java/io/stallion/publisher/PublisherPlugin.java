@@ -22,6 +22,8 @@ import io.stallion.assets.DefinedBundle;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.restfulEndpoints.*;
 import io.stallion.services.Log;
+import io.stallion.templating.JinjaTemplating;
+import io.stallion.templating.TemplateRenderer;
 
 import java.util.List;
 
@@ -36,6 +38,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
 
     @Override
     public void boot() throws Exception {
+        TemplateConfig.load();
         BlogConfigController.register();
         BlogPostController.register();
         BlogPostVersionController.register();
@@ -44,11 +47,20 @@ public class PublisherPlugin extends StallionJavaPlugin {
         AuthorProfileController.register();
         UploadedFileController.register();
         FormSubmissionController.register();
+        SiteSettingsController.register();
         PageController.register();
+        GlobalModuleController.register();
+        GlobalModuleVersionController.register();
+
 
 
         ResourceToEndpoints converter = new ResourceToEndpoints("/st-publisher");
-        List<AdminEndpoints> resources = list(new AdminEndpoints());
+        List<EndpointResource> resources = list(
+                new AdminEndpoints(),
+                new CommentsEndpoints(),
+                new ContactsEndpoints(),
+                new GlobalModuleEndpoints()
+        );
         for (EndpointResource resource: resources) {
             Log.finer("Register resource {0}", resource.getClass().getName());
             EndpointsRegistry.instance().addEndpoints(converter.convert(resource).toArray(new RestEndpointBase[]{}));
@@ -63,8 +75,18 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/stallion.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/moment.min.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.js"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/common.tag").setProcessor("riot"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin-riot.tag").setProcessor("riot"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/editor.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/markdown-editor.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/page-editor.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/comments-admin.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/contacts-admin.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/authors-config.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/blog-configs.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/extra-html-config.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/template-widgets-config.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/sitemap-config.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/site-information-config.tag").setProcessor("riot"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/file-library.tag").setProcessor("riot")
                         )
         );
@@ -125,5 +147,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin.css")
                 )
         );
+
+        TemplateRenderer.instance().getJinjaTemplating().registerTag(new GlobalModuleTag());
     }
 }

@@ -16,11 +16,43 @@
 
 package io.stallion.publisher;
 
-import io.stallion.dataAccess.MappedModel;
-
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
+import java.util.List;
+import java.util.Map;
 
-public class WidgetSettings extends MappedModel {
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.UniqueKey;
+import io.stallion.services.Log;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name="site_settings")
+public class SiteSettingRecord extends ModelBase {
+
+    private String name = "";
+    private String value = "";
+
+    @Column
+    @UniqueKey
+    public String getName() {
+        return name;
+    }
+
+    public SiteSettingRecord setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    @Column(columnDefinition = "longtext")
+    public String getValue() {
+        return value;
+    }
+
+    public SiteSettingRecord setValue(String value) {
+        this.value = value;
+        return this;
+    }
 }

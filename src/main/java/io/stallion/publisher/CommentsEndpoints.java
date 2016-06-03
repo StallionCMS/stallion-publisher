@@ -16,23 +16,32 @@
 
 package io.stallion.publisher;
 
-public enum WidgetTypes {
-    LINKS(1),
-    MENU(2),
-    HTML(3),
-    MARKDOWN(4),
-    IMAGE_GRID(5)
-    ;
+import static io.stallion.utils.Literals.*;
+import static io.stallion.Context.*;
+
+import java.util.List;
+import java.util.Map;
+
+import io.stallion.restfulEndpoints.EndpointResource;
+import io.stallion.services.Log;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 
-    private int value;
+public class CommentsEndpoints implements EndpointResource {
 
-    WidgetTypes(int i) {
-        value = i;
+
+    @GET
+    @Path("/comments/list")
+    @Produces("application/json")
+    public Object getComments(@QueryParam("page") Integer page) {
+        page = or(page, 1);
+        Map ctx =  map(val("pager", CommentController.instance().filterChain().exclude("deleted", true).sort("id", "desc").pager(page)));
+        return ctx;
     }
 
-    public int getValue() {
-        return value;
-    }
 
 }

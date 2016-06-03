@@ -17,6 +17,7 @@
 package io.stallion.publisher;
 
 import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.UniqueKey;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -27,8 +28,10 @@ public class BlogConfig extends ModelBase {
     private String internalName;
     private String title;
     private String metaDescription;
-    private String template;
+    private String listingTemplate;
+    private String postTemplate;
     private String slug;
+    private boolean editable = false;
 
     @Column
     public String getInternalName() {
@@ -50,7 +53,7 @@ public class BlogConfig extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(columnDefinition = "longtext")
     public String getMetaDescription() {
         return metaDescription;
     }
@@ -61,22 +64,43 @@ public class BlogConfig extends ModelBase {
     }
 
     @Column
-    public String getTemplate() {
-        return template;
+    public String getListingTemplate() {
+        return listingTemplate;
     }
 
-    public BlogConfig setTemplate(String template) {
-        this.template = template;
+    public BlogConfig setListingTemplate(String listingTemplate) {
+        this.listingTemplate = listingTemplate;
         return this;
     }
 
     @Column
+    public String getPostTemplate() {
+        return postTemplate;
+    }
+
+    public BlogConfig setPostTemplate(String postTemplate) {
+        this.postTemplate = postTemplate;
+        return this;
+    }
+
+    @Column
+    @UniqueKey
     public String getSlug() {
         return slug;
     }
 
     public BlogConfig setSlug(String slug) {
         this.slug = slug;
+        return this;
+    }
+
+    @Column(nullable = false)
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public BlogConfig setEditable(boolean editable) {
+        this.editable = editable;
         return this;
     }
 }

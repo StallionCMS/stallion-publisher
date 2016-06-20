@@ -1,8 +1,8 @@
 {% extends "base.jinja" %}
 {% block main_body %}
 <div class="pure-g">
-  <div class="pure-1-2">
-    <div class="posts">
+  <div class="pure-u-1-2">
+    <div class="posts" style="padding-right: 20px;" >
       <section class="post">
         <header class="post-header">
           <h2 class="post-title">{{ page.title }}</h2>
@@ -13,10 +13,17 @@
       </section>
     </div><!--end posts-->
   </div>
-  <div class="pure-1-2">
-    <form>
+  <div class="pure-u-1-2">
+    <div class="posts" style="padding-right: 20px;" >
+      <section class="post">
+        <header class="post-header">
+          <h2 class="post-title">{% editable_text form_header %}Download our Whitepaper{% end_editable %}</h2>
+        </header>
+        <div>
+          {% editable_image form_image %}{% end_editable %}
+        </div>
+    {% contact_form %}      
       <fieldset>
-        <legend>Contact us</legend>
         <div class="st-form-success" style="display:none;">
           Thank you for reaching out, we will get back to you promptly!
         </div>
@@ -28,10 +35,12 @@
         <label>Your message</label>
         <textarea class="pure-input-1" name="message" required="required"></textarea>
         <p>
-          <button type="submit" class="pure-button pure-button-primary">Get in touch</button>
+          <button type="submit" class="pure-button pure-button-primary">{% editable_text form_button_text %}Download{% end_editable %}</button>
         </p>
       </fieldset>
-    </form>
+      {% endform %}
+      </section>
+      </div>
   </div>
 </div>
 {% endblock %}

@@ -12,13 +12,17 @@
      self.simplemde = null;
      self.loaded = false;
      var cm = null;
-     console.log('editor markdown ', self.markdown);
 
+     var toolbarSelector = '#' + self.opts.id + ' .editor-toolbar';
      
      /**************************/
      /* On load                */
      
      this.on('mount', function(){
+         if (self.markdown) {
+             self.markdown = parseOutWidgetHtmlFromContent(self.markdown);
+         }
+         
          self.simplemde = new SimpleMDE({
              toolbar: makeToolbar(), 
              element: self.markdownTextarea
@@ -31,17 +35,20 @@
          self.simplemde.codemirror.on('cursorActivity', cursorMoves);
          self.calculatedFrameHeight = $(window).height() - 150;
          setTimeout(function() {
-             self.editorToolbarTop = $('.editor-toolbar').offset().top;
-             self.editorToolbarWidth = $('.editor-toolbar').width() + 22;
+             self.editorToolbarTop = $(toolbarSelector).offset().top;
+             self.editorToolbarWidth = $(toolbarSelector).width() + 22;
          }, 100);
-         $(window).scroll(function() {
-             if ($(window).scrollTop() > self.editorToolbarTop) {
-                 $('.editor-toolbar').css({'background-color': 'white', 'opacity': 1, 'border-bottom': '1px solid #999', 'position': 'fixed', 'z-index': 1000, 'top': '0px', 'width': self.editorToolbarWidth + 'px'});
+         function onScrollOrFocus () {
+             if ($(window).scrollTop() > self.editorToolbarTop && cm.hasFocus()) {
+                 $(toolbarSelector).css({'background-color': 'white', 'opacity': 1, 'border-bottom': '1px solid #999', 'position': 'fixed', 'z-index': 1000, 'top': '0px', 'width': self.editorToolbarWidth + 'px'});
              } else {
-                 $('.editor-toolbar').css({'position': 'static', 'width': '100%'});
+                 $(toolbarSelector).css({'position': 'static', 'width': '100%'});
              }
-             console.log('editor scrolling');
-         });
+
+         }
+         cm.on('blur', onScrollOrFocus);
+         cm.on('focus', onScrollOrFocus);         
+         $(window).scroll(onScrollOrFocus);
          
          if (self.markdown === null) {
              self.simplemde.value("Loading ...");
@@ -52,7 +59,6 @@
                  loadAllLineWidgetsFromPost();
              }, 10);
          }
-         console.log('i am mouneted ', self.opts);
          
      });
 
@@ -64,7 +70,6 @@
          if (widgets !== undefined) {
              self.widgets = JSON.parse(JSON.stringify(widgets));
          }
-         console.log('setData', markdown);
          //self.simplemde.value(content);
          self.update();
      }
@@ -86,7 +91,6 @@
              if (self.markdown === null) {
                  self.simplemde.value('Loading...');
              } else if (self.markdown != self.oldMarkdown) {
-                 console.log('iam updated', self.markdown);
                  self.simplemde.value(self.markdown);
                  loadAllLineWidgetsFromPost();
                  self.oldMarkdown = self.markdown;
@@ -102,12 +106,17 @@
          if (!self.loaded) {
              return;
          }
-         console.log('editor try call callback');
          if (self.opts.onchange) {
              self.opts.onchange.call(evt);
          }
      };
 
+     function triggerChange() {
+         if (self.opts.onchange) {
+             self.opts.onchange.call();
+         }
+     }
+     
      /******************************/
      /* Adding widgets to the page */
 
@@ -117,15 +126,14 @@
                  callback: function(widgetData) {
                      var line = addLineWidget(widgetData, true);
                      self.widgets.push(widgetData);
-                     widgetData.line = line;                     
-                     reloadPreview();
+                     widgetData.line = line;
+                     triggerChange();
                  }
              }
          });         
      }
 
      function loadAllLineWidgetsFromPost() {
-         console.log('load all line widgets for post');
          self.lineWidgets.forEach(function(lineWidget) {
              lineWidget.clear();
          });
@@ -146,7 +154,6 @@
              line = cursor.line;
          }
          var thisLine = cm.getRange({line: line, ch:0}, {line: line+1, ch: 0}).trim('\n');
-         console.log('line is ', thisLine);
          if (thisLine.length > 0) {
              if (cursor.ch > 0) {
                  cm.replaceRange("\n", {line:line, ch:999999});
@@ -193,7 +200,7 @@
              marker.deleted = true;
              marker.clear();
              widgetData.deleted = true;
-             reloadPreview();
+             triggerChange();
          });
          $node.find('.line-widget-edit').click(function() {
              showRiotModal({
@@ -210,7 +217,7 @@
                              }
                          });
                          $node.find('.widget-preview').html(widgetData.previewHtml);
-                         reloadPreview(true);
+                         triggerChange();
                      }
                  }
              });         
@@ -276,7 +283,6 @@
          });
          cm.getAllMarks().forEach(function(mark) {
              var widget = widgetByGuid[mark.widgetGuid];
-             console.log('mark widget guid ', mark.widgetGuid, ' widget data', widget, 'mark ', mark);
              if (!widget) {
                  return;
              }
@@ -304,12 +310,10 @@
              }
              if (cursor.line > lastLine) {
                  //cm.doc.setCursor({line: cursor.line + 1, ch: cursor.ch});
-                 console.log('move cursor down');                 
                  cm.execCommand('goLineDown');
                  lastLine = cursor.line + 1;
              } else {
                  var newLine = cursor.line -1;
-                 console.log('newLien ', newLine);
                  cm.execCommand('goLineUp');
                  lastLine = cursor.line - 1;
              }
@@ -324,7 +328,6 @@
              self.forceAllowChange = false;
              return;
          }
-         console.log('beforeChange');
          //if (change.from.line === change.to.line) {
          //    return;
          //}
@@ -333,7 +336,6 @@
          if (marks && marks.length > 0) {
              //debugger;
          }
-         //console.log('beforeChange, marks ', marks, change.from.line, change.to.line);
          if (marks && marks.length > 0) {
              change.cancel();
              if (change.origin === '+input' && change.text.length == 2 && change.text[0] === '' && change.text[1] === '') {
@@ -342,10 +344,8 @@
                      //cm.replaceRange("\n", {line:change.to.line, ch:0});
                      //cm.doc.setValue("\n" + cm.doc.getValue());
                      //loadAllLineWidgetsFromPost();
-                     console.log('insert line at 0');
                      insertLine(cm, 0);
                  } else {
-                     console.log('add line after ', change.to.line);
                      insertLine(cm, change.to.line + 1);
                      //self.forceAllowChange = true;
                      //cm.doc.setValue(cm.doc.getValue() + "\n");
@@ -442,6 +442,11 @@
                     Image
                 </a>
             </div>
+            <div class="widget-option">
+                <a href="javascript:;" onclick={selectWidget.bind(this, 'image-collection')}>
+                    Image Collection/Gallery
+                </a>
+            </div>
         </div>
         <div class="modal-footer">
             <a href="javascript:;" onclick={close}>Cancel</a>
@@ -449,30 +454,29 @@
     </div>
     <div if={widgetType}>
         <div class="modal-header"><h4>Configure widget</h4></div>
-        <div class="modal-body">
-            <embed-widget-configure name="embedWidget" if={widgetType == 'embed'}></embed-widget-configure>
-            <image-widget-configure name="imageWidget" if={widgetType == 'image'}></embed-widget-configure>
+        <div class="modal-body" id="widgetConfigureTarget"">
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" style="float: left;" onclick={saveWidget}>Update</button>
             <a href="javascript:;" onclick={close}>Cancel</a>
         </div>
+    </div>
     <script>
      var self = this;
      self.widgetType = '';
+     self.activeTag = null;
 
-     self.selectWidget = function(widgetType) {
+     self.selectWidget = function(widgetType, widgetData) {
          var widgetTag = self.tags[widgetType + 'Widget'];
-         var widgetData = self.widgetData;
          if (!widgetData || !Object.keys(widgetData).length) {
              widgetData = {data: {}, type: widgetType, label: '', html: ''};
          }
-         widgetTag.widgetData = widgetData;
          self.update({widgetType: widgetType});
+         self.activeTag = appendRiotTag(self.widgetConfigureTarget, widgetType + '-widget-configure', {widgetData: widgetData});
      };
 
      self.saveWidget = function() {
-         var widgetTag = self.tags[self.widgetType + 'Widget'];
+         var widgetTag = self.activeTag;
          var guid = '';
          if (self.widgetData && self.widgetData.guid) {
              guid = self.widgetData.guid;
@@ -488,7 +492,7 @@
              self.opts.callback(widgetData);
              self.close();
          } else {
-             console.log('no saveChanges function on widget ', widgetTag);
+
          }
      };
      
@@ -497,36 +501,214 @@
          self.opts.parentElement.modal('hide');
      };
 
+     self.on('mount', function() {
+         if (self.widgetData && self.widgetData.length > 0 && self.widgetData.type) {
+             self.selectWidget(self.widgetData.type, self.widgetData);
+         }
+     });
+
      if (self.opts.widgetData) {
          self.widgetData = JSON.parse(JSON.stringify(self.opts.widgetData));
-         self.selectWidget(self.widgetData.type);
      };
      
     </script>
 </widget-modal>
 
-<embed-widget-configure>
-    <div class="form-group">
-        <label>The HTML Embed code</label>
-        <textarea class="form-control" autofocus="autofocus" name="embedCode" value={widgetData.data.embedCode}></textarea>
+<image-widget-modal>
+    <div>
+        <div class="modal-header"><h4>Choose Image</h4></div>
+        <div class="modal-body">
+            <image-widget-configure name="imageWidget"></image-widget-configure>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" style="float: left;" onclick={saveWidget}>Update</button>
+            <a href="javascript:;" onclick={close}>Cancel</a>
+        </div>
     </div>
     <script>
      var self = this;
+     
+     self.close = function() {
+         self.unmount();
+         self.opts.parentElement.modal('hide');
+     };
+     
+     self.saveWidget = function() {
+         var widgetTag = self.tags['imageWidget'];
+         var widgetData = widgetTag.buildData();
+         self.opts.callback(widgetData);
+         self.close();
+     };
+
+     
+    </script>
+</image-widget-modal>
+
+<embed-widget-configure>
+    <div>
+        <ul class="nav nav-tabs" role="tablist">        
+            <li role="presentation" class="{'active': tab==='embedLink'}"><a class="" href="javascript:;" onclick={showTab.bind(this, 'embedLink')}>Embed from a URL</a></li>
+            <li role="presentation" class="{'active': tab==='embedHtml'}"><a href="javascript:;"  onclick={showTab.bind(this, 'embedHtml')}>Embed HTML</a></li>
+        </ul>
+    </div>
+    <div if={tab==='embedLink'}>
+        <div class="form-group">
+            <label>Paste in a link to the content you want to embed. Can be a Youtube video, Twitter message, Facebook post, or anything else, and we'll try to guess the embed code. If you have an exact embed code, click "Embed HTML" and paste it in there.</label>
+            <input  class="form-control" autofocus="autofocus" name="embedLink" value={widgetData.data.embedLink}>
+            <div class="form-group">
+                <button onclick={doEmbed} class="btn btn-primary">Embed</button>
+            </div>
+        </div>
+    </div>
+    <div if={tab==='embedHtml'}>
+        <div class="form-group">
+            <label>The HTML Embed code</label>
+            <textarea class="form-control" autofocus="autofocus" name="embedCode" value={widgetData.data.embedCode}></textarea>
+        </div>
+    </div>
+    <script>
+     var self = this;
+     self.tab = 'embedLink';
+     if (self.widgetData && self.widgetData.html) {
+         self.tab = 'embedHtml';
+     }
+     self.code = '';
+     self.link = ''
+     //self.widgetData = self.opts.widgetData;
+
+     self.showTab = function(tab) {
+         self.update({tab: tab});
+     }
+
+     self.doEmbed = function() {
+         var $ele = $('<div></div>');
+         self.link = self.embedLink.value;
+         $ele.oembed(self.embedLink.value, {
+             afterEmbed: function(o) {
+                 if (typeof(o.code) === 'string') {
+                     self.code = o.code;
+                 } else {
+                     self.code = o.code[0].outerHTML;
+                 }
+                 //debugger;
+                 console.log('afterEmbed', self.code);
+                 //debugger;
+                 self.parent.saveWidget();
+             }
+         });
+     };
+     
      self.on('mount', function() {
 
      });
      self.buildData = function() {
+         var code = self.code || self.embedCode.value;
+         var previewHtml = '<span style="font-size: 11px; margin-left: 5px;display:inline-block;">' + (self.link || code.substr(0, 120).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')) + '...</span>';
          var widgetData = {
              label: 'Embed Code',
              data: {
-                 embedCode: self.embedCode.value
+                 embedCode: code,
+                 embedLink: self.link
              },
-             html: self.embedCode.value
+             previewHtml: previewHtml,
+             html: code
          };
+         console.log('widgetData ', widgetData);
          return widgetData;
      };
     </script>
 </embed-widget-configure>
+
+//<script>
+   function appendRiotTag(target, tagName, opts) {
+       var $ele = $('<' + tagName + '></' + tagName + '>');
+       $(target).append($ele);
+       var id = 'widget-' + generateUUID();
+       $ele.attr('id', id);
+       return riot.mount('#' + id, opts)[0];
+   }
+//</script>
+
+<image-collection-widget-configure>
+    <div if={showAddImage}>
+        <image-widget-configure></image-widget-configure>
+    </div>
+    <div show={!showAddImage}>
+        <h1>Image Collection</h1>
+        <div each={img in images}>
+            
+        </div>
+        <button onclick={update.bind(this, {showAddImage: true})} class="btn btn-primary">Add image</button>
+        <div show={!showAdvanced}>
+            <a href="javascript:;" onclick={update.bind(this, {showAdvanced: true})}>Show advanced</a>
+        </div>
+        <div show={showAdvanced} class="advanced-options">
+            <div>
+                <a href="javascript:;" onclick={update.bind(this, {showAdvanced: false})}>Hide advanced options.</a>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" name="useDefaultStylingInput" checked={useDefaultStylingInput}> Use default image collection style</label>
+            </div>
+            <div class="form-group">
+                <label>Custom CSS class</label>
+                <input type="input" class="form-control" name="customCssClassInput" value={customCssClass} />
+            </div>
+            
+        </div>
+    </div>
+    <script>
+     self.images = [];
+     self.useDefaultStyling = true;
+     self.customCssClass = '';
+     self.showAdvanced = false;
+
+     if (self.widgetData && self.widgetData.data && self.widgetData.data) {
+         self.images = self.widgetData.data.images || [];
+         self.useDefaultStyling = self.widgetData.data.useDefaultStyling !== false;
+         self.customCssClass = self.widgetData.data.customCssClass;
+         if (self.customCssClass || !self.useDefaultStyling) {
+             self.showAdvanced = true;
+         }
+     }
+
+     function buildHtml() {
+         var $ul = $('<ul class="st-image-collection"></ul>');
+         if (self.useDefaultStyling) {
+             $ul.addClass('st-image-collection-default');
+         }
+         if (self.customCssClass) {
+             $ul.addClass(self.customCssClass);
+         }
+         self.images.forEach(function(img) {
+             $img = $ul.append('<li></li>').append('<img>');
+             $img.src = img.src;
+         });
+         return $ul.get(0).outerHTML;
+     }
+
+     self.buildData = function() {
+         self.customCssClass = self.customCssClassInput.value;
+         self.useDefaultStyling = $(self.useDefaultStylingInput).is(':checked');
+             
+         var data = {
+             images: self.images,
+             useDefaultStyling: self.useDefaultStyling,
+             customCssClass: self.customCssClass
+         }
+         var html = buildHtml();
+         var widgetData = {
+             isBlock: true,
+             label: 'Image Collection',
+             previewHtml: '<img src="' + newData.src + '">',
+             data: newData,
+             html: html
+         };
+         return widgetData;
+     };
+
+     
+    </script>
+</image-collection-widget-configure>
 
 <image-widget-configure>
     <div if={tab!=='formatting'}>
@@ -664,7 +846,6 @@
      self.opts.formData = data;
 
      self.urlChange = function() {
-         console.log('url change ');
          var url = self.src.value;
          if (url.indexOf('://') > -1) {
              self.selectImageCallback(url);
@@ -773,6 +954,10 @@
          return $wrap.get(0).outerHTML;
      };
 
+     if (self.markdown) {
+         self.markdown = parseOutWidgetHtmlFromContent(markdown);
+     }
+
      
     </script>
 </image-widget-configure>
@@ -800,7 +985,6 @@
              acceptedFiles: 'image/*,.jpg,.png,.svg,.gif',
              init: function() {
                  this.on("success", function(file, response) { 
-                     console.log(file, response);
                      //var o = JSON.parse(response);
                      self.parent.selectImageCallback(response.fullUrl);
                      this.removeFile(file);

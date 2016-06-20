@@ -1,0 +1,42 @@
+<div class="st-comments st-comments-for-{{ post.id }}">
+  {% if threadComments.size() > 0 %}
+    <h3 class="comments-header above-comments">Comments</h3>
+  {% endif %}
+  {% for comment in commentsContext.comments %}
+      <div riot-tag="comment" class="st-comment-{{ comment.id }} st-comment-wrapper" data-comment-id="{{ comment.id }}">
+        <hr>
+      <div class="st-comment-byline">
+        {% if comment.authorWebSite %}
+        <a href="{{ comment.authorWebSite }}" rel="nofollow">{{ comment.authorDisplayName }}</a>
+        {% else %}
+        {{ comment.authorDisplayName }}
+        {% endif %}
+        commented at {{ utils.formatLocalDate(comment.createdTicks, "MMMM d, YYYY h:mm a") }}</div>
+      <div class="st-comment-body">{{ comment.bodyHtml }}</div>
+    </div><!--end comment-->
+  {% endfor %}
+  <div class="new-comment-wrapper">
+    <div id="new-comments-riot-target" riot-tag="comments-dynamic"></div><!--end new-comments-->
+  </div>
+  <div class="st-comments-form-wrapper" riot-tag="comment-form">
+    
+  </div>
+</div>
+
+<script type="text/javascript">
+
+(function() {
+  
+  window.stFlatCommentsContext = {{ utils.htmlSafeJson(commentsContext) }};
+  stFlatCommentsContext.commentById = {};
+  stFlatCommentsContext.riotTagBycommentId = {};
+  stFlatCommentsContext.newComments = [];
+  stFlatCommentsContext.comments.forEach(function(comment) {
+    stFlatCommentsContext.commentById[comment.id] = comment;
+  });
+
+}());
+</script>
+
+
+

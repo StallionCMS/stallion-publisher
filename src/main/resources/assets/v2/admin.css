@@ -22,6 +22,17 @@
     border: 1px solid #999;
 }
 
+.editable-page-element-wrapper .CodeMirror, .editable-page-element-wrapper .CodeMirror-scroll {
+    min-height: 30px;
+}
+
+.editable-page-element-wrapper {
+    margin-bottom: 2em;
+}
+.editable-page-element-wrapper .editor-statusbar {
+    display: none;
+}
+
 .CodeMirror-widget {
 
     padding: 0px;
@@ -62,6 +73,18 @@
     -webkit-transform-origin: 0 0;
 
 }
+
+.frame-25 {
+    -ms-zoom: 0.25;
+    -moz-transform: scale(0.25);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.25);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.25);
+    -webkit-transform-origin: 0 0;
+
+}
+
 
 .preview-iframe.dirty {
     opacity: .2;
@@ -182,4 +205,20 @@
 
 .page-actions .btn-open {
     width: 60px;
+}
+
+.template-choice {
+    display: inline-block;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.template-choice:hover {
+    background-color: #F8F8F8;
+}
+
+.template-choice img {
+    min-width: 100px;
+    max-width: 190px;
+    max-height: 150px;
+    min-height: 120px;
 }

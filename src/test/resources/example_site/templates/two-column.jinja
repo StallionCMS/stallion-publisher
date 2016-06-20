@@ -1,0 +1,32 @@
+{% extends "base.jinja" %}
+{% block main_body %}
+<div class="pure-g">
+  <div class="pure-u-md-1 pure-u-1">
+    <section class="post">
+      <header class="post-header">
+        <h2 class="post-title">{{ page.title }}</h2>
+      </header>
+    </section>
+  </div>
+</div>
+<div class="pure-g">
+  <div class="pure-u-md-1-2 pure-u-1">
+    <div class="posts">
+      <section class="post">
+        <div class="post-description">
+          {{ page.content }}
+        </div>
+      </section>
+    </div><!--end posts-->
+  </div>
+  <div class="pure-u-md-1-2 pure-u-1">
+    <div class="posts">
+      <section class="post">
+        <div class="post-description">
+          {% editable_markdown second_column %}{% end_editable %}
+        </div>
+      </section>
+    </div><!--end posts-->
+  </div>
+</div>
+{% endblock %}

@@ -168,7 +168,7 @@
            riotOpts.parentElement = $ele;
            $ele.unbind('show.bs.modal');
            $ele.unbind('hidden.bs.modal');
-           riot.mount('widget-modal.modal-riot-content', riotOpts);
+           riot.mount(riotTag + '.modal-riot-content', riotOpts);
            $ele.on('hidden.bs.modal', function (e) {
                riotTagObject.unmount();
            })
@@ -201,7 +201,7 @@
        $ele.modal({show: false});
 
        $ele.on('show.bs.modal', function (e) {
-           riot.mount('widget-modal.modal-riot-content', riotOpts);
+           riot.mount(riotTag + '.modal-riot-content', riotOpts);
        });
        //$ele.on('hidden.bs.modal', function (e) {
        //    riotTagObject.unmount();
@@ -336,26 +336,6 @@
     </script>
 </sidebar-menu>
 
-<new-page>
-    <h1>Creating page &hellip;</h1>
-    <script>
-     var self = this;
-     self.mixin('databind');
-
-     this.on('mount', function(){
-         stallion.request({
-             url:'/st-publisher/posts/new-for-editing',
-             method: 'POST',
-             data: {type: 'page'},
-             success: function(o) {
-                 window.location.hash = '/edit-content/' + o.postId;
-             }
-         });
-     });     
-
-    </script>
-    
-</new-page>
    
 
 <new-post>
@@ -423,3 +403,93 @@
 
     </script>
 </new-post>
+
+
+
+<new-page>
+    <h2 show={loading}>Loading &hellip;</h2>
+    <div show={!loading}>
+        <div class="recent-pages">
+            <h5>Clone a recent page</h5>
+            <div>
+                <div class="recent-page-choice" each={page in recentPages} style="overflow: hidden; width: 250px; height: 300px; display: inline-block; margin-right: 20px;">
+                    <div>{ page.title }</div>
+                    
+                    <div style="position: absolute; z-index: 100; height: 250px; width: 300px; opacity: .2; padding-top: 100px; padding-left: 40px; background-color: white;"><button class="btn btn-primary">Clone</button></div>
+                    <iframe src="/st-publisher/posts/{page.id}/view-latest-version" class="frame-25" style="width: 1000px; height: 800px;"></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="page-templates">
+            <h5>Start from a template</h5>
+            <div>
+                <div onclick={onChooseTemplate.bind(this, template.template)} class="template-choice" each={template in templates}>
+                    <img src="{ template.thumbnail }">
+                    <br>
+                    { template.template }
+                </div>
+            </div>
+        </div>
+        <div class="special-templates">
+            <h5>Special templates</h5>
+            <div>
+                <div onclick={onChooseTemplate.bind(this, template.template)} class="template-choice" each={template in specialTemplates}>
+                    <img src="{ template.thumbnail }">
+                    <br>
+                    { template.template }
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <script>
+     var self = this;
+     self.mixin('databind');
+     self.blogs = [];
+     self.loading = true;
+     self.templates = [];
+     self.specialTemplates = [];
+     self.recentPages = [];
+     
+     self.onClone = function(cloneId) {
+         self.createNewPageAndRedirect(cloneId, '');
+     }
+
+     self.onChooseTemplate = function(template) {
+         self.createNewPageAndRedirect(0, template);
+     }
+
+     
+     self.createNewPageAndRedirect = function(cloneId, template) {
+         console.log('new page cloneId ', cloneId, 'template ', template);
+         stallion.request({
+             url:'/st-publisher/posts/new-for-editing',
+             method: 'POST',
+             data: {
+                 type: 'page',
+                 cloneId: cloneId,
+                 template: template
+             },             
+             success: function(o) {
+                 window.location.hash = '/edit-content/' + o.postId;
+             }
+         });
+     };
+
+     this.on('mount', function(){
+         stallion.request({
+             url: '/st-publisher/posts/choose-page-template-context',
+             method: 'GET',
+             success: function(o) {
+                 self.update({
+                     templates: o.templates,
+                     specialTemplates: o.specialTemplates,
+                     recentPages: o.recentPages,
+                     loading: false
+                 });
+             }
+         });
+     });     
+
+    </script>
+</new-page>

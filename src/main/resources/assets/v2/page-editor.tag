@@ -38,13 +38,13 @@
                             <input type="radio" name="options" id="option2" autocomplete="off" onchange={showTab.bind(this, 'options')}> Options
                         </label>                    
                     </div>
-                    &nbsp; &nbsp; <a href="{post.slug}" target="_blank"">Preview in new tab</a>
+                    &nbsp; &nbsp; <a href="/st-publisher/posts/{post.postId}/view-latest-version" target="_blank"">Preview in new tab</a>
                 </div>
                 <div show={tab==='editor'}>
-                    <markdown-editor onchange={onMarkdownChange} name="markdownEditor" foo="bar"></markdown-editor>
-                    <div each={element in templateElements}>
-                        <label>Edit {element.name} section</label>
-                        <markdown-editor onchange={onMarkdownChange} markdown={element.rawContent} ></markdown-editor>
+                    <markdown-editor id="markdownEditor" onchange={onMarkdownChange} name="markdownEditor" foo="bar"></markdown-editor>
+                    <div class="editable-page-element-wrapper" each={element in templateElements}>
+                        <label>Edit <em>{element.name}</em> section</label>
+                        <page-element name="pageElementEditable" elementname="{element.name}" onchange={onMarkdownChange} element={element} ></page-element>
                     </div>
                 </div>
                 <div show={tab==="versions"}>
@@ -162,7 +162,6 @@
              } else {
                  $('#live-preview-column').css({'position': 'static', 'width': '100%'});
              }
-             console.log('scrolling');
          });
          
          $(self.title).change(function() {
@@ -214,7 +213,8 @@
                  //});
                  //self.simplemde.value(self.post.originalContent);
                  self.lastWidgetCount = self.post.widgets.length;
-                 self.previewIframe.src = '/st-publisher/posts/' + self.postId + '/view-version/' + self.versionId;
+                 self.previewIframe.src = '/st-publisher/posts/' + self.postId + '/view-latest-version';
+                 //self.previewIframe.contentWindow.location.reload();
                  previewNotDirty();
                  //loadAllLineWidgetsFromPost();
              }
@@ -249,12 +249,10 @@
      
      self.switchPreviewMode = function(mode) {
          self.previewMode = mode;
-         console.log('new frame mode is ', mode);
          $frame = $('.preview-iframe');
          $column = $('#preview-bootstrap-col');
          $frame.removeClass('fifty').removeClass('seventy-five').removeClass('tablet').removeClass('mobile').removeClass('desktop');
          var width = $column.width();
-         console.log('column width ', width);
          $frame.css({width: $column.width() + 'px', height: self.calculatedFrameHeight + "px"});
          if (mode === 'mobile') {
              $frame.addClass('mobile');
@@ -277,7 +275,6 @@
      };
 
      self.onMarkdownChange = function() {
-         console.log('onMarkdownChange markdown changed!');
          if (self.dirty === false && !self.loading) {
              showPreviewDirty();             
          };
@@ -326,12 +323,29 @@
 
 
      function reloadPreview(force) {
-         var postData = {};
+         var postData = {elements:[]};
          postData.title = self.title.value;
          console.log('save draft, reload the preview!');
          var markdownData = self.tags.markdownEditor.getData();
          postData.originalContent = markdownData.markdown;
          postData.widgets = markdownData.widgets;
+         var editorTags = self.tags['pageElementEditable'] || [];
+         if (editorTags && editorTags.length === undefined) {
+             editorTags = [editorTags];
+         }
+         
+         editorTags.forEach(function(editorTag) {
+             data = editorTag.getData();
+             postData.elements.push({
+                 name: editorTag.opts.elementname,
+                 content: data.content,
+                 data: data.data,
+                 type: data.type,
+                 rawContent: data.rawContent,
+                 widgets: data.widgets
+             });
+         });
+
          if (self.urlTouched) {
              postData.slug = self.slug.value;
          }
@@ -348,7 +362,8 @@
              success: function(postVersion) {
                  self.post.widgets = postVersion.widgets;
                  self.update({versionId: postVersion.id, lastAutosaveAt: 'Last auto-saved at ' + moment().format('hh:mm:ss a')});
-                 self.previewIframe.contentWindow.location.href = '/st-publisher/posts/' + self.postId + '/view-version/' + self.versionId;
+                 //self.previewIframe.contentWindow.location.href = '/st-publisher/posts/' + self.postId + '/view-latest-version';
+                 self.previewIframe.contentWindow.location.reload();
                  self.optionsDirty = false;
                  previewNotDirty();
              }
@@ -409,7 +424,6 @@
      self.loading = true;
      self.loadAll = 'false';
      self.pager = null;
-     console.log('init version history');
 
      self.reopen = function() {
          
@@ -443,8 +457,146 @@
      }
 
      self.on('mount', function() {
-         console.log('mounted version history');
          self.reloadVersions();
      });
     </script>
 </version-history>
+
+<image-editable>
+    <div>
+        <button class="btn btn-default"  onclick={showModal}>Choose Image</button>
+        <span if={src}>
+            <img style="max-width: 40px; max-height: 40px;" src="{src}">
+        </span>
+        <span if={!src}>
+            No image selected.
+        </span>
+
+    </div>
+    <script>
+     var self = this;
+     self.src = opts.element.data.src;
+     self.data = opts.element.data;
+     console.log('opts.element' , opts.element);
+     function chooseImageCallback(widget) {
+         console.log('image chosen ', widget);
+         self.src = widget.data.src;
+         self.data = widget.data;
+         self.content = widget.html;
+         self.update();
+         self.opts.onchange();
+     };
+
+     self.getData = function() {
+         return {
+             content: self.content,
+             rawContent: self.content,
+             data: self.data
+         }
+     };
+
+     self.showModal = function() {
+         showRiotModal({
+             riotTag: 'image-widget-modal',
+             mountOpts: {
+                 callback: chooseImageCallback
+             }
+         });
+     };
+    </script>
+</image-editable>
+
+<text-editable>
+    <div class="form-group">
+        <input class="form-control" type="text" name="contentValue" value={content}>
+    </div>
+    <script>
+     var self = this;
+     self.content = this.opts.content;
+     console.log('text editable loaded');
+
+     self.getData = function() {
+         return {
+             content: self.contentValue.value,
+             rawContent: self.contentValue.value
+         }
+     };
+
+
+    </script>
+</text-editable>
+
+
+
+<page-element>
+    <div each={element in imageElements}>
+        <image-editable name="subelement"  element={element} onchange={handleChange}></image-editable>
+    </div>
+    <div each={element in textElements}>
+        <text-editable name="subelement"  data={element.data} content={element.content} onchange={handleChange}></text-editable>
+    </div>
+    <div each={element in markdownElements}>
+        <markdown-editor name="subelement" id="{element.name}Editor" elementname="{element.name}" onchange={handleChange} markdown={element.rawContent} widgets={element.widgets} ></markdown-editor>            
+    </div>
+    <script>
+     var self = this;
+     self.element = JSON.parse(JSON.stringify(this.opts.element));
+     
+     /*
+     var typeToTag = {
+         'markdown': 'markdown-editor',
+         'image': 'image-editable',
+         'text': 'text-editable'
+     }
+     */
+     self.textElements = [];
+     self.imageElements = [];
+     self.markdownElements = [];
+     if (self.element.type === 'image') {
+         self.imageElements = [self.element];
+     } else if (self.element.type === 'text') {
+         self.textElements = [self.element];
+     } else {
+         self.markdownElements = [self.element];
+     }
+
+     self.handleChange = function() {
+         var data = {};
+         if (self.element.type === 'markdown') {
+             data = self.tags['subelement'].getData();
+             data.rawContent = data.markdown;
+             delete data.markdown;
+         } else {
+             data = self.tags['subelement'].getData();
+         }
+         self.element.content = data.content;
+         self.element.rawContent = data.rawContent;
+         self.element.data = data.data;
+         self.element.widgets = data.widgets;
+         console.log('handleChange', self.element.name, self.element.type, self.element);
+         self.opts.onchange();
+     };
+     
+     console.log('page-element self.element ', self.element.type, self.element);
+     /*
+     self.on('mount', function() {
+         var tag = typeToTag[self.element.type];
+         var tagHtml = "<" + tag + "></" + tag + ">";
+         $(self.edit_wrapper).append(tagHtml);
+         console.log('mount tag ', tag, tagHtml);
+         self.innerTag = riot.mount(tag, {
+             elementname: self.element.name,
+             widgets: self.element.widgets,
+             data: self.element.data,
+             rawContent: self.element.rawContent,
+             markdown: self.element.rawContent,
+             content: self.element.content
+         })[0];
+     });
+     */
+     self.getData = function() {
+         return self.element;
+     }
+
+    </script>
+</page-element>

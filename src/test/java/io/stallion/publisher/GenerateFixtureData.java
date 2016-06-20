@@ -19,6 +19,13 @@
 
 package io.stallion.publisher;
 
+import io.stallion.publisher.comments.Comment;
+import io.stallion.publisher.comments.CommentsController;
+import io.stallion.publisher.contacts.Contact;
+import io.stallion.publisher.contacts.ContactsController;
+import io.stallion.publisher.contacts.FormSubmission;
+import io.stallion.publisher.contacts.FormSubmissionController;
+import io.stallion.publisher.content.*;
 import io.stallion.services.Log;
 import io.stallion.tools.SampleDataGenerator;
 import io.stallion.users.IUser;
@@ -26,17 +33,13 @@ import io.stallion.users.Role;
 import io.stallion.users.User;
 import io.stallion.users.UserController;
 import io.stallion.utils.GeneralUtils;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class GenerateFixtureData extends SampleDataGenerator {
@@ -48,10 +51,10 @@ public class GenerateFixtureData extends SampleDataGenerator {
 
     @Override
     public void generate() {
+
         makeAuthors();
         makeBlogConfigs();
         makePosts();
-        makePages();
         makeComments();
         makePages();
         makeFormSubmissions();
@@ -192,7 +195,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
             if (x % 4 == 0) {
                 blogId = getId(91);
             }
-            BlogPost post = new BlogPost()
+            Content post = new Content()
                     .setInitialized(true)
                     .setType("post")
                     .setBlogId(blogId)
@@ -206,7 +209,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
                     .setPublishDate(publishDate)
                     .setId(newId(x));
             Log.info("update blog post {0} {1}", getId(x), post.getUpdatedAt());
-            BlogPostController.instance().save(post);
+            ContentController.instance().save(post);
         }
     }
 
@@ -224,7 +227,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
             if (x % 7 == 0) {
                 publishDate = futureTime.plusDays(x);
             }
-            BlogPost post = new BlogPost()
+            Content post = new Content()
                     .setInitialized(true)
                     .setType("page")
                     .setUpdatedAt(baseTime.plusDays(x).toInstant().toEpochMilli())
@@ -237,7 +240,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
                     .setPublishDate(publishDate)
                     .setId(newId(x));
             Log.info("update blog post {0} {1}", getId(x), post.getUpdatedAt());
-            BlogPostController.instance().save(post);
+            ContentController.instance().save(post);
             /*
             Page page = new Page()
                     .setContent(content)
@@ -281,7 +284,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
             if (x % 7 == 0) {
                 publishDate = futureTime.plusDays(x);
             }
-            Contact contact = ContactController.instance().forUniqueKey("email", email);
+            Contact contact = ContactsController.instance().forUniqueKey("email", email);
             if (contact == null) {
                 Log.info("conact is null {0}", email);
                 contact = new Contact()
@@ -295,7 +298,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
                     .setWebSite("https://" + name.toLowerCase() + " stallion.io")
                     .setSecretToken(GeneralUtils.md5Hash(email))
                     ;
-            ContactController.instance().save(contact);
+            ContactsController.instance().save(contact);
 
             Comment comment = new Comment()
                     .setParentPermalink("http://localhost:8090/some-post")
@@ -315,7 +318,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
             if (x % 13 == 7) {
                 comment.setApproved(false).setDeleted(true);
             }
-            CommentController.instance().save(comment);
+            CommentsController.instance().save(comment);
         }
     }
 
@@ -328,7 +331,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
             String name = commenterNames[(int)(x % commenterNames.length)];
             String email = "testing1+" + name.toLowerCase() + "+" + (x % 20) + "@stallion.io";
             ZonedDateTime publishDate = baseTime.plusDays(x);
-            Contact contact = ContactController.instance().forUniqueKey("email", email);
+            Contact contact = ContactsController.instance().forUniqueKey("email", email);
             if (contact == null) {
                 contact = new Contact()
                         .setEmail(email)
@@ -341,7 +344,7 @@ public class GenerateFixtureData extends SampleDataGenerator {
                     .setWebSite("https://" + name.toLowerCase() + " stallion.io")
                     .setSecretToken(GeneralUtils.md5Hash(email))
                     ;
-            ContactController.instance().save(contact);
+            ContactsController.instance().save(contact);
 
             Map<String, Object> data = new HashMap<String, Object>(map(val("email", email), val("message", body)));
             FormSubmission submission = new FormSubmission()

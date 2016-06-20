@@ -23,6 +23,10 @@ thumbnail = "page.png"
 template = "landing-page.jinja"
 thumbnail = "landing-page.png"
 
+[[pageTemplates]]
+template = "two-column.jinja"
+thumbnail = "landing-page.png"
+
 
 
 [[pageTemplates]]

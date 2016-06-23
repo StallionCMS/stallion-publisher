@@ -14,12 +14,17 @@
  * along with this program. If not, see <https://creativecommons.org/licenses/by-nc-sa/4.0/>.
  */
 
-package io.stallion.publisher;
+package io.stallion.publisher.content;
 
-public class MainRunner
-{
-    public static void main( String[] args ) throws Exception {
-        System.setProperty("java.awt.headless", "true");
-        io.stallion.boot.MainRunner.mainWithPlugins(args, new PublisherPlugin());
+
+public class EditableImageCollectionTag extends EditableTextTag {
+    @Override
+    public String getType() {
+        return "image-collection";
+    }
+
+    @Override
+    public String getName() {
+        return "editable_image_collection";
     }
 }

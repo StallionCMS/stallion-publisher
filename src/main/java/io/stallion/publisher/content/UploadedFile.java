@@ -23,10 +23,12 @@ import javax.persistence.Column;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
 
+import static io.stallion.utils.Literals.empty;
+
 @Table(name="uploaded_files")
 public class UploadedFile extends ModelBase {
     private String name = "";
-    private String url = "";
+    private String rawUrl = "";
     private String cloudKey = "";
     private String type = "";
     private String extension = "";
@@ -36,15 +38,21 @@ public class UploadedFile extends ModelBase {
 
     // Thumb limited to 350px wide or 250px tall
     private String thumbCloudKey = "";
-    private String thumbUrl = "";
+    private String thumbRawUrl = "";
     private Integer thumbWidth = 0;
     private Integer thumbHeight = 0;
+
+    private String smallCloudKey = "";
+    private String smallRawUrl = "";
+    private Integer smallWidth = 0;
+    private Integer smallHeight = 0;
+
 
     // Medium is limited to 900px wide
     private String mediumCloudKey = "";
     private Integer mediumWidth = 0;
     private Integer mediumHeight = 0;
-    private String mediumUrl = "";
+    private String mediumRawUrl = "";
 
     @Column
     public String getName() {
@@ -56,17 +64,45 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    public String getFullUrl() {
-        return url.replace("{cdnUrl}", Settings.instance().getCdnUrl());
+    public String getUrl() {
+        return rawUrl.replace("{cdnUrl}", Settings.instance().getCdnUrl());
     }
+
+    public String getThumbUrl() {
+        if (empty(getThumbRawUrl())) {
+            return getUrl();
+        } else {
+            return getThumbRawUrl().replace("{cdnUrl}", Settings.instance().getCdnUrl());
+        }
+    }
+
+    public String getSmallUrl() {
+        if (empty(getSmallRawUrl())) {
+            return getUrl();
+        } else {
+            return getSmallRawUrl().replace("{cdnUrl}", Settings.instance().getCdnUrl());
+        }
+
+    }
+
+
+    public String getMediumUrl() {
+        if (empty(getMediumRawUrl())) {
+            return getUrl();
+        } else {
+            return getMediumRawUrl().replace("{cdnUrl}", Settings.instance().getCdnUrl());
+        }
+
+    }
+
 
     @Column
-    public String getUrl() {
-        return url;
+    public String getRawUrl() {
+        return rawUrl;
     }
 
-    public UploadedFile setUrl(String url) {
-        this.url = url;
+    public UploadedFile setRawUrl(String rawUrl) {
+        this.rawUrl = rawUrl;
         return this;
     }
 
@@ -141,12 +177,12 @@ public class UploadedFile extends ModelBase {
     }
 
     @Column
-    public String getThumbUrl() {
-        return thumbUrl;
+    public String getThumbRawUrl() {
+        return thumbRawUrl;
     }
 
-    public UploadedFile setThumbUrl(String thumbUrl) {
-        this.thumbUrl = thumbUrl;
+    public UploadedFile setThumbRawUrl(String thumbRawUrl) {
+        this.thumbRawUrl = thumbRawUrl;
         return this;
     }
 
@@ -170,6 +206,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
+    @Column
     public String getMediumCloudKey() {
         return mediumCloudKey;
     }
@@ -200,12 +237,52 @@ public class UploadedFile extends ModelBase {
     }
 
     @Column
-    public String getMediumUrl() {
-        return mediumUrl;
+    public String getMediumRawUrl() {
+        return mediumRawUrl;
     }
 
-    public UploadedFile setMediumUrl(String mediumUrl) {
-        this.mediumUrl = mediumUrl;
+    public UploadedFile setMediumRawUrl(String mediumRawUrl) {
+        this.mediumRawUrl = mediumRawUrl;
+        return this;
+    }
+
+    @Column
+    public String getSmallCloudKey() {
+        return smallCloudKey;
+    }
+
+    public UploadedFile setSmallCloudKey(String smallCloudKey) {
+        this.smallCloudKey = smallCloudKey;
+        return this;
+    }
+
+    @Column
+    public String getSmallRawUrl() {
+        return smallRawUrl;
+    }
+
+    public UploadedFile setSmallRawUrl(String smallRawUrl) {
+        this.smallRawUrl = smallRawUrl;
+        return this;
+    }
+
+    @Column
+    public Integer getSmallWidth() {
+        return smallWidth;
+    }
+
+    public UploadedFile setSmallWidth(Integer smallWidth) {
+        this.smallWidth = smallWidth;
+        return this;
+    }
+
+    @Column
+    public Integer getSmallHeight() {
+        return smallHeight;
+    }
+
+    public UploadedFile setSmallHeight(Integer smallHeight) {
+        this.smallHeight = smallHeight;
         return this;
     }
 }

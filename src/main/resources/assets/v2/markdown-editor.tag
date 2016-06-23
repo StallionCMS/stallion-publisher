@@ -24,7 +24,8 @@
          }
          
          self.simplemde = new SimpleMDE({
-             toolbar: makeToolbar(), 
+             toolbar: makeToolbar(),
+             autoDownloadFontAwesome: false,
              element: self.markdownTextarea
          });
          cm = self.simplemde.codemirror;
@@ -120,9 +121,15 @@
      /******************************/
      /* Adding widgets to the page */
 
-     function insertWidget() {
+     function insertWidget(type) {
+         var widgetData = null;
+         if (type) {
+             widgetData = {type: type};
+         }
          showRiotModal({
+             backdrop: 'static',
              mountOpts: {
+                 widgetData: widgetData,
                  callback: function(widgetData) {
                      var line = addLineWidget(widgetData, true);
                      self.widgets.push(widgetData);
@@ -131,6 +138,10 @@
                  }
              }
          });         
+     }
+
+     function insertImage(editor) {
+         insertWidget('image');
      }
 
      function loadAllLineWidgetsFromPost() {
@@ -204,6 +215,7 @@
          });
          $node.find('.line-widget-edit').click(function() {
              showRiotModal({
+                 backdrop: 'static',
                  mountOpts: {
                      widgetData: widgetData,
                      callback: function(widgetData) {
@@ -387,24 +399,174 @@
 
      }
 
+     function pasteRichContent() {
+         showRiotModal({
+             riotTag: 'paste-html-modal',
+             mountOpts: {
+                 callback: function(content) {
+                     var cursor = self.simplemde.codemirror.doc.getCursor();
+                     console.log('insert content ' , content,  ' at ', cursor);
+                     cm.replaceRange(content, {line: cursor.line, ch: cursor.ch});
+                 }
+             }
+         });
+     }
+
+
+     function _replaceSelection(cm, active, startEnd, url) {
+	 if(/editor-preview-active/.test(cm.getWrapperElement().lastChild.className))
+	     return;
+         
+	 var text;
+	 var start = startEnd[0];
+	 var end = startEnd[1];
+	 var startPoint = cm.getCursor("start");
+	 var endPoint = cm.getCursor("end");
+	 if(url) {
+	     end = end.replace("#url#", url);
+	 }
+	 if(active) {
+	     text = cm.getLine(startPoint.line);
+	     start = text.slice(0, startPoint.ch);
+	     end = text.slice(startPoint.ch);
+	     cm.replaceRange(start + end, {
+		 line: startPoint.line,
+		 ch: 0
+	     });
+	 } else {
+	     text = cm.getSelection();
+	     cm.replaceSelection(start + text + end);
+
+	     startPoint.ch += start.length;
+	     if(startPoint !== endPoint) {
+		 endPoint.ch += start.length;
+	     }
+	 }
+	 cm.setSelection(startPoint, endPoint);
+	 cm.focus();
+     }
+     
+     function insertLink() {
+         
+         showRiotModal({
+             riotTag: 'insert-link-modal',
+             mountOpts: {
+                 callback: function(url) {
+                     console.log('insert link ', url);
+	             var cm = self.simplemde.codemirror;
+	             var stat = self.simplemde.getState();
+	             var options = self.simplemde.options;
+                     console.log('stat.link ', stat.link, 'options.insertTexts ', options.insertTexts.link);
+                     var startEnd = ["[", "](" + url + ")"]
+	             _replaceSelection(cm, stat.link, startEnd, '');
+                     // TODO refocus on the editor
+                 }
+             }
+         });
+     }
+
+     
+     
      /*****************************/
      /* Editor Helpers            */
 
      function makeToolbar() {
          var toolbar = [
-             "bold",
-	     "italic",
-             "strikethrough",
-             "heading",
-             "code",
-             "quote",
-             "unordered-list",
-             "ordered-list",
-             "link",
-             "table",
-             "fullscreen",
-             "undo",
-             "redo",
+	     {
+		 name: "bold",
+		 className: "icon icon-bold",
+		 title: "Bold",
+                 action: SimpleMDE.toggleBold,
+		 default: true
+	     },
+	     {
+		 name: "italic",
+		 action: SimpleMDE.toggleItalic,
+		 className: "icon icon-italic",
+		 title: "Italic",
+		 default: true
+	     },
+	     {
+		 name: "strikethrough",
+		 action: SimpleMDE.toggleStrikethrough,
+		 className: "icon icon-strikethrough",
+		 title: "Strikethrough"
+	     },
+	     {
+		 name: "heading",
+		 action: SimpleMDE.toggleHeadingSmaller,
+		 className: "icon icon-font-size",
+		 title: "Heading",
+		 default: true
+	     },
+             {
+		 name: "code",
+		 action: SimpleMDE.toggleCodeBlock,
+		 className: "icon icon-embed2",
+		 title: "Code"
+	     },
+	     {
+		 name: "quote",
+		 action: SimpleMDE.toggleBlockquote,
+		 className: "icon icon-quotes-left",
+		 title: "Quote",
+		 default: true
+	     },
+	     {
+		 name: "unordered-list",
+		 action: SimpleMDE.toggleUnorderedList,
+		 className: "icon icon-list2",
+		 title: "Generic List",
+		 default: true
+	     },
+	     {
+		 name: "ordered-list",
+		 action: SimpleMDE.toggleOrderedList,
+		 className: "icon icon-list-numbered",
+		 title: "Numbered List",
+		 default: true
+	     },
+             {
+		 name: "link",
+		 action: insertLink,
+		 className: "icon icon-link",
+		 title: "Create Link",
+		 default: true
+	     },
+	     {
+		 name: "image",
+		 action: insertImage,
+		 className: "icon icon-image2",
+		 title: "Insert Image",
+		 default: true
+	     },
+	     {
+		 name: "pasteRich",
+		 action: pasteRichContent,
+		 className: "icon icon-paste",
+		 title: "Paste Rich Content",
+		 default: true
+	     },
+             
+             {
+		 name: "fullscreen",
+		 action: SimpleMDE.toggleFullScreen,
+		 className: "icon icon-enlarge2 no-disable no-mobile",
+		 title: "Toggle Fullscreen",
+		 default: true
+             },
+	     {
+		 name: "undo",
+		 action: SimpleMDE.undo,
+		 className: "icon icon-undo no-disable",
+		 title: "Undo"
+	     },
+	     {
+		 name: "redo",
+		 action: SimpleMDE.redo,
+		 className: "icon icon-redo no-disable",
+		 title: "Redo"
+	     },             
              {
                  name: "insertWidget",
                  action: function(editor) {
@@ -434,17 +596,27 @@
         <div class="modal-body">
             <div class="widget-option">
                 <a href="javascript:;" onclick={selectWidget.bind(this, 'embed')}>
-                    HTML Embed (Youtube Video, Slideshare, etc.)
+                    <span class="icon icon-embed"></span> HTML Embed (Youtube Video, Slideshare, etc.)
                 </a>
             </div>
             <div class="widget-option">
                 <a href="javascript:;" onclick={selectWidget.bind(this, 'image')}>
-                    Image
+                    <span class="icon icon-image2"></span> Image
                 </a>
             </div>
             <div class="widget-option">
                 <a href="javascript:;" onclick={selectWidget.bind(this, 'image-collection')}>
-                    Image Collection/Gallery
+                    <span class="icon icon-images3"></span> Image Collection/Gallery
+                </a>
+            </div>
+            <div class="widget-option">
+                <a href="javascript:;" onclick={selectWidget.bind(this, 'html-form')}>
+                    <span class="icon icon-insert-template"></span> HTML Form
+                </a>
+            </div>
+            <div class="widget-option">
+                <a href="javascript:;" onclick={selectWidget.bind(this, 'html')}>
+                    <span class="icon icon-file-xml"></span> HTML Code
                 </a>
             </div>
         </div>
@@ -453,11 +625,11 @@
         </div>
     </div>
     <div if={widgetType}>
-        <div class="modal-header"><h4>Configure widget</h4></div>
+        <div class="modal-header"><h4>{header}</h4></div>
         <div class="modal-body" id="widgetConfigureTarget"">
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" style="float: left;" onclick={saveWidget}>Update</button>
+            <button class="btn btn-primary" style="float: left;" onclick={saveWidget} disabled={updateDisabled}>Update</button>
             <a href="javascript:;" onclick={close}>Cancel</a>
         </div>
     </div>
@@ -465,6 +637,8 @@
      var self = this;
      self.widgetType = '';
      self.activeTag = null;
+     self.header = 'Configure widget'
+     self.updateDisabled = true;
 
      self.selectWidget = function(widgetType, widgetData) {
          var widgetTag = self.tags[widgetType + 'Widget'];
@@ -472,7 +646,8 @@
              widgetData = {data: {}, type: widgetType, label: '', html: ''};
          }
          self.update({widgetType: widgetType});
-         self.activeTag = appendRiotTag(self.widgetConfigureTarget, widgetType + '-widget-configure', {widgetData: widgetData});
+         self.activeTag = appendRiotTag(self.widgetConfigureTarget, widgetType + '-widget-configure', {widgetData: widgetData, parent: self});
+         self.activeTag.parent = self;
      };
 
      self.saveWidget = function() {
@@ -502,7 +677,7 @@
      };
 
      self.on('mount', function() {
-         if (self.widgetData && self.widgetData.length > 0 && self.widgetData.type) {
+         if (self.widgetData && self.widgetData.type) {
              self.selectWidget(self.widgetData.type, self.widgetData);
          }
      });
@@ -513,6 +688,173 @@
      
     </script>
 </widget-modal>
+
+<paste-html-modal>
+    <div>
+        <div class="modal-header"><h4>Paste Rich Content</h4></div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <label>Paste rich text, HTML, or from Google Docs or Word into this text box.</label>
+                    <div contenteditable="true" onPaste={htmlUpdated} class="paste-target" name="pasteTarget"></div>
+                </div>
+                <div class="col-sm-6">
+                    <label>Preview the resulting markdown here:</label>
+                    <textarea class="markdown-preview" class="form-control" name="markdownPreview"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" style="float: left;" onclick={saveWidget}>Insert</button>
+            <a href="javascript:;" onclick={close}>Cancel</a>
+        </div>
+    </div>
+    <script>
+     var self = this;
+     
+     self.close = function() {
+         self.unmount();
+         self.opts.parentElement.modal('hide');
+     };
+
+
+     self.htmlUpdated = function(evt) {
+         //var html = evt.clipboardData.getData('text/html');
+         setTimeout(function() {
+             var markdown = toMarkdown($(self.pasteTarget).html());
+             markdown = markdown.replace(/<[^>]+>/g, '');
+             self.markdownPreview.value = markdown;
+         }, 20);
+         return true;
+     }
+     
+     self.saveWidget = function() {
+         var content = self.markdownPreview.value;
+         self.opts.callback(content);
+         self.close();
+     };
+    </script>
+</paste-html-modal>
+
+<insert-link-modal>
+    <div>
+        <div class="modal-header"><h4>Insert Link</h4></div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <a href="javascript:;" onclick={switchTab.bind(this, 'external-link')} class={'vertical-tab': true, 'active-tab': tab==="external-link"}>
+                        External Link
+                    </a>
+                    <a href="javascript:;" onclick={switchTab.bind(this, 'internal-link')} class={'vertical-tab': true, 'active-tab': tab==="internal-link"}>
+                        Internal Page
+                    </a>
+                    <a href="javascript:;" onclick={switchTab.bind(this, 'document')} class={'vertical-tab': true, 'active-tab': tab==="document"}>
+                        Document or File
+                    </a>
+
+                </div>
+                <div class="col-sm-8 tab-box">
+                    <div show={tab==="external-link"}>
+                        <label>Enter the URL of the page here</label>
+                        <input type="text" name="link" class="form-control" placeholder="https://...">            
+                    </div>
+                    <div show={tab==="internal-link"}>
+                        <internal-link-picker callback={linkPicked}></internal-link-picker>
+                    </div>
+                    <div show={tab==="document"}>
+                        <file-library ispicker={true} callback={filePicked} ></file-library>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" style="float: left;" onclick={saveWidget}>Insert</button>
+            <a href="javascript:;" onclick={close}>Cancel</a>
+        </div>
+    </div>
+    <script>
+     var self = this;
+     
+     self.tab = 'internal-link';
+     self.url = '';
+
+     self.switchTab = function(tab) {
+         self.tab = tab;
+     }
+
+     self.linkPicked = function(o) {
+         self.url = o.url;
+     };
+     
+     self.filePicked = function(file) {
+         console.log('filePicked ', file);
+         self.url = file.url;
+         self.saveWidget();
+     }
+
+     self.close = function() {
+         self.unmount();
+         self.opts.parentElement.modal('hide');
+     };
+     
+     self.saveWidget = function() {
+         if (!self.url) {
+             self.url = self.link.value;
+         }
+         self.opts.callback(self.url);
+         self.close();
+     };
+
+     
+    </script>
+</insert-link-modal>
+
+<internal-link-picker>
+    <div if={!loaded}>
+        Loading &hellips;
+    </div>
+    <div if={loaded}>
+        <label>Pick a page or blog post</label>
+        <select name="pageSelector" class="form-control"></select>
+    </div>
+    <script>
+     var self = this;
+     self.loaded = false;
+     self.items = [];
+
+     self.on('updated', function() {
+         if (self.loaded) {
+             var data = [{id: '', text: 'Pick a page'}];
+             self.items.forEach(function(item) {
+                 data.push({
+                     id: item.permalink,
+                     text: item.title
+                 });
+             });
+             console.log('data', data);
+             $(self.pageSelector).select2({
+                 data: data,
+                 placeholder: 'Select an option'
+             }).on('select2:select', function (evt) {
+                 console.log('selected ', evt, this, self.pageSelector.value);
+                 self.opts.callback({url: self.pageSelector.value});
+             });
+         }
+     });
+
+
+     self.on('mount', function() {
+         stallion.request({
+             url: '/st-publisher/all-live-contents',
+             success: function(o) {
+                 self.update({items: o.pager.items, loaded: true});
+             }
+         });
+     });
+
+    </script>
+</internal-link-picker>
 
 <image-widget-modal>
     <div>
@@ -543,6 +885,37 @@
      
     </script>
 </image-widget-modal>
+
+<image-collection-widget-modal>
+    <div>
+        <div class="modal-header"><h4>Configure Gallery</h4></div>
+        <div class="modal-body">
+            <image-collection-widget-configure widgetdata={opts.widgetdata} name="imageWidget"></image-collection-widget-configure>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" style="float: left;" onclick={saveWidget}>Update</button>
+            <a href="javascript:;" onclick={close}>Cancel</a>
+        </div>
+    </div>
+    <script>
+     var self = this;
+     console.log('image-collection-model ', opts.widgetdata);
+     self.close = function() {
+         self.unmount();
+         self.opts.parentElement.modal('hide');
+     };
+     
+     self.saveWidget = function() {
+         var widgetTag = self.tags['imageWidget'];
+         var widgetData = widgetTag.buildData();
+         self.opts.callback(widgetData);
+         self.close();
+     };
+
+     
+    </script>
+
+</image-collection-widget-modal>
 
 <embed-widget-configure>
     <div>
@@ -599,7 +972,7 @@
      };
      
      self.on('mount', function() {
-
+         
      });
      self.buildData = function() {
          var code = self.code || self.embedCode.value;
@@ -619,6 +992,91 @@
     </script>
 </embed-widget-configure>
 
+<html-widget-configure>
+    <div>
+        <div class="form-group">
+            <label>Enter any custom HTML you wish</label>
+            <textarea class="form-control" name="html" style="min-height: 360px;"></textarea>
+        </div>
+    </div>
+    <script>
+     var self = this;
+     self.mixin('databind');
+     var data = self.opts.widgetData && self.opts.widgetData.data ? self.opts.widgetData.data : {};
+     data.html = data.html || '';
+
+     self.setFormData(data);
+
+     self.buildData = function() {
+         var data = self.getFormData();
+         var html = data.html;
+         var widgetData = {
+             isBlock: true,
+             type: 'html',
+             label: 'HTML',
+             previewHtml: '',
+             data: data,
+             html: html
+         };
+         return widgetData;
+     };
+
+     self.on('mount', function() {
+         if (self.opts.parent) {
+             self.opts.parent.update({header: 'Custom HTML Widget', updateDisabled: false});
+         }
+     });
+
+    </script>
+
+
+</html-widget-configure>
+
+<html-form-widget-configure>
+    <div>
+        <div class="form-group">
+            <label>The HTML for your form</label>
+            <textarea  style="min-height: 360px;" class="form-control" name="formHtml"></textarea>
+        </div>
+    </div>
+    <script>
+     var self = this;
+     self.mixin('databind');
+     var data = self.opts.widgetData && self.opts.widgetData.data ? self.opts.widgetData.data : {};
+     
+
+     var FORM_HTML = "<form id=\"stallion-contact-form\" class=\"pure-form pure-form-stacked st-contacts-form\"><div class=\"st-form-success\" style=\"display:none;\">\n                    Thank you for reaching out, we will get back to you promptly!\n                </div>\n                <label for=\"name\">Your name</label>\n                <input class=\"pure-input-1\" name=\"name\" type=\"text\" placeholder=\"Your name\" required=\"required\">\n\n                <label for=\"email\">Email</label>\n                <input class=\"pure-input-1\" name=\"email\" type=\"email\" placeholder=\"Email\" required=\"required\">\n                <label>Your message</label>\n                <textarea class=\"pure-input-1\" name=\"message\" required=\"required\" style=\"height: 74px;\"></textarea>\n                <p>\n                    <button type=\"submit\" class=\"pure-button pure-button-primary\">Get in touch</button>\n                </p>\n            </fieldset>\n</form>";
+
+     if (!data.formHtml) {
+         data.formHtml = FORM_HTML;
+     }
+
+     self.setFormData(data);
+
+     self.buildData = function() {
+         var data = self.getFormData();
+         var html = data.formHtml;
+         var widgetData = {
+             isBlock: true,
+             type: 'html',
+             label: 'HTML',
+             previewHtml: '<form...>',
+             data: data,
+             html: html
+         };
+         return widgetData;
+     };
+
+     self.on('mount', function() {
+         if (self.opts.parent) {
+             self.opts.parent.update({header: 'Configure HTML Form', updateDisabled: false});
+         }
+     });
+
+    </script>
+</html-form-widget-configure>
+
+
 //<script>
    function appendRiotTag(target, tagName, opts) {
        var $ele = $('<' + tagName + '></' + tagName + '>');
@@ -630,37 +1088,161 @@
 //</script>
 
 <image-collection-widget-configure>
-    <div if={showAddImage}>
-        <image-widget-configure></image-widget-configure>
+    <div if={screen==="selector"}>
+        <div style="margin-bottom: 1em;">
+            <a href="javascript:;" onclick={showScreen.bind(this, 'collection')}>&#171; Back to collection</a>
+        </div>
+        <image-selector hideUrlTab={true} callback={imageSelectCallback}></image-selector>
     </div>
-    <div show={!showAddImage}>
-        <h1>Image Collection</h1>
-        <div each={img in images}>
+    <div show={screen ==="collection"}>
+        <div class="row p">
+            <div class="col-sm-6 small-image-upload-target-column"> 
+                <image-uploader callback={imageSelectCallback}></image-uploader>
+            </div>
+            <div class="col-sm-6 add-image-button-column">
+                <div>
+                    or &nbsp; <button onclick={showScreen.bind(this, 'selector')} class="btn btn-default btn-md">Add image from your library &#187;</button>
+                </div>
+            </div>
+        </div>
+        <p if={!images.length}>
+            <em><big>No images yet.</big></em>
+        </p>
+        <div name="included-images-list">
+            <div each={img, i in images} class="image-thumb-box item">
+                <a class="delete-icon" href="javascript:;" onclick={deleteImage.bind(this, i)}>&#215;</a>
+                <div class="image-wrap-box">
+                    <img src={img.src} title={img.caption} >
+                </div>
+                <div class="caption-wrap-box">
+                    <div style="height: 90px;" class="">
+                        <a if={!img.caption && !img.showAddCaption} onclick={showAddCaption.bind(this, img)} href="javascript:;">Add caption</a>
+                        <textarea  if={img.caption || img.showAddCaption}  type="text" placeholder="Caption (optional)" class="form-control" onchange={updateCaption.bind(this, img)} >{img.caption}</textarea>
+                        
+                        <a if={!img.link && !img.showAddLink} onclick={showAddLink.bind(this, img)} href="javascript:;">Add link</a>
+                        <input if={img.link || img.showAddLink} type="text" placeholder="https://somesite.com" onchange={updateLink.bind(this, img)} class="form-control" value={img.link}>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p>
             
+        </p>
+        <hr>
+        <div class="form-group">
+            <label>How should the images be laid out?</label>
+            <select name="layout" class="form-control" onchange={layoutChanged} >
+                <option value="image-grid-medium">Grid with medium images</option>
+                <option value="image-grid-small">Grid with small images</option>
+                <option value="image-columns">Two Columns Responsive (One column on small screens)</option>
+                <option value="image-one-column">One Column</option>
+                <option value="image-slider">Slider</option>
+                <option value="custom">Use custom CSS styling</option>
+            </select>
         </div>
-        <button onclick={update.bind(this, {showAddImage: true})} class="btn btn-primary">Add image</button>
-        <div show={!showAdvanced}>
-            <a href="javascript:;" onclick={update.bind(this, {showAdvanced: true})}>Show advanced</a>
+        <div if={showCustomCss} class="form-group">
+            <label>Custom CSS class(es)</label>
+            <input type="input" class="form-control" name="customCssClass" placeholder="Enter one or more CSS class names, separated by spaces."/>
         </div>
-        <div show={showAdvanced} class="advanced-options">
-            <div>
-                <a href="javascript:;" onclick={update.bind(this, {showAdvanced: false})}>Hide advanced options.</a>
-            </div>
-            <div class="form-group">
-                <label><input type="checkbox" name="useDefaultStylingInput" checked={useDefaultStylingInput}> Use default image collection style</label>
-            </div>
-            <div class="form-group">
-                <label>Custom CSS class</label>
-                <input type="input" class="form-control" name="customCssClassInput" value={customCssClass} />
+        <div class="checkbox p">
+            <label><input type="checkbox" name="galleryOnClick" value="true"> Open slideshow mode when an image is clicked on?</label>
+        </div>
+        <p show={false}>
+            <a href="javascript:;" onclick={update.bind(this, {showAdvanced: true})}>Show advanced options &#187;</a>
+        </p>
+        <div show={false} class="advanced-options st-top-spaced">
+            <div class="p">
+                <a href="javascript:;" onclick={update.bind(this, {showAdvanced: false})}>&#171; Hide advanced options.</a>
             </div>
             
         </div>
     </div>
     <script>
-     self.images = [];
-     self.useDefaultStyling = true;
-     self.customCssClass = '';
-     self.showAdvanced = false;
+     var self = this;
+     self.mixin('databind');
+     if (self.opts.widgetdata) {
+         self.opts.widgetData = self.opts.widgetdata;
+     }
+     var data = (self.opts.widgetData && self.opts.widgetData.data) ? self.opts.widgetData.data : {};
+     data.layout = data.layout || 'image-grid-medium';
+     self.images = data.images || [];
+     self.useDefaultStyling = data.useDefaultStyling !== undefined ? data.useDefaultStyling : true;
+     self.screen = 'collection';
+     self.showCustomCss = data.layout === 'custom';
+
+     self.on('updated', function() {
+         Sortable.create(self['included-images-list'], {
+             draggable: '.item',
+             handle: '.image-wrap-box',
+             onEnd: function (evt) {
+                 evt.oldIndex;  // element's old index within parent
+                 evt.newIndex;  // element's new index within parent
+                 var img = self.images[evt.oldIndex];
+                 self.images.splice(evt.oldIndex, 1);
+                 self.images.splice(evt.newIndex, 0, img);
+                 console.log(self.images);
+             }
+         });
+     });
+
+     self.deleteImage = function(index) {
+         self.images.splice(index, 1);
+         self.update();
+     }
+
+     self.showAddCaption = function(img) {
+         img.showAddCaption = true;
+         self.update();
+     }
+
+     self.showAddLink = function(img, evt) {
+         img.showAddLink = true;
+         self.update();
+     }
+
+     self.layoutChanged = function() {
+         if (self.layout.value === 'custom') {
+             self.showCustomCss = true;
+         } else {
+             self.showCustomCss = false;
+         }
+     }
+
+     self.setFormData(data);     
+
+
+     self.updateCaption = function(img, evt) {
+         img.caption = evt.target.value;
+     }
+
+     self.updateLink = function(img, evt) {
+         img.link = evt.target.value;
+     }
+
+
+     self.showScreen = function(screen) {
+         self.update({screen: screen});
+     }
+
+     self.imageSelectCallback = function(imageInfo) {
+         var img = {
+             src: imageInfo.mediumUrl,
+             height: imageInfo.mediumHeight || imageInfo.height,
+             width: imageInfo.mediumWidth || imageInfo.width,
+             originalSrc: imageInfo.url,
+             originalHeight: imageInfo.height,
+             originalWidth: imageInfo.width
+         }
+         self.images.push(img);
+         self.update({screen: 'collection'});
+         if (self.opts.parent) {
+             self.opts.parent.update({updateDisabled: false});
+         }
+     }
+
+     self.removeImage = function() {
+
+     };
 
      if (self.widgetData && self.widgetData.data && self.widgetData.data) {
          self.images = self.widgetData.data.images || [];
@@ -671,87 +1253,267 @@
          }
      }
 
-     function buildHtml() {
+     function buildHtml(data) {
          var $ul = $('<ul class="st-image-collection"></ul>');
-         if (self.useDefaultStyling) {
-             $ul.addClass('st-image-collection-default');
+         if (data.layout !== 'custom') {
+             $ul.addClass('st-image-collection-default').addClass(data.layout);
+         } else {
+             $ul.addClass(data.customCssClass);
          }
-         if (self.customCssClass) {
-             $ul.addClass(self.customCssClass);
+         if (data.layout === 'image-grid-medium' || data.layout === 'image-grid-small') {
+             $ul.addClass('image-grid');
          }
+
+         if (data.galleryOnClick) {
+             $ul.addClass('with-slideshow');
+         }
+         
          self.images.forEach(function(img) {
-             $img = $ul.append('<li></li>').append('<img>');
-             $img.src = img.src;
+             var $img = $('<img>');
+             $img.attr('src', img.src)
+                 .attr('data-height', img.height)
+                 .attr('data-width', img.width)
+                 .attr('data-original-src', img.originalSrc)
+                 .attr('data-original-height', img.originalHeight)
+                 .attr('data-original-width', img.originalWidth)
+                 ;
+             var $li = $('<li></li>').addClass('item');
+             if (img.link && !data.galleryOnClick) {
+                 var $a = $('<a></a>');
+                 $a.attr('href', img.link);
+                 $a.append($img);
+                 $li.append($a);
+             } else {
+                 $li.append($img);
+             }
+             if (img.caption && img.link) {
+                 var $caption = $('<div></div>').addClass("image-caption");
+                 var $a2 = $('<a></a>');
+                 $a2.html(img.caption);
+                 $a2.attr('href', img.link);
+                 $caption.append($a2);
+                 $li.append($caption);
+             } else if (img.caption) {
+                 var $caption = $('<div></div>').addClass("image-caption").html(img.caption);
+                 $li.append($caption);
+             }
+             $ul.append($li);
          });
-         return $ul.get(0).outerHTML;
+         var $div = $('<div></div').addClass('st-image-collection-wrapper').addClass(data.layout);
+         $div.append($ul);
+         return $div.get(0).outerHTML;
      }
 
      self.buildData = function() {
-         self.customCssClass = self.customCssClassInput.value;
-         self.useDefaultStyling = $(self.useDefaultStylingInput).is(':checked');
-             
-         var data = {
-             images: self.images,
-             useDefaultStyling: self.useDefaultStyling,
-             customCssClass: self.customCssClass
-         }
-         var html = buildHtml();
+         var data = self.getFormData();
+         data.images = self.images;
+         var html = buildHtml(data);
          var widgetData = {
              isBlock: true,
+             type: 'image-collection',
              label: 'Image Collection',
-             previewHtml: '<img src="' + newData.src + '">',
+             previewHtml: '<img src="' + self.images[0].src + '">',
+             data: data,
+             html: html
+         };
+         return widgetData;
+     };
+
+     self.on('mount', function() {
+         var disabled = true;
+         if (self.images.length > 0) {
+             disabled = false;
+         }
+         if (self.opts.parent) {
+             self.opts.parent.update({header: 'Configure Image Collection/Gallery', updateDisabled: disabled});
+         }
+     });
+
+     
+    </script>
+</image-collection-widget-configure>
+
+
+
+
+<image-widget-configure>
+    <div if={tab==='selector'}>
+        <image-selector callback={selectImageCallback}></image-selector>
+    </div>
+
+    <div if={tab==='formatting'}>
+        <div style="border-bottom: 1px solid #F4F4F4; padding-bottom: 1em; margin-bottom: 1em;">
+            <img src="{image.thumbUrl}"" style="max-width: 50px; max-width: 50px; display:inline-block; margin-right: 20px; border: 1px solid #CCC;">
+            <a target="_blank" href="{image.url}">{image.thumbUrl}</a>
+            <a class="btn btn-default btn-sm" href="javascript;" onclick={showTab.bind(this, 'selector')}>Change Image</a>
+        </div>
+        <image-full-formatting name="formatting" widgetData={widgetData}></image-full-formatting>
+    </div>
+    <script>
+     var self = this;
+     self.mixin('databind');
+     self.tab = 'selector';
+     self.widgetData = self.opts.widgetData || {};
+     self.widgetData.data = self.widgetData.data || {};
+     self.image = {};
+     if (self.widgetData.data.image) {
+         self.image = JSON.parse(JSON.stringify(self.widgetData.data.image));
+     }
+
+     if (self.widgetData.data.src) {
+         self.tab = 'formatting';
+     }
+
+     self.urlChange = function() {
+         var url = self.src.value;
+         if (url.indexOf('://') > -1) {
+             self.selectImageCallback(url);
+         }
+     };
+
+     self.selectImageCallback = function(image) {
+         self.image = image;
+         self.update({
+             tab: 'formatting', 
+             imageUrl: image.mediumUrl, image: image
+         });
+         self.opts.parent.update({updateDisabled: false});
+     }
+
+     self.showTab = function(tabName) {
+         self.tab = tabName;
+     }
+
+     self.buildData = function() {
+         var newData = self.tags.formatting.getFormData();
+         newData.image = self.image;
+         console.log('image ', newData.image);
+         newData.src = self.image.mediumUrl;
+         var isBlock = (newData.title || newData.caption || newData.alignment !== 'inline') ? true : false;
+         var html = buildHtml(newData, isBlock);
+         var widgetData = {
+             isBlock: isBlock,
+             label: 'Image',
+             previewHtml: '<img src="' + self.image.thumbUrl + '">',
              data: newData,
              html: html
          };
          return widgetData;
      };
 
-     
-    </script>
-</image-collection-widget-configure>
+     function buildHtml(data, isBlock) {
+         var $wrap;
+         if (isBlock) { 
+             $wrap = $('<div></div>')
+         } else {
+             $wrap = $('<span></span>')
+         }
+         $wrap.addClass('st-image-wrapper');
+         $imgOuter = $('<div></div>').addClass('image-outer');
+         var $img = $('<img>');
+         $imgOuter.append($img);
+         $wrap.append($imgOuter);
+         $img.attr('src', data.src).attr('alt', data.altText).attr('title', data.altText);
 
-<image-widget-configure>
-    <div if={tab!=='formatting'}>
-        <ul class="nav nav-tabs" role="tablist">        
-            <li role="presentation" class="active"><a class="" href="javascript:;" onclick={showTab.bind(this, 'library')}>Image Library</a></li>
-            <li role="presentation"><a href="javascript:;"  onclick={showTab.bind(this, 'upload')}>Upload</a></li>
-            <li role="presentation"><a href="javascript:;" onclick={showTab.bind(this, 'url')}>Web Address (URL)</a></li>
-        </ul>
-    </div>
-    <div if={tab==="library"}>
-        <image-library></image-library>
-    </div>
-    <div if={tab==="upload"}>
-        <image-uploader></image-uploader>
-    </div>
-    <div if={tab==="url"}>
-        <div class="form-group"></div>
-        <div class="form-group">
-            <label>Insert the URL of the image here:</label>
-            <input type="text" class="form-control" name="src" >
-        </div>
-        <div class="form-group">
-            <button class="btn btn-primary" onclick={urlChange}>Use this image</button>
-        </div>
-    </div>
-    
-    <div if={tab==='formatting'}>
-        <div style="border-bottom: 1px solid #F4F4F4; padding-bottom: 1em; margin-bottom: 1em;">
-            <img src="{imageUrl}"" style="max-width: 50px; max-width: 50px; display:inline-block; margin-right: 20px; border: 1px solid #CCC;">
-            <a target="_blank" href="{imageUrl}">{imageUrl}</a>
-            <a class="btn btn-default btn-sm" href="javascript;" onclick={showTab.bind(this, 'library')}>Change Image</a>
-        </div>
+         /*
+         if (data.alignment === 'left') {
+             $wrap.css({'float': 'left'});
+         }
+
+         if (data.alignment === 'right') {
+             $wrap.css({'float': 'right'});
+         }
+
+
+         if (data.alignment === 'center') {
+             $wrap.css({'display': 'block', 'text-align': 'center'});
+         }
+
+         if (data.alignment == 'inline') {
+             $wrap.css({'display': 'inline-block'});
+         }
+
+         */
+         $wrap.addClass('st-image-' + data.alignment);
+         
+         
+         if (data.constrain100) {
+             $img.css({'max-width': '100%'})
+         }
+         if (data.maxWidth) {
+             $wrap.css({'max-width': data.maxWidth + 'px'});
+         }
+         if (data.maxHeight) {
+             $img.css({'max-height': data.maxHeight + 'px'});
+         }
+         if (data.minWidth) {
+             $img.css({'min-width': data.minWidth + 'px'});
+         }
+         if (data.minHeight) {
+             $img.css({'min-height': data.minHeight + 'px'});
+         }
+         
+         $img.css({'border-width': data.borderWidth + 'px', 'border-style': 'solid', 'border-color': data.borderColor});
+         $img.css({'margin-left': data.marginLeft + 'px', 'margin-top': data.marginTop + 'px', 'margin-right': data.marginRight + 'px', 'margin-bottom': data.marginBottom + 'px'});
+         
+         if (data.title) {
+             var $title = $('<h5 class="st-image-title"></h5>').html(data.title);
+             $wrap.prepend($title);
+         }
+
+         if (data.caption) {
+             var $caption = $('<div class="st-image-caption"></div>').html(data.caption);
+             $wrap.append($caption);
+         }
+
+         if (data.caption || data.title) {
+             $wrap.css({'display': 'block'});
+         }
+
+
+
+         if (data.linkUrl) {
+             var $a = $('<a></a>');
+             $a.attr('href', data.linkUrl);
+             $img.wrap($a);
+         }
+         $wrap.append($("<div></div>").addClass("image-bottom"));
+         return $wrap.get(0).outerHTML;
+     };
+
+     if (self.markdown) {
+         self.markdown = parseOutWidgetHtmlFromContent(markdown);
+     }
+
+     
+     self.on('mount', function() {
+         var disabled = true;
+         console.log(self.widgetData);
+         if (self.widgetData.data.src) {
+             disabled = false;
+        }
+        if (self.opts.parent) {
+            self.opts.parent.update({header: 'Configure Image Widget', updateDisabled: disabled});
+        }
+     });
+
+
+    </script>
+</image-widget-configure>
+
+
+<image-full-formatting>
+    <div>
         <h3>Formatting</h3>
 
         <div class="row">
             <div class="col-sm-6">
                 <h5>Align</h5>                
                 <div class="form-group">
-                    <label for="alignInline">Inline<br> <input type="radio"  name="alignment" value="inline"></label>
                     <label for="alignCenter">Center <br><input type="radio" name="alignment" value="center"></label>        
                     <label for="alignLeft">Left <br><input type="radio"  name="alignment" value="left"></label>
                     <label for="alignRight">Right <br><input type="radio" name="alignment" value="right"></label>
-                        
+                    <label for="alignRight">Image Left, Caption Right<br><input type="radio" name="alignment" value="caption-right"></label>
                 </div>
             </div>
             <div class="col-sm-6">
@@ -823,13 +1585,12 @@
     <script>
      var self = this;
      self.mixin('databind');
-     self.tab = 'library';
-     self.imageUrl = '';
-     self.widgetData = self.widgetData || {data: {}};
-     var data = self.widgetData.data;
+     var widgetData = self.opts.widgetdata || {};
+     var data = widgetData.data || {};
+     console.log('formatting data' , data);
      data.alignment = data.alignment || 'center';
      data.borderColor = data.borderColor || '#777';
-     data.borderWidth = data.borderWidth === undefined ? 1 : data.borderWidth;
+     data.borderWidth = data.borderWidth === undefined ? 0 : data.borderWidth;
      data.marginLeft = data.marginLeft || 0;
      data.marginTop = data.marginTop || 0;
      data.marginRight = data.marginRight || 0;
@@ -843,240 +1604,21 @@
      data.maxHeight = data.maxHeight || 1000;     
      data.constrain100 = data.constrain100 === undefined ? true : data.constrain100;
      data.link = data.link;
-     self.opts.formData = data;
 
-     self.urlChange = function() {
-         var url = self.src.value;
-         if (url.indexOf('://') > -1) {
-             self.selectImageCallback(url);
-         }
-     };
 
-     self.selectImageCallback = function(url) {
-         self.update({tab: 'formatting', imageUrl: url});
-     }
+     self.setFormData(data);
 
-     self.showTab = function(tabName) {
-         self.tab = tabName;
-     }
 
      self.advancedVisible = false;
+     
      self.toggleAdvancedOptions = function() {
          self.update({advancedVisible: !self.advancedVisible});
      }
-
-     self.buildData = function() {
-         var newData = self.getFormData();
-         newData.src = self.imageUrl;
-         var isBlock = (newData.title || newData.caption || newData.alignment !== 'inline') ? true : false;
-         var html = buildHtml(newData, isBlock);
-         var widgetData = {
-             isBlock: isBlock,
-             label: 'Image',
-             previewHtml: '<img src="' + newData.src + '">',
-             data: newData,
-             html: html
-         };
-         return widgetData;
-     };
-
-     function buildHtml(data, isBlock) {
-         var $wrap;
-         if (isBlock) { 
-             $wrap = $('<div></div>')
-         } else {
-             $wrap = $('<span></span>')
-         }
-         $wrap.addClass('st-image-wrapper');
-         var $img = $('<img>');
-         $wrap.append($img);         
-         $img.attr('src', data.src).attr('alt', data.altText).attr('title', data.altText);
-
-         if (data.alignment === 'left') {
-             $wrap.css({'float': 'left'});
-         }
-
-         if (data.alignment === 'right') {
-             $wrap.css({'float': 'right'});
-         }
-
-
-         if (data.alignment === 'center') {
-             $wrap.css({'display': 'block', 'text-align': 'center'});
-         }
-
-         if (data.alignment == 'inline') {
-             $wrap.css({'display': 'inline-block'});
-         }
-         
-         
-         if (data.constrain100) {
-             $img.css({'max-width': '100%'})
-         }
-         if (data.maxWidth) {
-             $wrap.css({'max-width': data.maxWidth + 'px'});
-         }
-         if (data.maxHeight) {
-             $img.css({'max-height': data.maxHeight + 'px'});
-         }
-         if (data.minWidth) {
-             $img.css({'min-width': data.minWidth + 'px'});
-         }
-         if (data.minHeight) {
-             $img.css({'min-height': data.minHeight + 'px'});
-         }
-         
-         $img.css({'border-width': data.borderWidth + 'px', 'border-style': 'solid', 'border-color': data.borderColor});
-         $img.css({'margin-left': data.marginLeft + 'px', 'margin-top': data.marginTop + 'px', 'margin-right': data.marginRight + 'px', 'margin-bottom': data.marginBottom + 'px'});
-         
-         if (data.title) {
-             var $title = $('<h5 class="st-image-title"></h5>').html(data.title);
-             $wrap.prepend($title);
-         }
-
-         if (data.caption) {
-             var $caption = $('<div class="st-image-caption"></div>').html(data.caption);
-             $wrap.append($caption);
-         }
-
-         if (data.caption || data.title) {
-             $wrap.css({'display': 'block'});
-         }
-
-
-
-         if (data.linkUrl) {
-             var $a = $('<a></a>');
-             $a.attr('href', data.linkUrl);
-             $img.wrap($a);
-         }
-         
-         return $wrap.get(0).outerHTML;
-     };
-
-     if (self.markdown) {
-         self.markdown = parseOutWidgetHtmlFromContent(markdown);
-     }
+     
 
      
     </script>
-</image-widget-configure>
+</image-full-formatting>
 
 
 
-<image-uploader>
-    <div>
-        <h3>Upload file</h3>
-        <form action="/st-publisher/upload-file"
-              class="image-dropzone dropzone"
-              id="my-image-dropzone">
-            
-        </form>        
-    </div>
-    <script>
-     var self = this;
-
-     self.on('mount', function() {
-         self.dropzone = new Dropzone(".image-dropzone", {
-             dictDefaultMessage: "Drag one more more files here. Or click to open a file picker.",
-             uploadMultiple: false,
-//             parallelUploads: true,
-             maxFiles: 1,
-             acceptedFiles: 'image/*,.jpg,.png,.svg,.gif',
-             init: function() {
-                 this.on("success", function(file, response) { 
-                     //var o = JSON.parse(response);
-                     self.parent.selectImageCallback(response.fullUrl);
-                     this.removeFile(file);
-                 });
-             },
-         });
-     });
-   
-    </script>
-
-</image-uploader>
-
-
-<image-library>
-    <div>
-        <h3>File Library</h3>
-        <h3 if={loading}>Loading &hellip;</h3>
-        <h3 if={!loading && !items.length}>No posts yet</h3>
-        <table if={!loading && items.length} class="pure-table comments-table">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th></th>                    
-                    <th>Name</th>
-                    <th></th>                    
-                    <th>Uploaded</th>     
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr each={item in items}>
-                    <td>
-                        <a class="btn btn-primary" href="javascript:;" onclick={selectImage.bind(this, item)}>Choose</a>
-                    </td>
-                    <td>
-                        <img src="{item.fullUrl}" style="max-width: 100px; max-height: 100px;">
-                    </td>
-                    <td>
-                        {item.name}
-                    </td>
-                    <td>
-                        {item.extension}
-                    </td>
-                    <td>
-                        {moment(item.uploadedAt * 1000).fromNow()}
-                    </td>
-                    <td>
-                        <a href="{item.fullUrl}" target="_blank">open</a>
-                    </td>
-
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <script>
-     var self = this;
-     self.loading = true;
-     self.items = null;
-     self.pager = null;
-     self.page = 1;
-     self.withDeleted = false;
-
-     self.selectImage = function(item) {
-         self.parent.selectImageCallback(item.fullUrl);
-     };
-
-     smartFormatDate = function(date) {
-         var m = moment(date);
-         return m.fromNow();
-     }
-     
-     
-     this.fetchData = function() {
-         stallion.request({
-             url: '/st-publisher/images?page=' + self.page + '&deleted=' + self.withDeleted,
-             success: function (o) {
-                 self.pager = o.pager;
-                 self.items = o.pager.items;
-                 self.loading = false;
-                 self.update();
-             },
-             error: function(o, form, xhr) {
-                 console.log('error loading dashboard', o, xhr);
-             }
-         });
-
-     };
-     
-     this.on('mount', function(){
-         self.fetchData();
-     });     
-
-    </script>
-    
-</image-library>

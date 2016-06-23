@@ -367,21 +367,21 @@ public class GenerateFixtureData extends SampleDataGenerator {
         ZonedDateTime baseTime = ZonedDateTime.of(2015, 5, 1, 12, 0, 0, 0, ZoneId.of("UTC"));
         UploadedFile[] files = {
                 new UploadedFile()
-                        .setUrl("https://stallion.io/st-assets/stallion-rearing-red-299.png?ts=1456278540000")
+                        .setRawUrl("https://stallion.io/st-assets/stallion-rearing-red-299.png?ts=1456278540000")
                         .setExtension("png")
                         .setUploadedAt(baseTime.plusDays(7))
                         .setName("Stallion Red Logo")
                         .setType("image")
                         .setId(newId(900)),
                 new UploadedFile()
-                        .setUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Declaration_independence.jpg/640px-Declaration_independence.jpg")
+                        .setRawUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Declaration_independence.jpg/640px-Declaration_independence.jpg")
                         .setExtension("jpg")
                         .setUploadedAt(baseTime.plusDays(18))
                         .setName("Founding Fathers Signing the Declaration")
                         .setType("document")
                         .setId(newId(901)),
                 new UploadedFile()
-                        .setUrl("http://www.constitution.org/us_doi.pdf")
+                        .setRawUrl("http://www.constitution.org/us_doi.pdf")
                         .setExtension("pdf")
                         .setUploadedAt(baseTime.plusDays(29))
                         .setName("The Declaration of Independence Text")

@@ -1,6 +1,6 @@
 {% extends "stallion:common-base.jinja" %}
 {% block builtin_head_bundles %}
-
+<link rel="stylesheet" href="https://i.icomoon.io/public/5ac4c7b9fd/StallionPublisher/style.css">
 {% endblock %}
 {% block extra_meta %}
 
@@ -30,3 +30,16 @@
 {%-- block builtin_footer_bundles --%}
 
 {%-- endblock --%}
+
+{% block pre_end_body %}
+<script type="text/javascript">
+        /*require.config({
+            baseUrl: "/st-assets/",
+            paths: {
+               "select2": "{{ assets.resource('v2/select2.min.js', 'publisher').replaceAll("\\.js$", '') }}"
+            },
+            waitSeconds: 15
+        });*/
+</script>
+
+{% endblock %}

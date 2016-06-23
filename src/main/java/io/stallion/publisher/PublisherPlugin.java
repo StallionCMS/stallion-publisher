@@ -102,16 +102,25 @@ public class PublisherPlugin extends StallionJavaPlugin {
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableMarkdownTag());
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableImageTag());
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableTextTag());
+        TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableImageCollectionTag());
 
 
         // Load javascript and style bundles
 
         DefinedBundle.getAlwaysHeadStylesheets()
                 .add("publisher", "public/comments-public.css")
+                .add("publisher", "public/unslider-dots.css")
+                .add("publisher", "public/unslider.css")
+                .add("publisher", "public/photoswipe.css")
+                .add("publisher", "public/default-skin.css")
+                .add("publisher", "public/comments-public.css")
                 .add("publisher", "public/contacts-always.css");
         DefinedBundle.getAlwaysFooterJavascripts()
                 .add("publisher", "public/perfectLayout.min.js")
-                .add("publisher", "public/contacts-always.js");
+                .add("publisher", "public/require.js")
+                .add("publisher", "public/unslider-min.js")
+                .add("publisher", "public/contacts-always.js")
+                .add("publisher", "public/widgets.js");
 
 
         DefinedBundle.register(
@@ -124,14 +133,20 @@ public class PublisherPlugin extends StallionJavaPlugin {
         DefinedBundle.register(
                 new DefinedBundle("publisher:admin2.js", ".js",
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/jquery-1.11.3.min.js"),
+                        //new BundleFile().setPluginName("publisher").setLiveUrl("public/require.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/simplemde.min.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/bootstrap.min.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/riot-and-compiler.js").setDebugUrl("always/riot-and-compiler.min.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/stallion.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/moment.min.js"),
+
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.js"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/sortable.min.js"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/select2.min.js"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/to-markdown.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/jquery.oembed.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/common.tag").setProcessor("riot"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/components.tag").setProcessor("riot"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin-riot.tag").setProcessor("riot"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/markdown-editor.tag").setProcessor("riot"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/page-editor.tag").setProcessor("riot"),
@@ -147,6 +162,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         )
         );
 
+        /*
         DefinedBundle.register(
                 new DefinedBundle("publisher:admin.js", ".js",
                         new BundleFile().setPluginName("stallion")
@@ -158,6 +174,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/react-router.0.13.3.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/zepto.min.js").setDebugUrl("admin/zepto.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/stallion.js").setDebugUrl("always/stallion.js"),
+
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/simplemde.min.js"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/react-textarea.min.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.jsx?processor=jsx"),
@@ -178,26 +195,30 @@ public class PublisherPlugin extends StallionJavaPlugin {
 
                 )
         );
+
         DefinedBundle.register(
                 new DefinedBundle("publisher:admin.css", ".css",
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap.min.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/simplemde.min.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/select2.min.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
                         //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/admin.css")
                 )
         );
+        */
 
         DefinedBundle.register(
                 new DefinedBundle("publisher:admin2.css", ".css",
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap.min.css"),
                         new BundleFile().setPluginName("stallion").setLiveUrl("always/pure-min.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/simplemde.min.css"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
+                        //new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
                         //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/select2.min.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("admin/admin.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin.css")

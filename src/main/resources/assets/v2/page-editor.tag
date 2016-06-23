@@ -113,7 +113,7 @@
                         </div>
                     </div>
                     <div show={dirty} class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
-                    <iframe class="preview-iframe mobile" style="width: 100%; height: 100%; min-height: 600px; " name="previewIframe"></iframe>
+                    <iframe sandbox="allow-forms allow-scripts" class="preview-iframe mobile" style="width: 100%; height: 100%; min-height: 600px; " name="previewIframe"></iframe>
                 </div>
             </div>
         </div><!-- end pure-g -->
@@ -363,7 +363,8 @@
                  self.post.widgets = postVersion.widgets;
                  self.update({versionId: postVersion.id, lastAutosaveAt: 'Last auto-saved at ' + moment().format('hh:mm:ss a')});
                  //self.previewIframe.contentWindow.location.href = '/st-publisher/posts/' + self.postId + '/view-latest-version';
-                 self.previewIframe.contentWindow.location.reload();
+                 //self.previewIframe.contentWindow.location.reload();
+                 self.previewIframe.src = '/st-publisher/posts/' + self.postId + '/view-latest-version?t=' + new Date().getTime();
                  self.optionsDirty = false;
                  previewNotDirty();
              }
@@ -462,6 +463,55 @@
     </script>
 </version-history>
 
+<image-collection-editable>
+    <div>
+        <button style="" class="btn btn-default"  onclick={showModal}>Add/Edit/Remove Images</button>
+        <span style="width:70%;" if={fourImages}>
+            <span each={img in fourImages}>
+                
+                <img src="{img.src}" style="max-width: 40px; max-height: 40px;">
+            </span>
+        </span>
+    </div>
+    <script>
+     var self = this;
+     self.src = opts.element.data.src;
+     self.data = opts.element.data || {};
+     self.fourImages = self.data.images ? self.data.images.slice(0, 4) : [];
+     console.log('opts.element' , opts.element);
+
+     function chooseImageCallback(widget) {
+         console.log('image chosen ', widget);
+         self.src = widget.data.src;
+         self.data = widget.data;
+         self.content = widget.html;
+         self.fourImages = self.data.images ? self.data.images.slice(0, 4) : [];
+         self.update();
+         self.opts.onchange();
+     };
+
+     self.getData = function() {
+         return {
+             content: self.content,
+             rawContent: self.content,
+             data: self.data
+         }
+     };
+
+     self.showModal = function() {
+         showRiotModal({
+             riotTag: 'image-collection-widget-modal',
+             mountOpts: {
+                 widgetdata: opts.element,
+                 callback: chooseImageCallback
+             }
+         });
+     };
+    </script>
+
+
+</image-collection-editable>
+
 <image-editable>
     <div>
         <button class="btn btn-default"  onclick={showModal}>Choose Image</button>
@@ -532,6 +582,9 @@
     <div each={element in imageElements}>
         <image-editable name="subelement"  element={element} onchange={handleChange}></image-editable>
     </div>
+    <div each={element in imageCollectionElements}>
+        <image-collection-editable name="subelement"  element={element} onchange={handleChange}></image-collection-editable>
+    </div>
     <div each={element in textElements}>
         <text-editable name="subelement"  data={element.data} content={element.content} onchange={handleChange}></text-editable>
     </div>
@@ -551,9 +604,12 @@
      */
      self.textElements = [];
      self.imageElements = [];
+     self.imageCollectionElements = [];
      self.markdownElements = [];
      if (self.element.type === 'image') {
          self.imageElements = [self.element];
+     } else if (self.element.type === 'image-collection') {
+         self.imageCollectionElements = [self.element];
      } else if (self.element.type === 'text') {
          self.textElements = [self.element];
      } else {

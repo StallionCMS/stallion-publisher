@@ -40,7 +40,8 @@
             <tbody>
                 <tr each={item in items}>
                     <td>
-                        <a class="btn btn-xs btn-default" href="{item.fullUrl}" target="_blank">open</a>
+                        <a if={!isPicker} class="btn btn-xs btn-default" href="{item.url}" target="_blank">open</a>
+                        <a if={isPicker} class="btn btn-xs btn-default" href="javascript:;" onclick={onPick.bind(this, item)}>Select</a>
                     </td>
                     <td>
                         {item.name}
@@ -52,7 +53,7 @@
                         {moment(item.uploadedAt * 1000).fromNow()}
                     </td>
                     <td style="height: 70px;">
-                        <img if={item.type==="image"} src="{item.fullUrl}" style="max-height: 50px; max-width:50px;">
+                        <img if={item.type==="image"} src="{item.thumbUrl}" style="max-height: 50px; max-width:50px;">
                     </td>
                 </tr>
             </tbody>
@@ -65,7 +66,14 @@
      self.pager = null;
      self.page = 1;
      self.withDeleted = false;
+     self.isPicker = self.opts.ispicker === undefined ? false : self.opts.ispicker;
+     console.log('opts.callback ', self.opts, opts.callback);
 
+     self.onPick = function(item) {
+         console.log('onPick ', item);
+         opts.callback(item);
+     };
+     
      smartFormatDate = function(date) {
          var m = moment(date);
          return m.fromNow();

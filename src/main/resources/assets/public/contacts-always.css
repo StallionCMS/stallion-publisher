@@ -1,3 +1,162 @@
+
+/* Forms */
 .st-contacts-form .st-form-success {
     display: none;
 }
+
+
+/* Images */
+
+img {
+    max-width: 100%;
+}
+
+.st-image-wrapper.st-image-center {
+    display: block;
+    text-align: center;
+    width: 100%;
+}
+
+.st-image-wrapper.st-image-left {
+    display: block;
+    text-align: left;
+    float: left;
+    width: 50%;
+    padding-right: 1em;
+    padding-top: .25em;
+    clear: left;
+}
+
+.st-image-wrapper.st-image-right {
+    display: block;
+    text-align: right;
+    float: right;
+    width: 50%;
+    padding-left: 1em;
+    padding-top: .25em;
+    clear: right;
+}
+
+.st-image-wrapper.st-caption-right {
+
+}
+
+.st-image-wrapper.st-image-right .st-image-caption, .st-image-wrapper.st-image-center .st-image-caption, .st-image-wrapper.st-image-left .st-image-caption {
+    text-align: center;
+    font-size: 85%;
+    line-height: 1.5em;
+    margin-top: -5px;
+}
+
+.st-image-wrapper.st-image-caption-right .image-outer {
+    max-width: 49%;
+    float: left;
+    display: block;
+    padding-right: 1em;
+    padding-top: .25em;
+}
+.st-image-wrapper.st-image-caption-right .st-image-caption {
+    width: 49%;
+    text-align: left;
+    float: left;
+    clear: right;
+}
+
+.st-image-wrapper.st-image-caption-right .image-bottom {
+    clear: both;
+}
+
+
+/* Image Collections */
+
+.st-image-collection li, ul.st-image-collection {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+.st-image-collection li {
+    display: inline-block;
+}
+.st-image-collection img {
+    max-width: 100%;
+}
+
+.st-image-collection.st-image-collection-default  {
+    margin: 0px;
+    padding: 0px;
+    
+}
+
+
+.st-image-collection.st-image-collection-default .item {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+}
+
+.st-image-collection.st-image-collection-default.image-columns .item {
+    vertical-align: middle;
+    text-align: center;
+}
+
+
+.st-image-collection.st-image-collection-default.image-gridz img {
+    max-height: 200px;
+    min-width: 50px;
+    max-height: 250px;
+    border: 1px solid #EEE;
+    max-width: 500px;
+}
+
+.st-image-collection.st-image-collection-default li .image-caption {
+    opacity: .9;
+    font-size: .85em;
+    margin-top: -.25em;
+}
+.st-image-collection.st-image-collection-default.image-gridz  li {
+    max-width: 100%;
+    text-align: center;
+    overflow: hidden;
+    display: inline-block;
+    margin-right: 12px;
+}
+
+.with-slideshow img {
+    cursor: pointer;
+}
+
+
+
+.unslider-nav ol li {
+    border: 2px solid #777;
+    background-color: white;
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+}
+
+.unslider-nav ol li.unslider-active {
+    border: 2px solid #777;
+    background-color: #CCC;
+}
+
+
+.unslider-arrow.next {
+    float: right;
+}
+
+.unslider-arrow.prev {
+    left: auto;
+    right: 20px;
+}
+.unslider-arrow {
+    position: static;
+    left: 20px;
+    z-index: 2;
+    cursor: pointer;
+}
+
+

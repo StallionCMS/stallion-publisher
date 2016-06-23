@@ -25,6 +25,7 @@ import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Or;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.exceptions.*;
+import io.stallion.exceptions.NotFoundException;
 import io.stallion.requests.ResponseComplete;
 import io.stallion.requests.StResponse;
 import io.stallion.requests.validators.SafeMerger;
@@ -88,6 +89,16 @@ public class AdminEndpoints implements EndpointResource {
     }
 
 
+    @GET
+    @Path("/all-live-contents")
+    @Produces("application/json")
+    public Object allContent(@QueryParam("page") Integer page) {
+        page = or(page, 1);
+        Map ctx =  map(val("pager", ContentController.instance().filter("published", true).pager(page, 1000)));
+        return ctx;
+    }
+
+
 
     @POST
     @Path("/upload-file")
@@ -99,18 +110,38 @@ public class AdminEndpoints implements EndpointResource {
             new File(folder).mkdirs();
         }
         UploadRequestProcessor processor = new UploadRequestProcessor(Context.getRequest()).uploadToPath(folder);
-        Long id = DataAccessRegistry.instance().getTickets().nextId();
-        String url = "{cdnUrl}/st-publisher/view-uploaded-file/" + id + "?ts=" + DateUtils.mils();
-        UploadedFile uf = new UploadedFile()
-                .setName(processor.getFileName())
-                .setExtension(processor.getExtension())
-                .setCloudKey(processor.getRelativePath())
-                .setUploadedAt(DateUtils.utcNow())
-                .setType(UploadedFileController.getTypeForExtension(processor.getExtension()))
-                .setUrl(url)
-                .setId(id);
+        UploadedFile uf = processor.getUploaded();
         UploadedFileController.instance().save(uf);
         return uf;
+    }
+
+    @GET
+    @Path("/view-uploaded-file/:fileId/thumb")
+    public Object viewUploadedThumbFile(@PathParam("fileId") Long fileId) {
+        String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
+        UploadedFile uf = UploadedFileController.instance().forId(fileId);
+        if (empty(uf.getThumbCloudKey())) {
+            throw new NotFoundException("File not found.");
+        }
+        String fullPath = folder + uf.getThumbCloudKey();
+        File file = new File(fullPath);
+        sendAssetResponse(file);
+        return null;
+    }
+
+    @GET
+    @Path("/view-uploaded-file/:fileId/medium")
+    public Object viewUploadedMediumFile(@PathParam("fileId") Long fileId) {
+        String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
+        UploadedFile uf = UploadedFileController.instance().forId(fileId);
+        if (empty(uf.getMediumCloudKey())) {
+            throw new NotFoundException("File not found.");
+        }
+
+        String fullPath = folder + uf.getMediumCloudKey();
+        File file = new File(fullPath);
+        sendAssetResponse(file);
+        return null;
     }
 
     @GET

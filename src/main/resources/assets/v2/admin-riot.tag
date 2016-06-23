@@ -16,6 +16,9 @@
        admin.$app = $('#riot-app');
        
        admin.onLoad = function() {
+           $("html").on("dragover", function(e) { e.preventDefault();  e.stopPropagation(); });
+           $("html").on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
+           $("title").html("Stallion Publisher");
            admin.sidebarTag = riot.mount('sidebar-menu');
            admin.configureRouting();
            riot.route.start(true);
@@ -154,6 +157,7 @@
        var title = opts.title;
        var outerClass = opts.outerClass;
        var innerClass = opts.innerClass;
+       var backdrop = opts.backdrop === undefined ? true : opts.backdrop;
        var sizeClass = opts.sizeClass || 'modal-lg';
        var closable = opts.closable === null ? true : opts.closable;
        var riotTag = opts.riotTag || 'widget-modal';
@@ -176,7 +180,9 @@
            return;
        }
        
-       $ele = $('<div class="modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="myModalLabel">Modal title</h4></div></div></div></div>');
+       $ele = $('<div class="modal" role="dialog" aria-labelledby="myLargeModalLabel"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="myModalLabel">Modal title</h4></div></div></div></div>');
+       $ele.on("dragover", function(e) { e.preventDefault();  e.stopPropagation(); });
+       $ele.on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
        riotOpts.parentElement = $ele;
        $ele.attr('id', elementId);
 
@@ -198,7 +204,8 @@
        }
        $ele.find('.modal-content').append('<' + riotTag + ' class="modal-riot-content"></' + riotTag + '>');
        $(document.body).prepend($ele);
-       $ele.modal({show: false});
+       console.log('backdrop ', backdrop);
+       $ele.modal({show: false, backdrop: backdrop});
 
        $ele.on('show.bs.modal', function (e) {
            riot.mount(riotTag + '.modal-riot-content', riotOpts);

@@ -1377,7 +1377,9 @@
              tab: 'formatting', 
              imageUrl: image.mediumUrl, image: image
          });
-         self.opts.parent.update({updateDisabled: false});
+         if (opts.parent && opts.parent.update) {
+             self.opts.parent.update({updateDisabled: false});
+         }
      }
 
      self.showTab = function(tabName) {

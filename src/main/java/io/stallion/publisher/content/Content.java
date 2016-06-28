@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Patrick Fitzsimmons
+ * Copyright (c) 2015-2016 Stallion Software LLC
  *
  * This file is part of Stallion Publisher.
  *
@@ -24,6 +24,7 @@ import io.stallion.dataAccess.ModelController;
 import io.stallion.dataAccess.StandardDisplayableModel;
 import io.stallion.dataAccess.db.Converter;
 import io.stallion.dataAccess.db.converters.JsonListConverter;
+import io.stallion.dataAccess.db.converters.JsonObjectConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -44,6 +45,9 @@ public class Content extends StandardDisplayableModel {
     private String headHtml = "";
     private String footerHtml = "";
     private List<PageElement> elements = list();
+    private Boolean scheduled = false;
+    private Boolean slugTouched = false;
+    private UploadedFile featuredImage = null;
 
 
     @Column
@@ -61,9 +65,7 @@ public class Content extends StandardDisplayableModel {
         return getPermalink() + "?stPreview=" + getPreviewKey();
     }
 
-    public Content setPreviewUrl(String noop) {
-        return this;
-    }
+
 
 
     @Column
@@ -105,10 +107,6 @@ public class Content extends StandardDisplayableModel {
         return getPublished();
     }
 
-    public Content setCurrentlyPublished(boolean currentlyPublished) {
-        //this.currentlyPublished = currentlyPublished;
-        return this;
-    }
 
     @Override
     @JsonIgnore
@@ -177,6 +175,37 @@ public class Content extends StandardDisplayableModel {
     @JsonDeserialize(contentAs=PageElement.class)
     public Content setElements(List<PageElement> elements) {
         this.elements = elements;
+        return this;
+    }
+
+    @Column
+    public Boolean getScheduled() {
+        return scheduled;
+    }
+
+    public Content setScheduled(Boolean scheduled) {
+        this.scheduled = scheduled;
+        return this;
+    }
+
+    @Column
+    public Boolean getSlugTouched() {
+        return slugTouched;
+    }
+
+    public Content setSlugTouched(Boolean slugTouched) {
+        this.slugTouched = slugTouched;
+        return this;
+    }
+
+    @Converter(cls= UploadedFileConverter.class)
+    @Column(columnDefinition = "longtext")
+    public UploadedFile getFeaturedImage() {
+        return featuredImage;
+    }
+
+    public Content setFeaturedImage(UploadedFile featuredImage) {
+        this.featuredImage = featuredImage;
         return this;
     }
 }

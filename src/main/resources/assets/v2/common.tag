@@ -22,5 +22,62 @@
 	   };
        };
 
+       stPublisher.slugify = function(text) {
+           return text.toString().toLowerCase()
+                      .replace(/\s+/g, '-')           // Replace spaces with -
+                      .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+                      .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                      .replace(/^-+/, '')             // Trim - from start of text
+                      .replace(/-+$/, '');            // Trim - from end of text
+       };
+       
    }());
 //</script>
+
+
+
+<mount-if>
+    <script>
+     var self = this;
+     self.condition = self.opts.condition;
+     self.tag = self.opts.tag;
+     self.inner = null;
+     self.innerId = '';
+     console.log('mount with opts ', self.opts);
+     if (!self.tag || self.condition === undefined) {
+         throw new Error("mount-if tag must have condition attribute and tag attribute: <mount-if condition={shouldExist} tag='image-library'></mount-if> ");
+     }
+
+
+     self.on('mount', function() {
+         console.log('mount-if mounted');
+         self.checkConditionAndUpdate();
+     });
+     
+     self.on('updated', function() {
+         console.log('mount-if updated');
+         self.checkConditionAndUpdate();
+     });
+
+     self.checkConditionAndUpdate = function() {
+         console.log('mount-if ', self.condition, self.tag, self.opts.condition, self.opts.tag);
+         if (self.condition) {
+             if (self.inner === null) {
+                 var $ele = $("<" + self.tag + "></" + self.tag + ">");
+                 self.innerId = 'inner-mount-' + generateUUID();
+                 $ele.attr('id', self.innerId).attr('name', 'inner');
+                 $(self.root).append($ele);
+                 setTimeout(function() { self.inner = riot.mount('#' + self.innerId, self.opts)[0] }, 5);
+             }
+         } else {
+             if (self.inner != null) {
+                 self.inner.dismount();
+                 $('#' + self.innerId).remove();
+                 self.inner = null;
+             }
+         }
+     };
+     
+          
+    </script>
+</mount-if>

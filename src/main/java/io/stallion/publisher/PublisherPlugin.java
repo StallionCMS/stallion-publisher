@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Patrick Fitzsimmons
+ * Copyright (c) 2015-2016 Stallion Software LLC
  *
  * This file is part of Stallion Publisher.
  *
@@ -107,6 +107,9 @@ public class PublisherPlugin extends StallionJavaPlugin {
 
         // Load javascript and style bundles
 
+
+        // PUBLIC STYLESHEETS
+
         DefinedBundle.getAlwaysHeadStylesheets()
                 .add("publisher", "public/comments-public.css")
                 .add("publisher", "public/unslider-dots.css")
@@ -123,12 +126,16 @@ public class PublisherPlugin extends StallionJavaPlugin {
                 .add("publisher", "public/widgets.js");
 
 
+        // PUBLIC COMMENTS STYLESHEETS
+
         DefinedBundle.register(
                 new DefinedBundle("publisher:public.js", ".js",
                         new BundleFile().setPluginName("publisher").setLiveUrl("public/comments-public.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("public/comments-public-riot.tag").setProcessor("riot")
                 )
         );
+
+        // ADMIN STYLESHEETS AND CSS
 
         DefinedBundle.register(
                 new DefinedBundle("publisher:admin2.js", ".js",
@@ -141,6 +148,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         new BundleFile().setPluginName("stallion").setLiveUrl("admin/moment.min.js"),
 
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.js"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/pikaday.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/sortable.min.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/select2.min.js"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/to-markdown.js"),
@@ -160,6 +168,23 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/site-information-config.tag").setProcessor("riot"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/file-library.tag").setProcessor("riot")
                         )
+        );
+
+
+        DefinedBundle.register(
+                new DefinedBundle("publisher:admin2.css", ".css",
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap.min.css"),
+
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/simplemde.min.css"),
+                        //new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
+                        //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
+                        new BundleFile().setPluginName("stallion").setLiveUrl("v2/pikaday.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/select2.min.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/admin.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.css"),
+                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin.css")
+                )
         );
 
         /*
@@ -210,20 +235,6 @@ public class PublisherPlugin extends StallionJavaPlugin {
         );
         */
 
-        DefinedBundle.register(
-                new DefinedBundle("publisher:admin2.css", ".css",
-                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap.min.css"),
-                        new BundleFile().setPluginName("stallion").setLiveUrl("always/pure-min.css"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/simplemde.min.css"),
-                        //new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
-                        //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/dashboard.css"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/select2.min.css"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("admin/admin.css"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.css"),
-                        new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin.css")
-                )
-        );
 
     }
 }

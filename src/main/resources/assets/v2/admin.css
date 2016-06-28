@@ -11,6 +11,9 @@
     margin-top: 0em;
 }
 
+autogrow-textarea .form-control {
+    min-height: 50px;
+}
 
  .fade {
    opacity: 0;

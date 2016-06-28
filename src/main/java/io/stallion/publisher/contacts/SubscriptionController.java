@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Patrick Fitzsimmons
+ * Copyright (c) 2015-2016 Stallion Software LLC
  *
  * This file is part of Stallion Publisher.
  *

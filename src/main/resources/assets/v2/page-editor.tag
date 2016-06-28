@@ -21,7 +21,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <label>{labelUpper} title</label>
-                <input name="title" type="text" value={post.title} placeholder="Untitled Post" class="form-control">
+                <input name="title" type="text" value={post.title} onchange={onTitleChanged} placeholder="Untitled Post" class="form-control">
             </div>
         </div>
         <div class="row">
@@ -55,23 +55,47 @@
                 <div show={tab==='options'} class="options">
                     <div class="form-group">
                         <label>URL</label>
-                        <input type="text" class="form-control" name="slug" onkeypress={onUrlTouched} onclick={onUrlTouched} onchange={onUrlTouched} value={post.slug || calculateSlug()} >
+                        <div class="input-group">
+                            <div class="input-group-addon">{stPublisherAdminContext.siteUrl}</div>
+                            <input type="text" class="form-control" name="slug" onchange={onUrlTouched} value={post.slugTouched ? post.slug : calculateSlug()} >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Featured image</label>
+                        <image-editable name="featuredImage" onchange={optionsChange}></image-editable>
+                    </div>
+                    <div class="form-group">
+                        <label>Author</label>
+                        <div class="form-group">
+                            <author-picker name="authorId"></author-picker>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Meta Description</label>
-                        <textarea name="metaDescription" class="form-control" value={post.metaDescription} onkeypress={optionsChange} onchange={optionsChange}></textarea>
+                        <autogrow-textarea name="metaDescription" value={post.metaDescription} onkeypress={optionsChange} onchange={optionsChange}></autogrow-textarea>
                     </div>
-                    <div class="form-group">
-                        <label>Publish At</label>
-                        <input type="date" class="form-control" name="publishDate" value={post.publishDate} onchange={optionsChange}>
+                    <div if={!currentlyPublished} class="form-group">
+                        <label>Publishing Options</label>
+                        <div class="radio">
+                            <div>
+                                <label><input type="radio" name="scheduled" value={false} onchange={setIsScheduled.bind(this, false)}> Publish when "Publish" button is clicked.</label>
+                            </div>
+                            <div>
+                                <label><input type="radio" name="scheduled" value={true} onchange={setIsScheduled.bind(this, true)}> Schedule for a future date &hellips;</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div if={shouldBeScheduled} class="form-group">
+                        <label>Publish Date</label>
+                        <datetime-picker name="publishDate" onchange={optionsChange}></datetime-picker>
                     </div>
                     <div class="form-group">
                         <label>Custom Head HTML</label>
-                        <textarea name="headHtml" class="form-control" onkeypress={optionsChange} onchange={optionsChange}></textarea>
+                        <autogrow-textarea name="headHtml" onkeypress={optionsChange} onchange={optionsChange}></textarea>
                     </div>
                     <div class="form-group">
                         <label>Custom Footer HTML</label>
-                        <textarea name="footerHtml" class="form-control"  onkeypress={optionsChange} onchange={optionsChange}></textarea>
+                        <autogrow-textarea name="footerHtml" onkeypress={optionsChange} onchange={optionsChange}></autogrow-textarea>
                     </div>
                 </div>
             </div>
@@ -120,6 +144,7 @@
     </div>
     <script>
      var self = this;
+     self.mixin('bound-form');
      self.postId = self.opts.postId;
      self.post = {
          title: 'A new blog post, click to edit this title',
@@ -175,12 +200,19 @@
          self.loadPost();
      });
 
+
+     self.setIsScheduled = function(scheduled) {
+         self.update({shouldBeScheduled: scheduled});
+     };
+
+
      self.onRestoreVersion = function(version) {
          self.tab = 'editor';       
          $('.editor-options-buttons label.btn-tab-editor').click();
          //$('.btn-tab-editor').addClass('active');
          self.loadPost();
      };
+
 
      self.loadPost = function() {
          self.update({loading: true});
@@ -204,6 +236,8 @@
                      self.labelPlural = 'pages';
                      self.labelUpper = 'Page';
                  }
+                 self.shouldBeScheduled = o.post.scheduled;
+                 self.setFormData(o.post);
                  self.update();
                  self.tags.markdownEditor.setData(self.post.originalContent, self.post.widgets);
                  //self.post.originalContent = parseOutWidgetHtmlFromContent(self.post.originalContent);
@@ -310,8 +344,16 @@
          debouncedReload();
      }
 
+     self.onTitleChanged = function() {
+         if (!self.urlTouched) {
+             self.slug.value =  "/" + stPublisher.slugify(self.title.value.toLowerCase());
+         }
+         debouncedReload();
+     }
+
+
      self.calculateSlug = function() {
-         return self.post.title.toLowerCase();
+         return "/" + stPublisher.slugify(self.post.title.toLowerCase());
      }
 
      self.optionsChange = function() {
@@ -324,7 +366,10 @@
 
      function reloadPreview(force) {
          var postData = {elements:[]};
-         postData.title = self.title.value;
+         var postData = self.getFormData();
+         postData.elements = [];
+
+         //postData.title = self.title.value;
          console.log('save draft, reload the preview!');
          var markdownData = self.tags.markdownEditor.getData();
          postData.originalContent = markdownData.markdown;
@@ -346,15 +391,10 @@
              });
          });
 
+         postData.slugTouched = self.urlTouched;
          if (self.urlTouched) {
              postData.slug = self.slug.value;
          }
-         postData.metaDescription = self.metaDescription.value;
-         if (self.publishDate.value) {
-             postData.publishDate = self.publishDate.value;
-         }
-         postData.headHtml = self.headHtml.value;
-         postData.footerHtml = self.footerHtml.value;
          stallion.request({
              url: '/st-publisher/posts/' + self.postId + '/update-draft',
              method: 'POST',
@@ -525,8 +565,13 @@
     </div>
     <script>
      var self = this;
-     self.src = opts.element.data.src;
-     self.data = opts.element.data;
+     self.data = {};
+     self.src = '';
+
+     if (opts.element) {
+         self.src = opts.element.data.src;
+         self.data = opts.element.data;
+     }
      console.log('opts.element' , opts.element);
      function chooseImageCallback(widget) {
          console.log('image chosen ', widget);
@@ -544,6 +589,16 @@
              data: self.data
          }
      };
+
+     self.getFormData = function() {
+         return self.data.image;
+     };
+
+     self.setFormData = function(data) {
+         var data = data || {};
+         self.update({data: {image: data}, src: data.thumbUrl});
+     };
+
 
      self.showModal = function() {
          showRiotModal({
@@ -579,51 +634,23 @@
 
 
 <page-element>
-    <div each={element in imageElements}>
-        <image-editable name="subelement"  element={element} onchange={handleChange}></image-editable>
-    </div>
-    <div each={element in imageCollectionElements}>
-        <image-collection-editable name="subelement"  element={element} onchange={handleChange}></image-collection-editable>
-    </div>
-    <div each={element in textElements}>
-        <text-editable name="subelement"  data={element.data} content={element.content} onchange={handleChange}></text-editable>
-    </div>
-    <div each={element in markdownElements}>
-        <markdown-editor name="subelement" id="{element.name}Editor" elementname="{element.name}" onchange={handleChange} markdown={element.rawContent} widgets={element.widgets} ></markdown-editor>            
-    </div>
+    <mount-if condition={element.type==='image'} tag="image-editable" name="image" onchange={handleChange} element={element}></mount-if>
+    <mount-if condition={element.type==='image-collection'} tag="image-collection-editable" name="image-collection" onchange={handleChange} element={element}></mount-if>
+
+    <mount-if condition={element.type==='text'} tag="text-editable"" name="text"  data={element.data} content={element.content} onchange={handleChange}></mount-if>
+    <mount-if condition={element.type==='markdown'} tag="markdown-editor" name="markdown"  data={element.data} markdown={element.content} widgets={element.widgets} onchange={handleChange}></mount-if>
     <script>
      var self = this;
      self.element = JSON.parse(JSON.stringify(this.opts.element));
-     
-     /*
-     var typeToTag = {
-         'markdown': 'markdown-editor',
-         'image': 'image-editable',
-         'text': 'text-editable'
-     }
-     */
-     self.textElements = [];
-     self.imageElements = [];
-     self.imageCollectionElements = [];
-     self.markdownElements = [];
-     if (self.element.type === 'image') {
-         self.imageElements = [self.element];
-     } else if (self.element.type === 'image-collection') {
-         self.imageCollectionElements = [self.element];
-     } else if (self.element.type === 'text') {
-         self.textElements = [self.element];
-     } else {
-         self.markdownElements = [self.element];
-     }
-
+     console.log('conditino?' , self.element.type, self.element.type=='image', self.element.type=='image-collection');
      self.handleChange = function() {
          var data = {};
          if (self.element.type === 'markdown') {
-             data = self.tags['subelement'].getData();
+             data = self.tags[self.element.type].inner.getData();
              data.rawContent = data.markdown;
              delete data.markdown;
          } else {
-             data = self.tags['subelement'].getData();
+             data = self.tags[self.element.type].inner.getData();
          }
          self.element.content = data.content;
          self.element.rawContent = data.rawContent;

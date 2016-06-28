@@ -14,7 +14,7 @@
  * along with this program. If not, see <https://creativecommons.org/licenses/by-nc-sa/4.0/>.
  */
 
-package io.stallion.publisher.tools;
+package io.stallion.publisher.content;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
@@ -22,8 +22,32 @@ import static io.stallion.Context.*;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.stallion.dataAccess.db.converters.AttributeConverter;
 import io.stallion.services.Log;
+import io.stallion.utils.json.JSON;
 
 
-public class SettingsBuilder {
+public class UploadedFileConverter implements AttributeConverter<UploadedFile, String> {
+
+    @Override
+    public String convertToDatabaseColumn(UploadedFile dbData) {
+        try {
+            if (dbData == null) {
+                return "";
+            }
+            return JSON.stringify(dbData);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public UploadedFile convertToEntityAttribute(String json) {
+        if (empty(json)) {
+            return null;
+        }
+        return JSON.parse(json, UploadedFile.class);
+    }
 }
+

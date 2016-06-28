@@ -1,5 +1,137 @@
 
 
+<author-picker>
+    <select class="form-control" name="authorSelect">
+        <option>Choose an author</option>
+    </select>
+    <script>
+     var self = this;
+     self.authorId = 0;
+
+     this.on('mount', function() {
+         console.log('author picker');
+         stallion.request({
+             url: '/st-publisher/active-authors',
+             success: function(o) {
+                 var data = [];
+                 o.authors.forEach(function(au) {
+                     
+                     data.push({
+                         id: au.author.id,
+                         text: au.user.displayName
+                     });
+                 });
+                 $(self.authorSelect).select2({
+                     width: '100%',
+                     data: data
+                 });
+                 if (self.authorId) {
+                     $(self.authorSelect).val(self.authorId + '').change();
+                 }
+             }
+         });
+     });
+     
+     getFormData() {
+         return parseInt(this.authorSelect.value, 10) || 0;
+     }
+
+     setFormData(value) {
+         self.authorId = value + '';
+         self.authorSelect.value = value + '';
+         console.log('authorId ', value);
+         $(self.authorSelect).val(value + '').change();
+     }
+     
+    </script>
+    
+</author-picker>
+
+<datetime-picker>
+    <input type="text" name="datepicker">
+    <select name="hour">
+        <option>12 AM</option>
+        <option>1 AM</option>
+        <option>12 PM</option>
+    </select>
+    <input type="number" size="2">
+    <select name="timezone">
+        <option>America/New York</option>
+    </select>
+
+    
+    <script>
+     var self = this;
+     self.picker = null;
+
+     
+     self.on('mount', function() {
+         self.picker = new Pikaday({
+             field: self.datepicker
+         });
+     });
+
+     self.getFormData = function() {
+
+     };
+
+     self.setFormData = function(value) {
+         
+     };
+    </script>
+</datetime-picker>
+
+<date-picker>
+    <input type="text" name="datepicker">
+    <script>
+     var self = this;
+     self.picker = null;
+
+     
+     self.on('mount', function() {
+         self.picker = new Pikaday({
+             field: self.datepicker
+         });
+     });
+
+     self.getFormData = function() {
+         
+     };
+
+     self.setFormData = function(value) {
+          
+     };
+     
+     
+    </script>
+</date-picker>
+
+<simple-markdown>
+
+</simple-markdown>
+
+<autogrow-textarea>
+    <textarea class="autogrow-textarea form-control {opts.class}" onchange={opts.onchange} onkeypress={opts.onkeypress} name="ta">{value}</textarea>
+    <script>
+     var self = this;
+     self.value = opts.value || '';
+     
+     self.on('mount', function() {
+         stallion.autoGrow({}, $(self.ta));
+     });
+
+     self.getFormData = function() {
+         return self.ta.value;
+     };
+
+     self.setFormData = function(value) {
+         self.update({value: value});
+     }
+    </script>
+</autogrow-textarea>
+
+
+
 <image-selector>
     <div>
         <ul class="nav nav-tabs" role="tablist">        

@@ -14,25 +14,38 @@
  * along with this program. If not, see <https://creativecommons.org/licenses/by-nc-sa/4.0/>.
  */
 
-package io.stallion.publisher.comments;
+package io.stallion.publisher.content;
 
+import static io.stallion.utils.Literals.*;
+import static io.stallion.Context.*;
 
-import io.stallion.Context;
-import io.stallion.settings.Settings;
-import io.stallion.templating.TemplateContextHookHandler;
-import io.stallion.utils.rss.RssLink;
-
+import java.util.List;
 import java.util.Map;
 
-public class CommentsContextHook extends TemplateContextHookHandler {
+import io.stallion.services.Log;
+import io.stallion.users.IUser;
+import io.stallion.users.User;
 
 
-    public void handle(Map<String, Object> obj) {
-        obj.put("commenting", new CommentingContext());
-        String link = Settings.instance().getSiteUrl() + "/_stx/comments/rss.xml";
-        String name = "Comments on " + Settings.instance().getSiteName();
-        Context.response().getMeta().getRssLinks().add(
-                new RssLink().setLink(link).setTitle(name)
-        );
+public class UserAuthor {
+    private AuthorProfile author;
+    private IUser user;
+
+    public AuthorProfile getAuthor() {
+        return author;
+    }
+
+    public UserAuthor setAuthor(AuthorProfile author) {
+        this.author = author;
+        return this;
+    }
+
+    public IUser getUser() {
+        return user;
+    }
+
+    public UserAuthor setUser(IUser user) {
+        this.user = user;
+        return this;
     }
 }

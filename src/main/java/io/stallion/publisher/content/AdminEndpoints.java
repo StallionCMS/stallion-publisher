@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Patrick Fitzsimmons
+ * Copyright (c) 2015-2016 Stallion Software LLC
  *
  * This file is part of Stallion Publisher.
  *
@@ -67,7 +67,10 @@ public class AdminEndpoints implements EndpointResource {
     public String adminPage() {
         Context.getResponse().getPageFooterLiterals().addDefinedBundle("publisher:admin2.js");
         Context.getResponse().getPageHeadLiterals().addDefinedBundle("publisher:admin2.css");
-        return TemplateRenderer.instance().renderTemplate("publisher:admin2.jinja");
+        Map pageContext = map();
+        pageContext.put("siteUrl", Settings.instance().getSiteUrl());
+        Map ctx = map(val("adminContextJson", Sanitize.htmlSafeJson(pageContext)));
+        return TemplateRenderer.instance().renderTemplate("publisher:admin2.jinja", ctx);
     }
 
     @GET
@@ -88,6 +91,16 @@ public class AdminEndpoints implements EndpointResource {
         return ctx;
     }
 
+
+
+    @GET
+    @Path("/active-authors")
+    @Produces("application/json")
+    public Object listAuthors()  {
+
+        Map ctx =  map(val("authors", AuthorProfileController.instance().listAllAuthors()));
+        return ctx;
+    }
 
     @GET
     @Path("/all-live-contents")
@@ -506,7 +519,7 @@ public class AdminEndpoints implements EndpointResource {
         newVersion.setDiff(truncateSmart(Sanitize.stripAll(StringUtils.difference(newVersion.getOriginalContent(), updatedVersion.getOriginalContent())), 250));
         SafeMerger.with()
                 .nonNull("title", "originalContent", "widgets", "metaDescription", "headHtml", "footerHtml", "elements")
-                .optional("slug")
+                .optional("slug", "authorId", "scheduled", "publishDate", "featuredImage")
                 .merge(updatedVersion, newVersion);
 
 

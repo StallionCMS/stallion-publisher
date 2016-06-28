@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Patrick Fitzsimmons
+ * Copyright (c) 2015-2016 Stallion Software LLC
  *
  * This file is part of Stallion Publisher.
  *
@@ -19,6 +19,13 @@ package io.stallion.publisher.content;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.StandardModelController;
+import io.stallion.users.User;
+import io.stallion.users.UserController;
+
+import java.util.List;
+
+import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.or;
 
 
 public class AuthorProfileController extends StandardModelController<AuthorProfile> {
@@ -32,5 +39,17 @@ public class AuthorProfileController extends StandardModelController<AuthorProfi
                 .setModelClass(AuthorProfile.class)
                 .setControllerClass(AuthorProfileController.class);
         DataAccessRegistry.instance().register(registration);
+    }
+
+    public List<UserAuthor> listAllAuthors() {
+        List<AuthorProfile> profiles = AuthorProfileController.instance().all();
+        List<UserAuthor>  userAuthors = list();
+        for (AuthorProfile profile: profiles) {
+            UserAuthor ua = new UserAuthor()
+                    .setAuthor(profile)
+                    .setUser(or(UserController.instance().forId(profile.getUserId()), new User()));
+            userAuthors.add(ua);
+        }
+        return userAuthors;
     }
 }

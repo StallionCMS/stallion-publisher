@@ -79,6 +79,8 @@
              if (this.$refs.bodycomponent && this.$refs.bodycomponent.saveChanges) {
                  var result = this.$refs.bodycomponent.saveChanges();
                  this.callback(result);
+             } else if (this.callback) {
+                 this.callback();
              }
              this.close();
          },

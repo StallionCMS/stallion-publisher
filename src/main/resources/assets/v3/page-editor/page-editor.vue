@@ -44,7 +44,7 @@
                         &nbsp; &nbsp; <a href="/st-publisher/posts/{{post.postId}}/view-latest-version" target="_blank"">Preview in new tab</a>
                     </div>
                     <div v-if="tab==='editor'">
-                        <markdown-editor :markdown="post.originalContent" :widgets="post.widgets"></markdown-editor>
+                        <markdown-editor editor-id="main-content-editor" :markdown="post.originalContent" :widgets="post.widgets"></markdown-editor>
                         <div class="editable-page-element-wrapper" v-for="element in templateElements">
                             <label>Edit <em>{{element.name}}</em> section</label>
                             <page-element name="pageElementEditable" elementname="{element.name}}" onchange="onMarkdownChange" element="element" ></page-element>

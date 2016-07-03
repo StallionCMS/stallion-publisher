@@ -52,8 +52,8 @@
          
      },
      methods: {
-         linkPicked: function(link) {
-             this.link = link;
+         linkPicked: function(o) {
+             this.link = o.url;
              this.callback(this.link);
              this.$refs.themodal.close();             
          },

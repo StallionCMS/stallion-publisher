@@ -346,25 +346,12 @@
 
          var marks = cm.doc.findMarks({line: change.from.line, ch: 0}, {line: change.to.line, ch: 999999});
          if (marks && marks.length > 0) {
-             //debugger;
-         }
-         if (marks && marks.length > 0) {
              change.cancel();
              if (change.origin === '+input' && change.text.length == 2 && change.text[0] === '' && change.text[1] === '') {
-                 //cm.replaceRange("\n\n", {line:change.to.line-1, ch:99999});
                  if (change.to.line === 0) {
-                     //cm.replaceRange("\n", {line:change.to.line, ch:0});
-                     //cm.doc.setValue("\n" + cm.doc.getValue());
-                     //loadAllLineWidgetsFromPost();
                      insertLine(cm, 0);
                  } else {
                      insertLine(cm, change.to.line + 1);
-                     //self.forceAllowChange = true;
-                     //cm.doc.setValue(cm.doc.getValue() + "\n");
-                     //loadAllLineWidgetsFromPost();
-                     //m.doc.setCursor({line:cm.doc.lineCount(), ch:0});
-                     //cm.replaceRange("\n\n", {line:change.to.line, ch:99999});
-                     
                  }
              }
          }

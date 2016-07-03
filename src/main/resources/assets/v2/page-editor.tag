@@ -138,10 +138,10 @@
                     </div>
                     <div show={dirty} class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
                     <iframe sandbox="allow-forms allow-scripts" class="preview-iframe mobile" style="width: 100%; height: 100%; min-height: 600px; " name="previewIframe"></iframe>
-                </div>
-            </div>
-        </div><!-- end pure-g -->
-    </div>
+                </div><!-- -end live preview column -->
+            </div><!-- end col-md-6  -->
+        </div><!-- end row -->
+    </div><!-- end loaded content div -->
     <script>
      var self = this;
      self.mixin('bound-form');

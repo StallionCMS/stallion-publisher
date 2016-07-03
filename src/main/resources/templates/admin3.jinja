@@ -1,0 +1,50 @@
+{% extends "stallion:common-base.jinja" %}
+{% block builtin_head_bundles %}
+<link rel="stylesheet" href="https://i.icomoon.io/public/5ac4c7b9fd/StallionPublisher/style.css">
+{% endblock %}
+{% block extra_meta %}
+
+{% endblock %}
+
+{% block body_content %}
+<div class="container-fluid">
+    <div id="vue-app">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <div class="logo-wrap">
+                <img class="stallion-logo" src="https://stallion.io/st-assets/stallion-rearing-red-299.png?ts=1456278540000" />
+            </div>
+            <div id="sidebar-target">
+                <sidebar-menu></sidebar-menu>
+            </div>
+            <p>&nbsp;</p>
+            <div id="sidebar-config-container"></div>
+            <ul class="nav nav-sidebar">
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <router-view class="view" transition="test" transition-mode="out-in" ></router-view>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+{%-- block builtin_footer_bundles --%}
+
+{%-- endblock --%}
+
+{% block pre_end_body %}
+<script type="text/javascript">
+    var stPublisherAdminContext = {{ adminContextJson }};
+
+        /*require.config({
+            baseUrl: "/st-assets/",
+            paths: {
+               "select2": "{{ assets.resource('v2/select2.min.js', 'publisher').replaceAll("\\.js$", '') }}"
+            },
+            waitSeconds: 15
+        });*/
+</script>
+
+{% endblock %}

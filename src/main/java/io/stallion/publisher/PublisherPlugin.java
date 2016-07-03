@@ -18,6 +18,7 @@ package io.stallion.publisher;
 
 import io.stallion.assets.BundleFile;
 import io.stallion.assets.DefinedBundle;
+import io.stallion.assets.VueBundleFile;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.publisher.comments.CommentsController;
 import io.stallion.publisher.comments.CommentsEndpoints;
@@ -185,6 +186,88 @@ public class PublisherPlugin extends StallionJavaPlugin {
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/dropzone.css"),
                         new BundleFile().setPluginName("publisher").setLiveUrl("v2/admin.css")
                 )
+        );
+
+        DefinedBundle.register(
+                "admin3",
+                new BundleFile().setPluginName("publisher").setLiveUrl("v3/bootstrap.min.css"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/simplemde.min.css"),
+                //new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
+                //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/pikaday.css"),
+                new BundleFile().setPluginName("stallion").setLiveUrl("vendor/vue.min.js").setDebugUrl("vendor/vue.js"),
+                new BundleFile().setPluginName("stallion").setLiveUrl("vendor/vue-router.min.js").setDebugUrl("vendor/vue-router.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/select2.min.css"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/dropzone.css"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("v3/dashboard.css"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("v3/admin.css"),
+
+                new BundleFile().setPluginName("stallion").setLiveUrl("always/jquery-1.11.3.min.js"),
+                //new BundleFile().setPluginName("publisher").setLiveUrl("public/require.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/simplemde.min.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/bootstrap.min.js"),
+                //        new BundleFile().setPluginName("stallion").setLiveUrl("always/riot-and-compiler.js").setDebugUrl("always/riot-and-compiler.min.js"),
+                new BundleFile().setPluginName("stallion").setLiveUrl("always/stallion.js"),
+                new BundleFile().setPluginName("stallion").setLiveUrl("admin/moment.min.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/dropzone.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/moment-timezone-with-data-2010-2020.min.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/pikaday.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/sortable.min.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/select2.min.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/to-markdown.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/jquery.oembed.js"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("v3/common.js"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/modal-base.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/author-picker.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/autogrow-textarea.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/date-picker.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/datetime-picker.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-library.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-selector.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/markdown-basic.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-simple-formatting.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-uploader.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-picker-field.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/loading-div.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/embed-widget-configure.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/html-form-widget-configure.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/html-widget-configure.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-collection-widget-configure.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-collection-widget-model.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-full-formatting.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-widget-configure.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-widget-modal.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/insert-link-modal.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/internal-link-picker.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/paste-html-modal.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/widget-modal.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/markdown-editor.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/image-collection-editable.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/image-editable.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/page-element.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/text-editable.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/version-history.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/page-editor.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/file-library.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/file-upload.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/contents-table.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/comments-table.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/new-page.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/new-post.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/view-content.vue"),
+
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/comments-admin.tag").setProcessor("riot"),
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/contacts-admin.tag").setProcessor("riot"),
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/authors-config.tag").setProcessor("riot"),
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/blog-configs.tag").setProcessor("riot"),
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/extra-html-config.tag").setProcessor("riot"),
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/template-widgets-config.tag").setProcessor("riot"),
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/sitemap-config.tag").setProcessor("riot"),
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/site-information-config.tag").setProcessor("riot"),
+                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/file-library.tag").setProcessor("riot"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/dashboard-home.vue"),
+                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/sidebar-menu.vue"),
+                new BundleFile().setPluginName("publisher").setLiveUrl("v3/main.js")
         );
 
         /*

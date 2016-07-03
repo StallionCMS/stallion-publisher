@@ -74,6 +74,19 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @GET
+    @Path("/dashboard")
+    @Produces("text/html")
+    public String dashboard() {
+        Context.getResponse().getPageFooterLiterals().addDefinedBundle("admin3-js");
+        Context.getResponse().getPageHeadLiterals().addDefinedBundle("admin3-css");
+        Map pageContext = map();
+        pageContext.put("siteUrl", Settings.instance().getSiteUrl());
+        Map ctx = map(val("adminContextJson", Sanitize.htmlSafeJson(pageContext)));
+        return TemplateRenderer.instance().renderTemplate("publisher:admin3.jinja", ctx);
+    }
+
+
+    @GET
     @Path("/files")
     @Produces("application/json")
     public Object getFiles(@QueryParam("page") Integer page) {

@@ -52,7 +52,7 @@ console.log('main.js loaded');
                 component: vueComponents['contents-table']
             },
             '/contacts': {
-                component: vueComponents['contents-table']
+                component: vueComponents['contacts-table']
             },
             '/files': {
                 component: vueComponents['file-library']

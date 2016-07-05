@@ -5,11 +5,24 @@
         <header class="post-header">
             <h2 class="post-title">{{ page.title }}</h2>
         </header>
+        <div>{% editable_image the_image %}{% end_editable %}</div>        
         <div class="post-description">
             {{ page.content }}
         </div>
-        {% editable_image_collection gallery %}
-        {% end_editable %}
+        <h1>{% editable_text the_line %}{% end_editable %}</h1>
+        <div>
+          {% editable_image_collection gallery %}
+          {% end_editable %}
+        </div>
+        <div>
+          {% editable_markdown secondary_content %}
+          {% end_editable %}          
+        </div>
+        <div>
+          {% editable_markdown third_content %}
+          {% end_editable %}          
+        </div>
+
     </section>
 </div><!--end posts-->
 {% endblock %}

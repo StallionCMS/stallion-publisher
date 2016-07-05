@@ -67,10 +67,15 @@
              }
          },
          setData: function(markdown, widgets) {
+             console.log('set data');
+             markdown = this.parseOutWidgetHtmlFromContent(markdown);
+             this.cm.doc.setValue(markdown);
              this.originalMarkdown = markdown;
              this.originalWidgets = widgets;
              this.widgets = JSON.parse(JSON.stringify(widgets));
              this.markdown = markdown;
+
+             this.syncAllWidgetsToCodeMirror();
          },
          // Syncs the data structure with the reality of codemirror:
          // Removes all widgets that have been deleted, syncs line numbers for each widget
@@ -501,3 +506,37 @@
      }
  }
 </script>
+
+<style>
+.markdown-editor .line-widget {
+    background-color: #F9F9F9;
+    border-radius: 2px;
+    padding: 6px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border: 1px dotted #ccc;
+    height: 40px;
+    display: block;
+}
+.markdown-editor .line-widget .line-widget-delete.btn.btn-default {
+    color: #944;
+}
+.markdown-editor .line-widget .widget-label {
+    font-weight: 600;
+}
+
+.markdown-editor .line-widget.line-widget-image, .markdown-editor .line-widget.line-widget-image-collection {
+    height: 50px;
+    
+}
+.markdown-editor .line-widget-image .widget-preview, .markdown-editor .line-widget-image-collection .widget-preview {
+    text-align: right;
+    float: right;
+}
+.markdown-editor .line-widget-image-collection .widget-preview img, .markdown-editor .line-widget-image .widget-preview img {
+    max-height: 38px;
+    max-width: 120px;
+    border: 1px solid #999;
+}
+ 
+</style>

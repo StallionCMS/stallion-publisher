@@ -48,7 +48,7 @@
          return {
              loading: true,
              pager: null,
-             loadAll: false
+             loadAll: true
          }
      },
      ready: function() {

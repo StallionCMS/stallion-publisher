@@ -45,9 +45,9 @@
                     </div>
                     <div v-show="tab==='editor'">
                         <markdown-editor v-ref:maincontent editor-id="main-content-editor" :markdown="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></markdown-editor>
-                        <div class="editable-page-element-wrapper" v-for="element in templateElements">
+                        <div class="editable-page-element-wrapper" v-for="element in post.elements">
                             <label>Edit <em>{{element.name}}</em> section</label>
-                            <page-element name="pageElementEditable" elementname="{element.name}}" onchange="onMarkdownChange" element="element" ></page-element>
+                            <page-element name="pageElementEditable" :element-name="element.name" :change-callback="onPageElementChange" :element="element" ></page-element>
                         </div>
                     </div>
                     <div v-if="tab==='versions'">
@@ -183,7 +183,6 @@
                  data.originalPost = o.post;
                  data.versionId = o.post.id;
                  data.contentId = contentId;
-                 data.templateElements = o.templateElements;
                  data.shouldBeScheduled = o.post.scheduled;
                  data.lastWidgetCount = o.post.widgets.length;
                  transition.next(data);
@@ -232,6 +231,11 @@
              this.previewMode = previewMode;
              
          },
+         onPageElementChange: function() {
+             console.log('page element changed');
+             this.dirty = true;
+             this.debouncedSaveDraftAndReloadPreview();
+         },
          onMarkdownChange: function() {
              console.log('markdown changed');
              this.dirty = true;
@@ -270,10 +274,13 @@
              post.originalContent = markdownEditorData.markdown;
              post.widgets = markdownEditorData.widgets;
 
+             
+
              var originalJson = JSON.stringify(this.originalPost);
              var currentJson = JSON.stringify(post);
              if (originalJson === currentJson) {
                  console.log('no changes, no need to save');
+                 this.dirty = false;
                  return;
              }
              /***
@@ -339,7 +346,21 @@
              this.dirty = true;
          },
          restoreVersionCallback: function() {
-             this.loadContent();
+             var self = this;
+             self.dirty = true;
+             this.loadContent(this.contentId, function(o) {
+                 self.tab = 'editor';
+                 // TODO: eliminate duplication with initial loading code
+                 self.post = JSON.parse(JSON.stringify(o.post));
+                 self.$refs.maincontent.setData(self.post.originalContent, self.post.widgets);
+                 self.originalPost = o.post;
+                 self.versionId = o.post.id;
+                 self.templateElements = o.templateElements;
+                 self.shouldBeScheduled = o.post.scheduled;
+                 self.lastWidgetCount = o.post.widgets.length;
+                 self.dirty = false;
+                 $(self.$el).find('.preview-iframe').attr('src', '/st-publisher/posts/' + self.contentId + '/view-latest-version?t=' + new Date().getTime());
+             });
          }
      },
      watch: {

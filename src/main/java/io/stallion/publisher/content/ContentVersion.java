@@ -25,7 +25,7 @@ import io.stallion.dataAccess.ModelController;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="blog_post_versions")
+@Table(name="content_versions")
 public class ContentVersion extends Content {
     private Long postId = 0L;
     private ZonedDateTime versionDate;

@@ -314,9 +314,10 @@ public class AdminEndpoints implements EndpointResource {
             ele.setContent(savedEle.getContent());
             ele.setData(savedEle.getData());
         }
+        newVersion.setElements(elements);
 
         Map context = map(val("post", newVersion));
-        context.put("templateElements", elements);
+        //context.put("templateElements", elements);
         return context;
     }
 
@@ -480,10 +481,12 @@ public class AdminEndpoints implements EndpointResource {
             post.getOldUrls().add(post.getSlug());
         }
         ContentsVersionController.instance().updatePostWithVersion(post, lastVersion);
-
-        if (post.getPublishDate() == null) {
+        post.setInitialized(true);
+        if (post.getPublishDate() == null || (post.getScheduled() && post.getDraft())) {
             post.setPublishDate(DateUtils.utcNow().minusMinutes(1));
+            post.setScheduled(true);
         }
+        post.setUpdatedAt(DateUtils.mils());
         post.setDraft(false);
 
 
@@ -549,7 +552,7 @@ public class AdminEndpoints implements EndpointResource {
         ZonedDateTime fifteenAgo = DateUtils.utcNow().minusMinutes(15);
         // Set all other new saved versions in the last fifteen minutes to not be a checkpoint. Thus only the last
         // save in a given session of editing will ever be considered a checkpoint version.
-        DB.instance().execute("UPDATE blog_post_versions SET checkpoint=0 WHERE " +
+        DB.instance().execute("UPDATE content_versions SET checkpoint=0 WHERE " +
                 "postId=? AND checkpoint=1 AND versionAuthorId=? AND versionDate > ? AND id!=? AND permanentCheckpoint=0 ",
                 postId, Context.getUser().getId(), new Timestamp(fifteenAgo.toInstant().toEpochMilli()), newVersion.getId());
 

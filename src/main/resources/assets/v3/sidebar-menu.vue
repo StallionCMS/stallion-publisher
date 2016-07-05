@@ -14,9 +14,9 @@
             <li class="files"><a href="#/files"><span class="icon-images"></span> Files/Media</a></li>
         </ul>
         <div>
-            <a onclick={toggleConfigShown} if={!configMenuShown} className="show-config-link not-shown" href="javascript:;"  onClick={this.toggleConfigShown}>Configuration &#9656;</a>
-            <a onclick={toggleConfigShown} if={configMenuShown} href="javascript:;" className="show-config-link shown" onClick={this.toggleConfigShown}>Configuration 	&#9662;</a>
-            <ul if={configMenuShown} className="nav nav-sidebar config-options">
+            <a v-if='!configMenuShown' className="show-config-link not-shown" href="javascript:;"  @click='configMenuShown=true'>Configuration &#9656;</a>
+            <a v-if='configMenuShown' href="javascript:;" className="show-config-link shown" @click='configMenuShown=false'>Configuration 	&#9662;</a>
+            <ul v-if='configMenuShown' className="nav nav-sidebar config-options">
                 <li><a href="#/settings/authors">Authors</a></li>
                 <li><a href="#/settings/extra-html">Extra HTML and CSS</a></li>
                 <li className="widgets"><a href="#/settings/widgets">Global Modules</a></li>
@@ -27,5 +27,11 @@
 </template>
 
 <script>
-
+ module.exports = {
+     data: function() {
+         return {
+             configMenuShown: false
+         };
+     }
+ };
 </script>

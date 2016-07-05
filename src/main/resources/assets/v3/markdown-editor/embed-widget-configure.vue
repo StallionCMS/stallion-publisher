@@ -17,7 +17,7 @@
         <div v-if="tab==='embedHtml'">
             <div class="form-group">
                 <label>The HTML Embed code</label>
-                <textarea class="form-control" autofocus="autofocus" name="embedCode" v-model="embedCode" ></textarea>
+                <autogrow-textarea class="form-control" autofocus="autofocus" name="embedCode" v-model="embedCode" ></autogrow-textarea>
             </div>
         </div>
     </div>
@@ -33,14 +33,16 @@
          }
      },
      data: function() {
-         var originalWidgetData = this.widgetData || {};
-         this.widgetData = JSON.parse(JSON.stringify(originalWidgetData));
          this.widgetData.data = this.widgetData.data || {};
          return {
              embedLink: this.widgetData.data.embedLink || '',
              embedCode: this.widgetData.data.embedCode || '',
-             tab: 'embedLink',
-             originalWidgetData: originalWidgetData
+             tab: 'embedLink'
+         }
+     },
+     ready: function() {
+         if (this.embedCode) {
+             this.okToInsert = true;
          }
      },
      methods: {
@@ -57,7 +59,6 @@
      watch: {
          'embedLink': function(link) {
              var self = this;
-             console.log('embed link updated ', link);
              var $ele = $('<div></div>');
              //self.link = self.embedLink.value;
              $ele.oembed(link, {
@@ -68,14 +69,12 @@
                          self.embedCode = o.code[0].outerHTML;
                      }
                      //debugger;
-                     console.log('afterEmbed', self.widgetData.data.embedCode);
                      //debugger;
                      //self.parent.saveWidget();
                  }
              });
          },
          'embedCode': function(embedCode) {
-             console.log('emebd code updated ', embedCode);
              if (embedCode) {
                  this.okToInsert = true;
              }

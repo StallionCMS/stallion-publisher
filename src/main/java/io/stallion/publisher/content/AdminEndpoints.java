@@ -532,7 +532,7 @@ public class AdminEndpoints implements EndpointResource {
         newVersion.setDiff(truncateSmart(Sanitize.stripAll(StringUtils.difference(newVersion.getOriginalContent(), updatedVersion.getOriginalContent())), 250));
         SafeMerger.with()
                 .nonNull("title", "originalContent", "widgets", "metaDescription", "headHtml", "footerHtml", "elements")
-                .optional("slug", "authorId", "scheduled", "publishDate", "featuredImage")
+                .optional("slug", "authorId", "scheduled", "publishDate", "featuredImage", "slugTouched")
                 .merge(updatedVersion, newVersion);
 
 

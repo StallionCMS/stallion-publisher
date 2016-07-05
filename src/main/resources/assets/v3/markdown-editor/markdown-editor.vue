@@ -3,7 +3,7 @@
 <template>
     <div class="markdown-editor" id="{{ editorId }}">
         <textarea class="form-control"></textarea>
-        <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widgettype="activeWidgetType" :widgetdata="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
+        <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
         <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback"></insert-link-modal>
         <paste-html-modal v-if="showPasteHtmlModal" :shown.sync="showPasteHtmlModal" :callback="pasteRichContentCallback"></paste-html-modal>
     </div>
@@ -38,7 +38,7 @@
              showPasteHtmlModal: false,
              showInsertLinkModal: false,
              activeWidgetData: {},
-             activeWidgetType: '',
+             activeWidgetType: 'dzf',
              forceAllowChange: false
          };
      },
@@ -62,7 +62,7 @@
          getData: function() {
              this._updateWidgetsArrayFromCodeMirror();
              return {
-                 markdown: this.getContentWithWidgetHtml(),
+                 markdown: this._getContentWithWidgetHtml(),
                  widgets: JSON.parse(JSON.stringify(this.widgets))
              }
          },
@@ -75,7 +75,8 @@
          // Syncs the data structure with the reality of codemirror:
          // Removes all widgets that have been deleted, syncs line numbers for each widget
          _updateWidgetsArrayFromCodeMirror: function() {
-             var cm = self.simplemde.codemirror;
+             var self = this;
+             var cm = self.cm;
              var newWidgets = []
              var widgetByGuid = {};
              self.widgets.forEach(function(widget) {
@@ -159,13 +160,14 @@
                          return false;
                      }
                  });
-                 $node.find('.widget-preview').html(widgetData.previewHtml);
+                 $(self.$el).find('.line-widget-' + widgetData.guid + ' .widget-preview').html(widgetData.previewHtml);
                  self.triggerChange();
              } else {
                  // Is new widget
                  var line = this._addWidgetToCodeMirror(widgetData, true);
                  widgetData.line = line;
                  this.widgets.push(widgetData);
+                 self.triggerChange();
              }
              console.log('insert the widget', widgetData, widgetData.type, widgetData.html);
          },
@@ -184,6 +186,10 @@
          },
          triggerChange: function() {
              console.log('trigger change');
+             if (this.changeCallback) {
+                 this.changeCallback();
+             }
+             
          },
          pasteRichContent: function() {
              console.log('pasteRichContent modal');
@@ -197,7 +203,7 @@
          _addWidgetToCodeMirror: function(widgetData, atCursor) {
              var self = this;
              var cm = this.cm;
-             var $node = $('<span class="line-widget line-widget-' + widgetData.type + '"><span class="widget-label">' + widgetData.label + '</span> <span class="line-widget-edit btn btn-default btn-xs">Edit widget</span> <span class="line-widget-delete btn btn-xs btn-default">remove &#xd7;</span><span class="widget-preview">' + (widgetData.previewHtml || '') + '</span></span>').addClass('line-widget');
+             var $node = $('<span class="line-widget line-widget-' + widgetData.type + ' line-widget-' + widgetData.guid +  '"><span class="widget-label">' + widgetData.label + '</span> <span class="line-widget-edit btn btn-default btn-xs">Edit widget</span> <span class="line-widget-delete btn btn-xs btn-default">remove &#xd7;</span><span class="widget-preview">' + (widgetData.previewHtml || '') + '</span></span>').addClass('line-widget');
              //var widget = self.simplemde.codemirror.addLineWidget(line, $node.get(0), {});
              var cursor = cm.doc.getCursor();
              var line = widgetData.line;
@@ -256,8 +262,10 @@
              $node.find('.line-widget-edit').click(function() {
                  self.activeWidgetType = widgetData.type;
                  self.activeWidgetData = widgetData;
+                 console.log('edit widget ', widgetData);
                  self.showWidgetModal = true;
              });
+             
              return line;
          },
          _replaceSelection: function(cm, active, startEnd, url) {
@@ -319,9 +327,10 @@
              });
 
              cm.on('change', function(evt) {
-                 if (!self.loaded) {
-                     return;
-                 }
+                 //if (!self.loaded) {
+                 //    return;
+                 //}
+                 console.log('codemirror changed ' + self.editorId);
                  if (self.changeCallback) {
                      self.changeCallback(evt);
                  }

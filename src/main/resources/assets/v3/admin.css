@@ -215,14 +215,14 @@ autogrow-textarea .form-control {
     line-height: 94px;
 }
 
-image-collection-widget-configure .image-thumb-box {
+.image-collection-widget-configure .image-thumb-box {
     display: inline-block;
     height: 246px;
     width: 156px;
     vertical-align: top;
     margin-right: 10px;
 }
-image-collection-widget-configure .image-thumb-box .image-wrap-box {
+.image-collection-widget-configure .image-thumb-box .image-wrap-box {
     height: 156px;
     width: 156px;
     border: 1px solid #ddd;
@@ -231,17 +231,17 @@ image-collection-widget-configure .image-thumb-box .image-wrap-box {
     padding: 3px;
     cursor: move;
 }
-image-collection-widget-configure .image-thumb-box .caption-wrap-box {
+.image-collection-widget-configure .image-thumb-box .caption-wrap-box {
     height: 90px;
     width: 154px;
 }
 
 
 
-image-collection-widget-configure .image-thumb-box .caption-wrap-box a {
+.image-collection-widget-configure .image-thumb-box .caption-wrap-box a {
     font-size: 80%;
 }
-image-collection-widget-configure .image-thumb-box a.delete-icon {
+.image-collection-widget-configure .image-thumb-box a.delete-icon {
     position: absolute;
     display: inline-block;
     width: 24px;
@@ -254,18 +254,18 @@ image-collection-widget-configure .image-thumb-box a.delete-icon {
     opacity: .5;
 }
 
-image-collection-widget-configure .image-thumb-box .form-control {
+.image-collection-widget-configure .image-thumb-box .form-control {
     width: 150px;
     font-size: 80%;
     border: 1px solid transparent;
     padding: 2px;
 }
-image-collection-widget-configure .image-thumb-box .form-control:focus, image-collection-widget-configure .image-thumb-box .form-control:hover  {
+.image-collection-widget-configure .image-thumb-box .form-control:focus, image-collection-widget-configure .image-thumb-box .form-control:hover  {
     border: 1px dashed #999;
 }
 
 
-image-collection-widget-configure .image-thumb-box img {
+.image-collection-widget-configure .image-thumb-box img {
     max-height: 150px;
     max-width: 150px;
 }

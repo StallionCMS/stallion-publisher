@@ -9,7 +9,7 @@
                 <a target="_blank" v-bind:href="image.url">{{image.url}}</a>
                 <a class="btn btn-default btn-sm" href="javascript:;" @click="tab='selector'">Change Image</a>
             </div>
-            <image-full-formatting v-ref:formatting name="formatting" :widget-data="widgetData"></image-full-formatting>
+            <image-full-formatting v-ref:formatting name="formatting" :existing-formatting="formatting"></image-full-formatting>
         </div>
     </div>
 </template>
@@ -24,14 +24,27 @@
          }
      },
      data: function() {
+         var tab = 'selector';
+         var image = null;
+         if (this.widgetData.data.image) {
+             image = this.widgetData.data.image;
+             tab = 'formatting';
+         }
          return {
-             tab: 'selector',
-             image: null
+             formatting: JSON.parse(JSON.stringify(this.widgetData.data)),
+             tab: tab,
+             image: image
+         }
+     },
+     ready: function() {
+         if (this.image) {
+             this.okToInsert = true;
          }
      },
      methods: {
          getWidgetData: function() {
              var wd = this.widgetData;
+             wd.type = 'image';
              wd.label = 'Image';
              wd.data = this.$refs.formatting.getData();
              wd.data.image = this.image;
@@ -39,6 +52,7 @@
              wd.previewHtml = '<img src="' + this.image.thumbUrl + '">'
              //wd.data.embedLink = this.embedLink;
              //wd.data.embedCode = this.embedCode;
+             console.log('image ', wd.data.image, ' data ', wd.data);
              wd.html = this.buildHtml(wd.data.image, wd.data);
              return wd;
          },
@@ -54,30 +68,12 @@
              var $img = $('<img>');
              $imgOuter.append($img);
              $wrap.append($imgOuter);
-             $img.attr('src', data.src).attr('alt', data.altText).attr('title', data.altText);
+             $img.attr('src', image.mediumUrl).attr('alt', data.altText).attr('title', data.altText);
              
              $wrap.addClass('st-image-' + data.alignment);
              
-             
-             if (data.constrain100) {
-                 $img.css({'max-width': '100%'})
-             }
-             if (data.maxWidth) {
-                 $wrap.css({'max-width': data.maxWidth + 'px'});
-             }
-             if (data.maxHeight) {
-                 $img.css({'max-height': data.maxHeight + 'px'});
-             }
-             if (data.minWidth) {
-                 $img.css({'min-width': data.minWidth + 'px'});
-             }
-             if (data.minHeight) {
-                 $img.css({'min-height': data.minHeight + 'px'});
-             }
-             
-             $img.css({'border-width': data.borderWidth + 'px', 'border-style': 'solid', 'border-color': data.borderColor});
-             $img.css({'margin-left': data.marginLeft + 'px', 'margin-top': data.marginTop + 'px', 'margin-right': data.marginRight + 'px', 'margin-bottom': data.marginBottom + 'px'});
-             
+             $img.css({'border-width': '1px', 'border-style': 'solid', 'border-color': '#F9F9F9'});
+
              if (data.title) {
                  var $title = $('<h5 class="st-image-title"></h5>').html(data.title);
                  $wrap.prepend($title);
@@ -88,9 +84,7 @@
                  $wrap.append($caption);
              }
              
-             if (data.caption || data.title) {
-                 $wrap.css({'display': 'block'});
-             }
+             $wrap.css({'display': 'block'});
              
              if (data.linkUrl) {
                  var $a = $('<a></a>');

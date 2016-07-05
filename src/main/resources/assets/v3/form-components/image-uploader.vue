@@ -13,9 +13,9 @@
      props: {
          callback: Function
      },
-     compile: function() {
+     ready: function() {
          var self = this;
-         self.dropzone = new Dropzone(self['my-image-dropzone'], {
+         self.dropzone = new Dropzone($(self.$el).find('.image-dropzone').get(0), {
              dictDefaultMessage: "Drag one more more files here. Or click to open a file picker.",
              uploadMultiple: false,
              //             parallelUploads: true,

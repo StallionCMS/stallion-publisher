@@ -1,81 +1,87 @@
+<style>
+ .image-wrap-icon {
 
+ }
+ .image-wrapping img {
+     max-height: 40px;
+     margin-bottom: 1em;
+ }
+ .image-wrapping label {
+     text-align: center;
+     display: inline-block;
+     margin-right: 2px;
+     vertical-align: top;
+     width: 130px;
+     height: 130px;
+     padding: 6px;
+     border: 1px solid #CCC;
+     cursor: pointer;
+ }
+ .image-wrapping label:hover {
+     background-color: #F0F0F0;
+ }
+ .image-wrapping label.active {
+     background-color: #FBFBFB;
+ }
+ .image-wrapping label .label-text {
+     display: inline-block;
+     width: 100%;
+     height: 40px;
+ }
+ 
+</style>
 
 <template>
     <div class="image-full-formatting">
-        <h3>Formatting</h3>
-
-        <div class="row">
-            <div class="col-sm-6">
-                <h5>Align</h5>                
-                <div class="form-group">
-                    <label for="alignCenter">Center <br><input type="radio" name="alignment" value="center"></label>        
-                    <label for="alignLeft">Left <br><input type="radio"  name="alignment" value="left"></label>
-                    <label for="alignRight">Right <br><input type="radio" name="alignment" value="right"></label>
-                    <label for="alignRight">Image Left, Caption Right<br><input type="radio" name="alignment" value="caption-right"></label>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                    <label>Alternative text/Hover text (appears for screen readers and mouse hover)</label>
-                    <input type="text" class="form-control" name="altText"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Link URL (optional) -- link to follow when image is clicked on</label>
-                    <input type="text" class="form-control" name="linkUrl"></textarea>
-                </div>
-            </div>
-        </div>
         <div class="row">
             <div class="col-sm-12">
-                <a show={!advancedVisible} href="javascript:;" onclick={toggleAdvancedOptions}>Show advanced options &#171;</a>
-                <a show={advancedVisible} href="javascript:;" onclick={toggleAdvancedOptions}>&#187; Hide advanced options</a>
+                <div><em><big>Image alignment and wrap {{ formatting.alignment }} {{formatting.altText }}</big></em></div>
+                <div class="form-group image-wrapping">
+                    <label v-bind:class="{active: formatting.alignment==='center'}"><span class="label-text">Left</span>
+                        <br><img src="/st-resource/publisher/images/images-align-left.png">
+                        <br><input type="radio"  name="alignment" value="left" v-model="formatting.alignment">
+                    </label>
+                    <label v-bind:class="{active: formatting.alignment==='center'}"><span class="label-text">Center</span>
+                        <br><img src="/st-resource/publisher/images/images-center.png">
+                        <br><input type="radio" name="alignment" value="center" v-model="formatting.alignment">
+                        
+                    </label>    
+                    <label v-bind:class="{active: formatting.alignment==='center'}"><span class="label-text">Right</span>
+                        <br><img src="/st-resource/publisher/images/images-align-right.png">
+                        <br><input type="radio" name="alignment" value="right" v-model="formatting.alignment">
+                    </label>
+                    
+                    <label v-bind:class="{active: formatting.alignment==='center'}">
+                        <span class="label-text">Image Left, Caption Right</span>
+                        <br><img src="/st-resource/publisher/images/images-caption-right.png">
+                        <br><input type="radio" name="alignment" value="caption-right" v-model="formatting.alignment">
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-6">
             </div>
         </div>
-        <div class="row" show={advancedVisible}>
+        <div class="row">
             <div class="col-sm-6">
                 <div class="form-group">
-                    <label>Title/Header (appears above image)</label>
-                    <textarea class="form-control" style="height: 2.5em;" name="title"></textarea>
+                    <label>Link URL (optional) -- link to follow when image is clicked on</label>
+                    <input type="text" class="form-control" name="linkUrl" v-model="formatting.linkUrl"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Caption (appears below image)</label>
-                    <textarea class="form-control" style="height: 2.5em;" name="caption"></textarea>
+                    <label>Caption (optional, appears below image)</label>
+                    <textarea class="form-control" style="height: 2.5em;" name="caption" v-model="formatting.caption"></textarea>
                 </div>
             </div>
             <div class="col-sm-6">
-                <div>
-                    <h5>Margin</h5>
-                    <div style="margin-left: 60px;">Top: <input type="number" name="marginTop" >px</div>
-                    <div><span>Left: <input type="number" name="marginLeft" >px</span><span style="margin-left: 20px">Right: <input type="number" name="marginRight">px</span></div>
-                    <div style="margin-left: 60px;">Bottom: <input type="number" name="marginBottom" >px</div>
-                </div>
-                <div class="checkbox">
-                    <label><input type="checkbox" name="constrain100" value="true"> Constrain to column width?</label>
+                <div class="form-group">
+                    <label>Alternative text/Hover text (optional, appears for screen readers and mouse hover)</label>
+                    <input type="text" class="form-control" v-model="formatting.altText"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Max-width</label>
-                    <input type="number" name="maxWidth" >px
+                    <label>Title/Header (optional, appears above image)</label>
+                    <textarea class="form-control" style="height: 2.5em;" name="title" v-model="formatting.title"></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Max-height</label>
-                    <input type="number" name="maxHeight" >px
-                </div>
-                <div class="form-group">
-                    <label>Min-width</label>
-                    <input type="number" name="minWidth" >px
-                </div>
-                <div class="form-group">
-                    <label>Min-height</label>
-                    <input type="number" name="minHeight" >px
-                </div>
-                <div class="form-group">
-                    <label>Border width</label>
-                    <input type="number" name="borderWidth">
-                </div>
-                <div class="form-group">
-                    <label>Border color</label>
-                    <input type="text" name="borderColor">
-                </div>
+                
             </div>
         </div>
     </div>
@@ -84,19 +90,31 @@
 <script>
  module.exports = {
      props: {
-         widgetData: Object,
+         existingFormatting: Object,
      },
      data: function() {
-         this.widgetData = this.widgetData || {data: {}};
-         var data = JSON.parse(JSON.stringify(this.widgetData.data || {}));
-         return {
-             data: data
+         var formatting = {};
+         if (this.existingFormatting) {
+             formatting = JSON.parse(JSON.stringify(this.existingFormatting));
          }
+         formatting.altText = formatting.altText || '';
+         formatting.title = formatting.title || '';
+         formatting.alignment = formatting.alignment || 'center';
+         formatting.linkUrl = formatting.linkUrl || '';
+         formatting.caption = formatting.caption || '';                  
+         return {
+             formatting: formatting
+         };
+     },
+     ready: function() {
      },
      methods: {
          getData: function() {
-             return {};
+             return this.formatting;
          }
+     },
+     watch : {
+
      }
  }
 

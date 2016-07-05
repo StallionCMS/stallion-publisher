@@ -13,14 +13,19 @@
  
  module.exports = {
      props: {
+         widgetData: Object,
          insertCallback: Function,
          okToInsert: {
              twoWay: true
          }
      },
      data: function() {
+         var html = '';
+         if (this.widgetData && this.widgetData.data && this.widgetData.data.html) {
+             html = this.widgetData.data.html;
+         }
          return {
-             html: ''
+             html: html
          }
      },
      ready: function() {
@@ -29,7 +34,7 @@
      methods: {
          getWidgetData: function() {
              var self = this;
-             var data = {};
+             var data = {html: this.html};
              var html = this.html;
              var widgetData = {
                  isBlock: true,

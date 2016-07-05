@@ -3,7 +3,7 @@
 
 <template>
     <div class="modal {{cssClass}}" role="dialog" aria-labelledby="myLargeModalLabel">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog  {{ modalClass }}" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <slot name="header">
@@ -39,13 +39,16 @@
          },
          title: null,
          tag: '',
+         large: false,
+         small: false,
          cssClass: '',
          callback: Function,
          saveLabel: 'Save'
      },
      data: function() {
          return {
-             modal: null
+             modal: null,
+             modalClass: ''
          }
      },
      compiled: function() {
@@ -53,6 +56,12 @@
          var self = this;
          console.log('tag ', this.tag);
          var $ele = $(self.$el);
+         this.modalClass = 'modal-md';
+         if (this.large) {
+             this.modalClass = 'modal-lg';
+         } else if (this.small) {
+             this.modalClass = 'modal-sm';
+         }
          $ele.on("dragover", function(e) { e.preventDefault();  e.stopPropagation(); });
          $ele.on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
          $ele.modal({

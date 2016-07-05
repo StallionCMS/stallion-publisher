@@ -395,6 +395,7 @@
          if (self.urlTouched) {
              postData.slug = self.slug.value;
          }
+
          stallion.request({
              url: '/st-publisher/posts/' + self.postId + '/update-draft',
              method: 'POST',

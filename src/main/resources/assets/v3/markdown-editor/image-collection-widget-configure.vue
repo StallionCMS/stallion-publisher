@@ -58,7 +58,7 @@
                 <input type="input" class="form-control" name="customCssClass" placeholder="Enter one or more CSS class names, separated by spaces." v-model="galleryOnClick" v-bind:true-value="true" v-bind:false-value="false"/>
             </div>
             <div class="checkbox p">
-                <label><input type="checkbox" name="galleryOnClick" value="true"> Open slideshow mode when an image is clicked on?</label>
+                <label><input type="checkbox" name="galleryOnClick" v-bind:true-value="true" v-bind:false-value="false" v-model="galleryOnClick"> Open slideshow mode when an image is clicked on?</label>
             </div>
         </div>
     </div>
@@ -67,17 +67,24 @@
 <script>
  module.exports = {
      props: {
+         widgetData: Object,
          insertCallback: Function,
          okToInsert: {
              twoWay: true
          }
      },
      data: function() {
+         var data = JSON.parse(JSON.stringify(this.widgetData.data || {}));
          return {
              screen: 'collection',
-             images: [],
-             layout: 'image-grid-medium',
-             galleryOnClick: true
+             images: data.images  || [],
+             layout: data.layout || 'image-grid-medium',
+             galleryOnClick: data.galleryOnClick === undefined ? true : false
+         }
+     },
+     ready: function() {
+         if (this.images) {
+             this.okToInsert = true;
          }
      },
      attached: function() {

@@ -2,9 +2,9 @@
 
 <template>
     <div class="widget-modal">
-        <modal-base v-ref:themodal :shown.sync="shown" :title="title" >
+        <modal-base v-ref:themodal :shown.sync="shown" :large="true" :title="title" >
             <div slot="body">
-                <div v-if="!widgettype">
+                <div v-if="!widgetType">
                     <div class="widget-option">
                         <a href="javascript:;" @click="selectWidget('embed', 'Configure HTML Embed')">
                             <span class="icon icon-embed"></span> HTML Embed (Youtube Video, Slideshare, etc.)
@@ -31,12 +31,12 @@
                         </a>
                     </div>
                 </div>
-                <div v-if="widgettype">
-                    <embed-widget-configure v-ref:active v-if="widgettype==='embed'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert"></embed-widget-configure>
-                    <image-widget-configure v-ref:active v-if="widgettype==='image'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgettype==='image'"></image-widget-configure>
-                    <image-collection-widget-configure v-ref:active v-if="widgettype==='image-collection'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgettype==='image-collection'"></image-collection-widget-configure>
-                    <html-widget-configure v-ref:active v-if="widgettype==='html'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgettype==='html'"></html-widget-configure>
-                    <html-form-widget-configure v-ref:active v-if="widgettype==='html-form'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgettype==='html-form'"></html-form-widget-configure>
+                <div v-if="widgetType">
+                    <embed-widget-configure v-ref:active v-if="widgetType==='embed'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert"></embed-widget-configure>
+                    <image-widget-configure v-ref:active v-if="widgetType==='image'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='image'"></image-widget-configure>
+                    <image-collection-widget-configure v-ref:active v-if="widgetType==='image-collection'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='image-collection'"></image-collection-widget-configure>
+                    <html-widget-configure v-ref:active v-if="widgetType==='html'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='html'"></html-widget-configure>
+                    <html-form-widget-configure v-ref:active v-if="widgetType==='html-form'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='html-form'"></html-form-widget-configure>
                 </div>
             </div>
             <div slot="footer">
@@ -54,42 +54,52 @@
              twoWay: true
          },
          callback: Function,
-         widgettype: '',
-         widgetdata: null,
-         okToInsert: false
+         widgetType: '',
+         widgetData: null
      },
      data: function() {
+         var activeWidgetData = {data:{type: this.widgetType}};
+         if (this.widgetData && this.widgetData.type) {
+             activeWidgetData = JSON.parse(JSON.stringify(this.widgetData));
+             this.widgetType = activeWidgetData.type;
+         }
          return {
              title: "Insert Widget",
-             activeWidgetData: null
+             activeWidgetData: activeWidgetData,
+             okToInsert: false
          }
      },
      created: function() {
-         console.log('insert widget-modal created');
+
      },
      methods: {
          doInsertCallback: function() {
-             console.log('widget save callback');
+
          },
          cancel: function() {
-             console.log('cancel insert widget');
+
          },
          insertWidget: function() {
+             var previousGuid = this.widgetData.guid || '';
              var widgetData = this.$refs['active'].getWidgetData();
-             console.log('insert widget', this.$refs['active']);
+             if (previousGuid) {
+                 widgetData.guid = previousGuid;
+             } else {
+                 widgetData.guid = stPublisher.generateUUID();
+             }
              this.callback(widgetData);
              this.$refs.themodal.close();
          },
          selectWidget: function(type, title) {
-             if (this.widgetdata && this.widgetdata.type) {
-                 this.activeWidgetData = this.widgetdata;
+             if (this.widgetData && this.widgetData.type) {
+                 this.activeWidgetData = this.widgetData;
              } else {
                  this.activeWidgetData = {
                      type: type + '',
                      data: {}
                  }
              }
-             this.widgettype = type;
+             this.widgetType = type;
              this.title = title || this.title;
          }
      }

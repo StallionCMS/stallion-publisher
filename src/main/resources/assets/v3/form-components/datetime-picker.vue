@@ -22,7 +22,7 @@
 <template>
     <div class="vue-datetime-picker">
         <input class="form-control date-input" type="text" v-model="date" name="datepicker">
-        <select class="form-control time-input" v-model="hour" class="form-control" name="hour" min="0" max="59" step="1">
+        <select class="form-control time-input" v-model="hour" class="form-control" name="hour" min="0">
             <option value="0">12 AM</option>
             <option value="1">1 AM</option>
             <option value="2">2 AM</option>
@@ -48,7 +48,7 @@
             <option value="22">10 PM</option>
             <option value="23">11 PM</option>
         </select> :
-        <input class="minute-input form-control" v-model="minute" type="number" size="2">
+        <input class="minute-input form-control" v-model="minute" type="number" size="2"  max="59" step="1">
         <select class="timezone-input form-control" v-model="timezone" name="timezone">
             <option v-for="name in timezoneNames">{{ name }}</option>
         </select>
@@ -60,7 +60,7 @@
  module.exports = {
      props: {
          value: {
-             //twoWay: true
+             twoWay: true
          }
      },
      compiled: function() {
@@ -76,7 +76,13 @@
      data: function() {
          var self = this;
          var tz = moment.tz.guess();
-         var m = moment(self.value).tz(tz);
+         var mils = self.value;
+         var m;
+         // TODO: this should be explicit
+         if (mils > 0 && mils < 2467378540) {
+             mils = mils * 1000;
+         }
+         var m = moment(mils || new Date().getTime()).tz(tz);
          return {
              date: m.format('YYYY-MM-DD'),
              hour: m.hour(),
@@ -91,8 +97,8 @@
              var datestamp = self.date + ' ' + self.hour + ':' + self.minute;
              console.log('datetime changed ', datestamp, a, b);
              var m = moment.tz(datestamp, "YYYY-MM-DD H:m", self.timezone);
-             console.log(m.format(), m, m.valueOf());
-             this.value = m.valueOf()
+             console.log('New datetime: ', m.format(), m, m.valueOf());
+             this.value = m.valueOf() / 1000;
          }
      },
      watch: {

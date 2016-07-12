@@ -56,7 +56,7 @@ public class Contact extends ModelBase implements Contactable {
     public final static Set<String> SETTABLE_FIELDS = set("givenName", "familyName", "displayName", "webSite", "honorific");
 
 
-    @Column
+    @Column(length = 100)
     public String getGivenName() {
         return givenName;
     }
@@ -66,7 +66,7 @@ public class Contact extends ModelBase implements Contactable {
         return this;
     }
 
-    @Column
+    @Column(length = 100)
     public String getFamilyName() {
         return familyName;
     }
@@ -76,7 +76,7 @@ public class Contact extends ModelBase implements Contactable {
         return this;
     }
 
-    @Column
+    @Column(length = 150)
     @UniqueKey
     public String getEmail() {
         return email;
@@ -87,7 +87,7 @@ public class Contact extends ModelBase implements Contactable {
         return this;
     }
 
-    @Column
+    @Column(length = 200)
     public String getDisplayName() {
         return displayName;
     }
@@ -97,7 +97,7 @@ public class Contact extends ModelBase implements Contactable {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getWebSite() {
         return webSite;
     }
@@ -108,7 +108,7 @@ public class Contact extends ModelBase implements Contactable {
     }
 
     @UniqueKey
-    @Column
+    @Column(length = 60)
     @JsonIgnore
     public String getEverCookie() {
         return everCookie;
@@ -122,7 +122,7 @@ public class Contact extends ModelBase implements Contactable {
 
 
     @UniqueKey
-    @Column
+    @Column(length = 60)
     @JsonIgnore
     public String getSecretToken() {
         return secretToken;
@@ -225,7 +225,7 @@ public class Contact extends ModelBase implements Contactable {
         return this;
     }
 
-    @Column
+    @Column(length = 50)
     public String getHonorific() {
         return honorific;
     }

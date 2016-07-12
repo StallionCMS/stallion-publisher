@@ -16,9 +16,7 @@
 
 package io.stallion.publisher;
 
-import io.stallion.assets.BundleFile;
-import io.stallion.assets.DefinedBundle;
-import io.stallion.assets.VueBundleFile;
+import io.stallion.assets.*;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.publisher.comments.CommentsController;
 import io.stallion.publisher.comments.CommentsEndpoints;
@@ -32,6 +30,7 @@ import io.stallion.settings.Settings;
 import io.stallion.sitemaps.SiteMapController;
 import io.stallion.sitemaps.SiteMapItem;
 import io.stallion.templating.TemplateRenderer;
+import io.stallion.utils.ResourceHelpers;
 
 import java.util.List;
 
@@ -42,6 +41,15 @@ public class PublisherPlugin extends StallionJavaPlugin {
     @Override
     public String getPluginName() {
         return "publisher";
+    }
+
+    @Override
+    public List<String> getSqlMigrations() {
+        List<String> files = list();
+        for(String file: ResourceHelpers.listFilesInDirectory(getPluginName(), "/sql/")) {
+            files.add(file.substring(5).replace(".mysql.js", ""));
+        }
+        return files;
     }
 
     @Override
@@ -188,93 +196,100 @@ public class PublisherPlugin extends StallionJavaPlugin {
                 )
         );
 
-        DefinedBundle.register(
-                "admin3",
-                new BundleFile().setPluginName("publisher").setLiveUrl("v3/bootstrap.min.css"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/simplemde.min.css"),
-                //new BundleFile().setPluginName("publisher").setLiveUrl("admin/icomoon.css"),
-                //new BundleFile().setPluginName("publisher").setLiveUrl("admin/bootstrap-theme.css"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/pikaday.css"),
-                new BundleFile().setPluginName("stallion").setLiveUrl("vendor/vue.min.js").setDebugUrl("vendor/vue.js"),
-                new BundleFile().setPluginName("stallion").setLiveUrl("vendor/vue-router.min.js").setDebugUrl("vendor/vue-router.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/select2.min.css"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/dropzone.css"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("v3/dashboard.css"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("v3/admin.css"),
 
-                new BundleFile().setPluginName("stallion").setLiveUrl("always/jquery-1.11.3.min.js"),
-                //new BundleFile().setPluginName("publisher").setLiveUrl("public/require.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/simplemde.min.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/bootstrap.min.js"),
-                //        new BundleFile().setPluginName("stallion").setLiveUrl("always/riot-and-compiler.js").setDebugUrl("always/riot-and-compiler.min.js"),
-                new BundleFile().setPluginName("stallion").setLiveUrl("always/stallion.js"),
-                new BundleFile().setPluginName("stallion").setLiveUrl("admin/moment.min.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/dropzone.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/moment-timezone-with-data-2010-2020.min.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/pikaday.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/sortable.min.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/select2.min.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/to-markdown.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("vendor/jquery.oembed.js"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("v3/common.js"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/modal-base.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/author-picker.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/autogrow-textarea.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/date-picker.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/datetime-picker.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-library.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-selector.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/markdown-basic.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-simple-formatting.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-uploader.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-picker-field.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-collection-configure.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/image-collection-field.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/form-components/loading-div.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/embed-widget-configure.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/html-form-widget-configure.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/html-widget-configure.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-collection-widget-configure.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-collection-widget-modal.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-full-formatting.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-widget-configure.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/image-widget-modal.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/internal-link-picker.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/insert-link-modal.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/paste-html-modal.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/widget-modal.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/markdown-editor/markdown-editor.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/image-collection-editable.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/image-editable.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/page-element.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/page-element-text.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/page-element-image.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/page-element-image-collection.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/page-element-markdown.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/text-editable.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/version-history.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/page-editor/page-editor.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/file-library.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/file-upload.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/contents-table.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/contacts-table.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/comments-table.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/new-page.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/new-post.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/screens/view-content.vue"),
 
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/comments-admin.tag").setProcessor("riot"),
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/contacts-admin.tag").setProcessor("riot"),
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/authors-config.tag").setProcessor("riot"),
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/blog-configs.tag").setProcessor("riot"),
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/extra-html-config.tag").setProcessor("riot"),
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/template-widgets-config.tag").setProcessor("riot"),
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/sitemap-config.tag").setProcessor("riot"),
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/site-information-config.tag").setProcessor("riot"),
-                //        new BundleFile().setPluginName("publisher").setLiveUrl("v2/file-library.tag").setProcessor("riot"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/dashboard-home.vue"),
-                new VueBundleFile().setPluginName("publisher").setLiveUrl("v3/sidebar-menu.vue"),
-                new BundleFile().setPluginName("publisher").setLiveUrl("v3/main.js")
+        BundleRegistry.instance().register(
+                new CompiledBundle("admin3",
+                        new ResourceBundleFile("publisher", "v3/bootstrap.min.css"),
+                        new ResourceBundleFile("publisher", "vendor/simplemde.min.css"),
+                        //new BundleFile().setPluginName("publisher", "admin/icomoon.css"),
+                        //new BundleFile().setPluginName("publisher", "admin/bootstrap-theme.css"),
+                        new ResourceBundleFile("publisher", "vendor/pikaday.css"),
+                        new ResourceBundleFile("stallion", "vendor/vue.min.js", "vendor/vue.js"),
+                        new ResourceBundleFile("stallion", "vendor/vue-router.min.js", "vendor/vue-router.js"),
+                        new ResourceBundleFile("publisher", "vendor/select2.min.css"),
+                        new ResourceBundleFile("publisher", "vendor/dropzone.css"),
+                        new ResourceBundleFile("publisher", "v3/dashboard.css"),
+                        new ResourceBundleFile("publisher", "v3/admin.css"),
+
+                        new ResourceBundleFile("stallion", "always/jquery-1.11.3.min.js"),
+
+
+                        new ResourceBundleFile("publisher", "vendor/simplemde.min.js"),
+                        new ResourceBundleFile("publisher", "vendor/bootstrap.min.js"),
+                        //        new BundleFile().setPluginName("stallion", "always/riot-and-compiler.js").setDebugUrl("always/riot-and-compiler.min.js"),
+                        new ResourceBundleFile("stallion", "always/stallion.js"),
+                        new ResourceBundleFile("stallion", "admin/moment.min.js"),
+                        new ResourceBundleFile("publisher", "vendor/dropzone.js"),
+                        new ResourceBundleFile("publisher", "vendor/moment-timezone-with-data-2010-2020.min.js"),
+                        new ResourceBundleFile("publisher", "vendor/pikaday.js"),
+                        new ResourceBundleFile("publisher", "vendor/sortable.min.js"),
+                        new ResourceBundleFile("publisher", "vendor/select2.min.js"),
+                        new ResourceBundleFile("publisher", "vendor/to-markdown.js"),
+                        new ResourceBundleFile("publisher", "vendor/jquery.oembed.js"),
+                        new ResourceBundleFile("publisher", "v3/common.js"),
+                        new ResourceBundleFile("publisher", "public/require.js"),
+                        new ResourceBundleFile("publisher", "v3/imports.js"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/*.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/*.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/tinymce-image-plugin.js"),
+                        new VueResourceBundleFile("publisher", "v3/page-editor/*.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/*.vue"),
+                        new VueResourceBundleFile("publisher", "v3/*.vue"),
+                        /*
+                        new VueResourceBundleFile("publisher", "v3/form-components/modal-base.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/author-picker.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/autogrow-textarea.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/date-picker.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/datetime-picker.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/image-library.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/image-selector.vue"),
+
+                        new VueResourceBundleFile("publisher", "v3/form-components/markdown-basic.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/image-simple-formatting.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/image-uploader.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/image-picker-field.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/image-collection-configure.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/image-collection-field.vue"),
+                        new VueResourceBundleFile("publisher", "v3/form-components/loading-div.vue"),
+
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/embed-widget-configure.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/html-form-widget-configure.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/html-widget-configure.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/image-collection-widget-configure.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/image-collection-widget-modal.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/image-full-formatting.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/image-widget-configure.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/image-widget-modal.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/internal-link-picker.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/insert-link-modal.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/paste-html-modal.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/widget-modal.vue"),
+                        new VueResourceBundleFile("publisher", "v3/markdown-editor/markdown-editor.vue"),
+                        new VueResourceBundleFile("publisher", "v3/page-editor/page-element.vue"),
+                        new VueResourceBundleFile("publisher", "v3/page-editor/page-element-text.vue"),
+                        new VueResourceBundleFile("publisher", "v3/page-editor/page-element-image.vue"),
+                        new VueResourceBundleFile("publisher", "v3/page-editor/page-element-image-collection.vue"),
+                        new VueResourceBundleFile("publisher", "v3/page-editor/page-element-markdown.vue"),
+                        new VueResourceBundleFile("publisher", "v3/page-editor/version-history.vue"),
+                        new VueResourceBundleFile("publisher", "v3/page-editor/page-editor.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/file-library.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/file-upload.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/contents-table.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/contacts-table.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/comments-table.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/new-page.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/new-post.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/settings-authors.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/settings-extra-html.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/settings-site-information.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/settings-global-modules.vue"),
+                        new VueResourceBundleFile("publisher", "v3/screens/view-content.vue"),
+                        new VueResourceBundleFile("publisher", "v3/dashboard-home.vue"),
+                        new VueResourceBundleFile("publisher", "v3/sidebar-menu.vue"),
+                        //*/
+                        new ResourceBundleFile("publisher", "v3/main.js")
+                )
         );
 
         /*

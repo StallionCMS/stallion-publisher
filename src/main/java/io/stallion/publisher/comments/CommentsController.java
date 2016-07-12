@@ -139,7 +139,7 @@ public class CommentsController extends StandardModelController<Comment> {
                 .setFrequency(subscription.getFrequency())
                 .setContactId(notifyContact.getId())
                 .setCreatedAt(DateUtils.mils())
-                .setSubscriptionId(subscription.getId().toString())
+                .setSubscriptionId(subscription.getId())
                 .setKey("comment-notify---" + newComment.getId().toString() + "---" + notifyContact.getId().toString() );
                 ;
         NotificationController.instance().submitNotification(notification);

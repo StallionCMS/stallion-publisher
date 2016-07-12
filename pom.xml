@@ -15,12 +15,13 @@
             <groupId>io.stallion</groupId>
             <artifactId>stallion-core</artifactId>
             <version>.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
             <version>2.0</version>
-
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>eu.michael-simons</groupId>
@@ -55,6 +56,9 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <archive>
+                        <manifest>
+                            <mainClass>io.stallion.publisher.MainRunner</mainClass>
+                        </manifest>
                         <manifestEntries>
                             <pluginBooterClass>io.stallion.publisher.PublisherPlugin</pluginBooterClass>
                             <Build-Time>${maven.build.timestamp}</Build-Time>

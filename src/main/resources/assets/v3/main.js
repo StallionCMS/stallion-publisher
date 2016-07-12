@@ -54,6 +54,9 @@ console.log('main.js loaded');
             '/contacts': {
                 component: vueComponents['contacts-table']
             },
+            '/tiny': {
+                component: vueComponents['tiny-demo']
+            },            
             '/files': {
                 component: vueComponents['file-library']
             },
@@ -62,7 +65,19 @@ console.log('main.js loaded');
             },
             '/comments': {
                 component: vueComponents['comments-table']
-            }
+            },
+            '/settings/authors': {
+                component: vueComponents['settings-authors']
+            },
+            '/settings/extra-html': {
+                component: vueComponents['settings-extra-html']
+            },
+            '/settings/global-modules': {
+                component: vueComponents['settings-global-modules']
+            },
+            '/settings/site-information': {
+                component: vueComponents['settings-site-information']
+            }            
         })
         
         // Now we can start the app!

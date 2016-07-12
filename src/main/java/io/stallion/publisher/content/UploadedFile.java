@@ -54,7 +54,7 @@ public class UploadedFile extends ModelBase {
     private Integer mediumHeight = 0;
     private String mediumRawUrl = "";
 
-    @Column
+    @Column(length = 100)
     public String getName() {
         return name;
     }
@@ -63,6 +63,7 @@ public class UploadedFile extends ModelBase {
         this.name = name;
         return this;
     }
+
 
     public String getUrl() {
         return rawUrl.replace("{cdnUrl}", Settings.instance().getCdnUrl());
@@ -96,7 +97,7 @@ public class UploadedFile extends ModelBase {
     }
 
 
-    @Column
+    @Column(length = 255)
     public String getRawUrl() {
         return rawUrl;
     }
@@ -106,7 +107,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getCloudKey() {
         return cloudKey;
     }
@@ -116,7 +117,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 30)
     public String getType() {
         return type;
     }
@@ -126,7 +127,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 15)
     public String getExtension() {
         return extension;
     }
@@ -166,7 +167,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getThumbCloudKey() {
         return thumbCloudKey;
     }
@@ -176,7 +177,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getThumbRawUrl() {
         return thumbRawUrl;
     }
@@ -206,7 +207,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getMediumCloudKey() {
         return mediumCloudKey;
     }
@@ -236,7 +237,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getMediumRawUrl() {
         return mediumRawUrl;
     }
@@ -246,7 +247,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getSmallCloudKey() {
         return smallCloudKey;
     }
@@ -256,7 +257,7 @@ public class UploadedFile extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getSmallRawUrl() {
         return smallRawUrl;
     }

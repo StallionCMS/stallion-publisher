@@ -39,7 +39,7 @@ public class Subscription extends ModelBase  {
     private String filePath = "";
     private boolean canChangeFrequency = true;
 
-    @Column
+    @Column(length = 100)
     public String getName() {
         return name;
     }
@@ -49,7 +49,7 @@ public class Subscription extends ModelBase  {
     }
 
     @UniqueKey
-    @Column
+    @Column(length = 150)
     public String getOwnerKey() {
         return ownerKey;
     }
@@ -79,7 +79,7 @@ public class Subscription extends ModelBase  {
         this.contactId = contactId;
     }
 
-    @Column
+    @Column(length = 40)
     public SubscriptionFrequency getFrequency() {
         return frequency;
     }

@@ -32,7 +32,7 @@
                  method: 'GET',
                  success: function(o) {
                      if (o.blogs && o.blogs.length === 1) {
-                         self.createNewPostAndRedirect(self.blogs[0].id);
+                         self.createNewPostAndRedirect(o.blogs[0].id);
                      } else if (!o.blogs) {
                          self.createNewPostAndRedirect(null);
                      } else {

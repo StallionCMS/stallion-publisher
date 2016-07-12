@@ -1,6 +1,11 @@
 {% extends "stallion:common-base.jinja" %}
 {% block builtin_head_bundles %}
+{{ assets.compiledBundle("admin3.css") }}
 <link rel="stylesheet" href="https://i.icomoon.io/public/5ac4c7b9fd/StallionPublisher/style.css">
+{% endblock %}
+
+{% block bundle_css %}
+
 {% endblock %}
 {% block extra_meta %}
 
@@ -33,18 +38,34 @@
 {%-- block builtin_footer_bundles --%}
 
 {%-- endblock --%}
+{%-- block bundle_js --%}
+{{ assets.compiledBundle("admin3.js") }}
+{%-- endblock --%}
 
 {% block pre_end_body %}
+
 <script type="text/javascript">
+
     var stPublisherAdminContext = {{ adminContextJson }};
 
-        /*require.config({
-            baseUrl: "/st-assets/",
-            paths: {
-               "select2": "{{ assets.resource('v2/select2.min.js', 'publisher').replaceAll("\\.js$", '') }}"
-            },
-            waitSeconds: 15
-        });*/
+    require.config({
+        baseUrl: "/st-assets/",
+        paths: {
+            "select2": "{{ assets.resource('v2/select2.min.js', 'publisher').replaceAll("\\.js$", '') }}",
+            "tinyMCE": "https://cdn.tinymce.com/4/tinymce.min"
+        },
+        waitSeconds: 15,
+        shim: {
+           tinyMCE: {
+               exports: 'tinyMCE',
+               init: function () {
+                   this.tinyMCE.DOM.events.domLoaded = true;
+                   return this.tinyMCE;
+                }
+            }
+        }
+    });
+
 </script>
 
 {% endblock %}

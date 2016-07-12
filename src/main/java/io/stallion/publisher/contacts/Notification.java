@@ -29,7 +29,7 @@ import javax.persistence.Table;
 public class Notification extends ModelBase {
     private String key;
     private Long contactId;
-    private String subscriptionId;
+    private Long subscriptionId;
 
     private boolean seen = false;
     private boolean sent = false;
@@ -42,7 +42,7 @@ public class Notification extends ModelBase {
     private String periodKey = "";
     private String extraData = "";
 
-    @Column
+    @Column(length = 60)
     @UniqueKey
     public String getKey() {
         return key;
@@ -54,11 +54,11 @@ public class Notification extends ModelBase {
     }
 
     @Column
-    public String getSubscriptionId() {
+    public Long getSubscriptionId() {
         return subscriptionId;
     }
 
-    public Notification setSubscriptionId(String subscriptionId) {
+    public Notification setSubscriptionId(Long subscriptionId) {
         this.subscriptionId = subscriptionId;
         return this;
     }
@@ -113,7 +113,7 @@ public class Notification extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getCallbackClassName() {
         return callbackClassName;
     }
@@ -123,7 +123,7 @@ public class Notification extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 75)
     public String getCallbackPlugin() {
         return callbackPlugin;
     }
@@ -133,7 +133,7 @@ public class Notification extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 40)
     public SubscriptionFrequency getFrequency() {
         return frequency;
     }
@@ -143,7 +143,7 @@ public class Notification extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 50)
     @AlternativeKey
     public String getPeriodKey() {
         return periodKey;

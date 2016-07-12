@@ -19,9 +19,13 @@
             <ul v-if='configMenuShown' className="nav nav-sidebar config-options">
                 <li><a href="#/settings/authors">Authors</a></li>
                 <li><a href="#/settings/extra-html">Extra HTML and CSS</a></li>
-                <li className="widgets"><a href="#/settings/widgets">Global Modules</a></li>
+                <li><a href="#/settings/global-modules">Global Modules</a></li>
                 <li><a href="#/settings/site-information">Site Information</a></li>
             </ul>
+        </div>
+        <div class="p">
+            <br><br>
+            <a href="{{ siteUrl }}" target="_blank">Open your web site <span class="icon-new-tab"></span></a>
         </div>
     </div>
 </template>
@@ -30,7 +34,8 @@
  module.exports = {
      data: function() {
          return {
-             configMenuShown: false
+             configMenuShown: false,
+             siteUrl: stPublisherAdminContext.siteUrl
          };
      }
  };

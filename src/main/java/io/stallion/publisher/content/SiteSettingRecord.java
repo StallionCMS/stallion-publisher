@@ -28,7 +28,7 @@ public class SiteSettingRecord extends ModelBase {
     private String name = "";
     private String value = "";
 
-    @Column
+    @Column(length = 75)
     @UniqueKey
     public String getName() {
         return name;

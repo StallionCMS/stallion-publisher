@@ -29,10 +29,7 @@ import io.stallion.exceptions.NotFoundException;
 import io.stallion.requests.ResponseComplete;
 import io.stallion.requests.StResponse;
 import io.stallion.requests.validators.SafeMerger;
-import io.stallion.restfulEndpoints.BodyParam;
-import io.stallion.restfulEndpoints.EndpointResource;
-import io.stallion.restfulEndpoints.MapParam;
-import io.stallion.restfulEndpoints.ObjectParam;
+import io.stallion.restfulEndpoints.*;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -58,27 +55,16 @@ import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
-
+@MinRole(Role.STAFF_LIMITED)
 @Produces("application/json")
 public class AdminEndpoints implements EndpointResource {
-    @GET
-    @Path("/admin")
-    @Produces("text/html")
-    public String adminPage() {
-        Context.getResponse().getPageFooterLiterals().addDefinedBundle("publisher:admin2.js");
-        Context.getResponse().getPageHeadLiterals().addDefinedBundle("publisher:admin2.css");
-        Map pageContext = map();
-        pageContext.put("siteUrl", Settings.instance().getSiteUrl());
-        Map ctx = map(val("adminContextJson", Sanitize.htmlSafeJson(pageContext)));
-        return TemplateRenderer.instance().renderTemplate("publisher:admin2.jinja", ctx);
-    }
 
     @GET
     @Path("/dashboard")
     @Produces("text/html")
     public String dashboard() {
-        Context.getResponse().getPageFooterLiterals().addDefinedBundle("admin3-js");
-        Context.getResponse().getPageHeadLiterals().addDefinedBundle("admin3-css");
+        //Context.getResponse().getPageFooterLiterals().addDefinedBundle("admin3-js");
+        //Context.getResponse().getPageHeadLiterals().addDefinedBundle("admin3-css");
         Map pageContext = map();
         pageContext.put("siteUrl", Settings.instance().getSiteUrl());
         Map ctx = map(val("adminContextJson", Sanitize.htmlSafeJson(pageContext)));
@@ -274,7 +260,7 @@ public class AdminEndpoints implements EndpointResource {
     @Path("/posts/:postId/latest-draft")
     @Produces("application/json")
     public Map<String, Object> getPostLatestDraft(@PathParam("postId") Long postId) {
-        ContentVersion newVersion = ContentsVersionController.instance().filter("postId", postId).sort("id", "desc").first();
+        ContentVersion newVersion = ContentsVersionController.instance().filter("postId", postId).sort("versionDate", "desc").first();
         if (newVersion == null) {
             Content post = ContentController.instance().forIdOrNotFound(postId);
             newVersion = ContentsVersionController.instance().newVersionFromPost(post);
@@ -387,7 +373,9 @@ public class AdminEndpoints implements EndpointResource {
     public Object chosePageTemplateContext() {
         Map ctx = map();
         ctx.put("templates", filter(TemplateConfig.instance().getPageTemplates(), pt->!pt.isSpecial()));
-        ctx.put("specialTemplates", filter(TemplateConfig.instance().getPageTemplates(), pt->pt.isSpecial()));
+        List<PageTemplateDefinition> specialTemplates = filter(TemplateConfig.instance().getPageTemplates(), pt->pt.isSpecial());
+        specialTemplates.add(new PageTemplateDefinition().setContentEditable(true).setSpecial(true).setTemplate("publisher:/page-templates/blank.jinja"));
+        ctx.put("specialTemplates", specialTemplates);
         ctx.put("recentPages", ContentController.instance().pages().sort("updatedAt", "desc").pager(1, 3).getItems());
         return ctx;
     }
@@ -473,8 +461,6 @@ public class AdminEndpoints implements EndpointResource {
 
         ContentVersion lastVersion = ContentsVersionController.instance().forIdOrNotFound(versionId);
         // Make this version a permanent checkpoint;
-        lastVersion.setPermanentCheckpoint(true);
-        ContentsVersionController.instance().save(lastVersion);
 
         Content post = ContentController.instance().forId(postId);
         if (post.getPublished()  && !post.getSlug().equals(lastVersion.getSlug())) {
@@ -482,7 +468,7 @@ public class AdminEndpoints implements EndpointResource {
         }
         ContentsVersionController.instance().updatePostWithVersion(post, lastVersion);
         post.setInitialized(true);
-        if (post.getPublishDate() == null || (post.getScheduled() && post.getDraft())) {
+        if (post.getPublishDate() == null || (!post.getScheduled() && post.getDraft())) {
             post.setPublishDate(DateUtils.utcNow().minusMinutes(1));
             post.setScheduled(true);
         }
@@ -491,6 +477,15 @@ public class AdminEndpoints implements EndpointResource {
 
 
         ContentController.instance().save(post);
+
+        lastVersion.setScheduled(post.getScheduled());
+        lastVersion.setPublishDate(post.getPublishDate());
+        lastVersion.setDraft(false);
+        lastVersion.setUpdatedAt(post.getUpdatedAt());
+        lastVersion.setPermanentCheckpoint(true);
+        lastVersion.setOldUrls(post.getOldUrls());
+        ContentsVersionController.instance().save(lastVersion);
+
 
         return post;
     }

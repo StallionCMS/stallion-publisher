@@ -43,6 +43,7 @@
          };
      },
      attached: function() {
+         var self = this;
          console.log('markdown ', this.markdown);
          this.simplemde = new SimpleMDE({
              element: $(this.$el).find('textarea').get(0),
@@ -54,6 +55,9 @@
          this.attachCodeMirrorEventHandlers();
          this.syncAllWidgetsToCodeMirror();
          this.setupScrollHandling();
+         setTimeout(function() {
+             self.cm.refresh();
+         }, 1);
      },
      methods: {
          /****************************

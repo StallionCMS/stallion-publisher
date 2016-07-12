@@ -41,7 +41,7 @@ public class FormSubmission extends ModelBase {
 
 
     @AlternativeKey
-    @Column
+    @Column(length = 150)
     public String getEmail() {
         return email;
     }
@@ -52,7 +52,7 @@ public class FormSubmission extends ModelBase {
     }
 
     @AlternativeKey
-    @Column
+    @Column(length = 60)
     public String getEverCookie() {
         return everCookie;
     }
@@ -85,7 +85,7 @@ public class FormSubmission extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 100)
     public String getFormName() {
         return formName;
     }
@@ -96,7 +96,7 @@ public class FormSubmission extends ModelBase {
     }
 
 
-    @Column
+    @Column(length = 255)
     public String getPageUrl() {
         return pageUrl;
     }
@@ -106,7 +106,7 @@ public class FormSubmission extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getPageTitle() {
         return pageTitle;
     }

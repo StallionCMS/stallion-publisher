@@ -78,19 +78,19 @@
                             <autogrow-textarea v-model="post.metaDescription" ></autogrow-textarea>
                         </div>
                         <div if="!currentlyPublished" class="form-group">
-                            <label>Publishing Options {{ post.scheduled }}</label>
+                            <label>Publishing Options</label>
                             <div class="radio">
                                 <div>
                                     <label><input type="radio" name="scheduled" v-bind:value="false" v-model="post.scheduled"> Publish when "Publish" button is clicked.</label>
                                 </div>
                                 <div>
-                                    <label><input type="radio" name="scheduled" v-bind:value="true" v-model="post.scheduled"> Schedule for a future date &hellip;</label>
+                                    <label><input type="radio" name="scheduled" v-bind:value="true" v-model="post.scheduled"> Publish on a future scheduled date and time &hellip;</label>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="true" class="form-group">
-                            <label>Publish Date</label>
-                            <datetime-picker :value="1447512468838"></datetime-picker>
+                        <div v-if="currentlyPublished || post.scheduled" class="form-group">
+                            <label>Publish Datze</label>
+                            <datetime-picker :value.sync="post.publishDate"></datetime-picker>
                         </div>
                         <div class="form-group">
                             <label>Custom Head HTML</label>
@@ -156,7 +156,7 @@
              labelPlural: 'posts',
              labelUpper: 'Post',
              tab: 'editor',
-             lastAutoSaveAt: 'A while ago',
+             lastAutosaveAt: '',
              contentId: 0,
              versionId: 0,
              originalPost: null,
@@ -250,7 +250,7 @@
              if (!this.post.slugTouched) {
                  this.post.slug = this.calculateSlug();
              }
-             this.optionsChange();
+             this.onPageElementChange();
          },
          calculateSlug: function() {
              return "/" + stPublisher.slugify(this.post.title.toLowerCase());
@@ -283,33 +283,13 @@
                  this.dirty = false;
                  return;
              }
-             /***
-             postData.widgets = markdownData.widgets;
-             var editorTags = self.tags['pageElementEditable'] || [];
-             if (editorTags && editorTags.length === undefined) {
-                 editorTags = [editorTags];
-             }
-             
-             editorTags.forEach(function(editorTag) {
-                 data = editorTag.getData();
-                 postData.elements.push({
-                     name: editorTag.opts.elementname,
-                     content: data.content,
-                     data: data.data,
-                     type: data.type,
-                     rawContent: data.rawContent,
-                     widgets: data.widgets
-                 });
-             });
-             ***/
-
              stallion.request({
                  url: '/st-publisher/posts/' + self.contentId + '/update-draft',
                  method: 'POST',
                  data: post,
                  success: function(postVersion) {
                      self.versionId = postVersion.id;
-                     self.lastAutoSaveAt = 'Last auto-saved at ' + moment().format('hh:mm:ss a');
+                     self.lastAutosaveAt = 'Last auto-saved at ' + moment().format('hh:mm:ss a');
                      self.optionsDirty = false;
                      if (callback) {
                          callback(postVersion);
@@ -370,6 +350,7 @@
          'post.slug': 'optionsChange',
          'post.authorId': 'optionsChange',
          'post.title': 'titleChange',
+         'post.publishDate': 'optionsChange',
          dirty: function() {
              
          },

@@ -39,7 +39,7 @@ public class GlobalModule extends ModelBase {
     private String description = "";
     private String previewTemplate = "";
 
-    @Column
+    @Column(length = 100)
     @UniqueKey
     public String getName() {
         return name;
@@ -81,7 +81,7 @@ public class GlobalModule extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 40)
     public String getType() {
         return type;
     }
@@ -91,7 +91,7 @@ public class GlobalModule extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getDescription() {
         return description;
     }
@@ -101,7 +101,7 @@ public class GlobalModule extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 200)
     public String getPreviewTemplate() {
         return previewTemplate;
     }

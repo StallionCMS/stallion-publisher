@@ -34,7 +34,7 @@ public class BlogConfig extends ModelBase {
     private boolean editable = false;
     private Integer postsPerPage = 10;
 
-    @Column
+    @Column(length = 75)
     public String getInternalName() {
         return internalName;
     }
@@ -44,7 +44,7 @@ public class BlogConfig extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 200)
     public String getTitle() {
         return title;
     }
@@ -64,7 +64,7 @@ public class BlogConfig extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 150)
     public String getListingTemplate() {
         return listingTemplate;
     }
@@ -74,7 +74,7 @@ public class BlogConfig extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 150)
     public String getPostTemplate() {
         return postTemplate;
     }
@@ -84,7 +84,7 @@ public class BlogConfig extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 200)
     @UniqueKey
     public String getSlug() {
         return slug;

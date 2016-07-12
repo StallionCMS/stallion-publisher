@@ -108,7 +108,7 @@ public class Comment extends ModelBase {
     }
 
 
-    @Column
+    @Column(length = 100)
     public String getAuthorFirstName() {
         return authorFirstName;
     }
@@ -119,7 +119,7 @@ public class Comment extends ModelBase {
     }
 
 
-    @Column
+    @Column(length = 100)
     public String getAuthorLastName() {
         return authorLastName;
     }
@@ -132,7 +132,7 @@ public class Comment extends ModelBase {
 
 
     @JsonView(RestrictedViews.Public.class)
-    @Column
+    @Column(length = 200)
     public String getAuthorDisplayName() {
         return authorDisplayName;
     }
@@ -146,7 +146,7 @@ public class Comment extends ModelBase {
 
 
     @JsonView(RestrictedViews.Public.class)
-    @Column
+    @Column(columnDefinition = "longtext")
     public String getBodyHtml() {
         return bodyHtml;
     }
@@ -158,7 +158,7 @@ public class Comment extends ModelBase {
 
 
     @JsonView(RestrictedViews.Member.class)
-    @Column
+    @Column(length = 150)
     public String getAuthorEmail() {
         return authorEmail;
     }
@@ -169,7 +169,7 @@ public class Comment extends ModelBase {
     }
 
     @JsonView(RestrictedViews.Public.class)
-    @Column
+    @Column(length = 255)
     public String getAuthorWebSite() {
         return authorWebSite;
     }
@@ -178,7 +178,7 @@ public class Comment extends ModelBase {
         this.authorWebSite = authorWebSite;
         return this;
     }
-    @Column
+    @Column(length = 20)
     public CommentState getState() {
         return state;
     }
@@ -264,7 +264,7 @@ public class Comment extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 65)
     public String getEditingToken() {
         return editingToken;
     }
@@ -274,7 +274,7 @@ public class Comment extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 255)
     public String getParentPermalink() {
         return parentPermalink;
     }
@@ -285,7 +285,7 @@ public class Comment extends ModelBase {
     }
 
 
-    @Column
+    @Column(length = 75)
     public String getCaptchaResponse() {
         return captchaResponse;
     }
@@ -307,7 +307,7 @@ public class Comment extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column (length = 75)
     public String getAuthorSecret() {
         return authorSecret;
     }
@@ -371,7 +371,7 @@ public class Comment extends ModelBase {
 
 
     @JsonView(RestrictedViews.Public.class)
-    @Column
+    @Column(length = 255)
     public String getParentTitle() {
         return parentTitle;
     }
@@ -468,7 +468,7 @@ public class Comment extends ModelBase {
     }
 
     @JsonView(RestrictedViews.Member.class)
-    @Column
+    @Column(columnDefinition = "longtext")
     public String getBodyMarkdown() {
         return bodyMarkdown;
     }

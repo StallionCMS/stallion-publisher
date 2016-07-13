@@ -27,6 +27,7 @@ import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.exceptions.*;
 import io.stallion.exceptions.NotFoundException;
 import io.stallion.requests.ResponseComplete;
+import io.stallion.requests.ServletFileSender;
 import io.stallion.requests.StResponse;
 import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.*;
@@ -138,7 +139,7 @@ public class AdminEndpoints implements EndpointResource {
         String fullPath = folder + uf.getThumbCloudKey();
         File file = new File(fullPath);
         sendAssetResponse(file);
-        return null;
+        throw new ResponseComplete();
     }
 
     @GET
@@ -153,7 +154,7 @@ public class AdminEndpoints implements EndpointResource {
         String fullPath = folder + uf.getMediumCloudKey();
         File file = new File(fullPath);
         sendAssetResponse(file);
-        return null;
+        throw new ResponseComplete();
     }
 
     @GET
@@ -164,7 +165,7 @@ public class AdminEndpoints implements EndpointResource {
         String fullPath = folder + uf.getCloudKey();
         File file = new File(fullPath);
         sendAssetResponse(file);
-        return null;
+        throw new ResponseComplete();
     }
 
 
@@ -177,47 +178,7 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     private void sendAssetResponse(InputStream stream, long modifyTime, long contentLength, String fullPath) throws IOException {
-        // TODO: Merge this with code from stallion core RequestProccessor to eliminate duplication
-
-        StResponse response = Context.getResponse();
-        // Set the caching headers
-        Long duration = 60 * 60 * 24 * 365 * 10L; // 10 years
-        Long durationMils = duration  * 1000;
-        response.addHeader("Cache-Control", "max-age=" + duration);
-        response.setDateHeader("Expires", System.currentTimeMillis() + durationMils);
-        if (modifyTime > 0) {
-            response.setDateHeader("Last-Modified", modifyTime);
-        }
-
-        // Set the Content-type
-        String contentType = GeneralUtils.guessMimeType(fullPath);
-        if (empty(contentType)) {
-            contentType = Files.probeContentType(FileSystems.getDefault().getPath(fullPath));
-        }
-        response.setContentType(contentType);
-
-        Integer BUFF_SIZE = 1024;
-        byte[] buffer = new byte[BUFF_SIZE];
-        ServletOutputStream os = response.getOutputStream();
-        response.setContentLength((int)contentLength);
-
-        try {
-            int byteRead = 0;
-            while(true) {
-                byteRead = stream.read(buffer);
-                if (byteRead == -1) {
-                    break;
-                }
-                os.write(buffer, 0, byteRead);
-            }
-            os.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            os.close();
-            stream.close();
-        }
-        throw new ResponseComplete();
+        new ServletFileSender(Context.getRequest(), Context.getResponse()).sendAssetResponse(stream, modifyTime, contentLength, fullPath);
     }
 
 

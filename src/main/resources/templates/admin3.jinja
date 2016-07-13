@@ -1,6 +1,8 @@
 {% extends "stallion:common-base.jinja" %}
 {% block builtin_head_bundles %}
-{{ assets.compiledBundle("admin3.css") }}
+
+<!--assets.compiledBundle("admin3.css") -->
+{{ assets.assetBundle("publisher", "admin.bundle.css") }}
 <link rel="stylesheet" href="https://i.icomoon.io/public/5ac4c7b9fd/StallionPublisher/style.css">
 {% endblock %}
 
@@ -39,7 +41,8 @@
 
 {%-- endblock --%}
 {%-- block bundle_js --%}
-{{ assets.compiledBundle("admin3.js") }}
+<!--assets.compiledBundle("admin3.js") -->
+{{ assets.assetBundle("publisher", "admin.bundle.js") }}
 {%-- endblock --%}
 
 {% block pre_end_body %}

@@ -34,8 +34,43 @@
             <artifactId>imgscalr-lib</artifactId>
             <version>4.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>io.stallion</groupId>
+            <artifactId>stallion-assets-pipeline-maven-plugin</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <!-- If you want snapshots versions -->
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>stallion-repo</id>
+            <url>http://mvn.stallion.io/repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <downloadUrl>http://mvn.stallion.io/repo</downloadUrl>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>stallion-repo</id>
+            <name>Stallion Software Maven Repository</name>
+            <url>scp://mvn.stallion.io/usr/share/maven-repo/</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
     <build>
         <plugins>
 
@@ -96,7 +131,7 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh</artifactId>
-                <version>2.4</version>
+                <version>2.10</version>
             </extension>
         </extensions>
     </build>

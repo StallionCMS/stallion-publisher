@@ -1,7 +1,7 @@
 <template>
     <div class="image-uploader">
         <h3 class="title">Upload file</h3>
-        <form action="/st-publisher/upload-file"
+        <form action="/st-publisher/files/upload-file"
               class="image-dropzone dropzone"
               id="my-image-dropzone">
         </form>        

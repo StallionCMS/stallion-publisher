@@ -20,6 +20,7 @@ import io.stallion.plugins.BasePluginSettings;
 import io.stallion.publisher.content.BlogConfig;
 import io.stallion.settings.SettingMeta;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,9 @@ public class PublisherSettings extends BasePluginSettings {
     private boolean commentsUseGravatar = false;
     @SettingMeta(cls=ArrayList.class)
     public List<BlogConfig> blogs;
+
+    @SettingMeta(valBoolean = true)
+    private boolean useMarkdown;
 
     @SettingMeta(cls=ArrayList.class)
     private List<String> notifyEmails;
@@ -52,6 +56,16 @@ public class PublisherSettings extends BasePluginSettings {
     private String realIpHeader;
     @SettingMeta(cls=ArrayList.class)
     private List<String> moderatorEmails = null;
+    @SettingMeta(valBoolean = false)
+    private boolean useCloudStorageForUploads;
+    @SettingMeta(val="")
+    private String uploadsBucket;
+    @SettingMeta(val="")
+    private String uploadsBucketBaseUrl;
+
+    @SettingMeta(val="")
+    private String uploadsPathPrefix;
+
 
 
     @SettingMeta(val="blog_posts")
@@ -182,5 +196,55 @@ public class PublisherSettings extends BasePluginSettings {
         this.reCaptchaSiteKey = reCaptchaSiteKey;
     }
 
+    public boolean isUseCloudStorageForUploads() {
+        return useCloudStorageForUploads;
+    }
+
+    public PublisherSettings setUseCloudStorageForUploads(boolean useCloudStorageForUploads) {
+        this.useCloudStorageForUploads = useCloudStorageForUploads;
+        return this;
+    }
+
+    public String getUploadsBucket() {
+        return uploadsBucket;
+    }
+
+    public PublisherSettings setUploadsBucket(String uploadsBucket) {
+        this.uploadsBucket = uploadsBucket;
+        return this;
+    }
+
+    public String getUploadsPathPrefix() {
+        return uploadsPathPrefix;
+    }
+
+    public PublisherSettings setUploadsPathPrefix(String uploadsPathPrefix) {
+        this.uploadsPathPrefix = uploadsPathPrefix;
+        return this;
+    }
+
+    public String getUploadsBucketBaseUrl() {
+        return uploadsBucketBaseUrl;
+    }
+
+    public PublisherSettings setUploadsBucketBaseUrl(String uploadsBucketBaseUrl) {
+        this.uploadsBucketBaseUrl = uploadsBucketBaseUrl;
+        return this;
+    }
+
+    @Column
+    public boolean isUseMarkdown() {
+        return useMarkdown;
+    }
+
+    public PublisherSettings setUseMarkdown(boolean useMarkdown) {
+        this.useMarkdown = useMarkdown;
+        return this;
+    }
+
+    public PublisherSettings setCommentsClosedAfterDays(Integer commentsClosedAfterDays) {
+        this.commentsClosedAfterDays = commentsClosedAfterDays;
+        return this;
+    }
 }
 

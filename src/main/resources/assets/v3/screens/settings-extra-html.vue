@@ -48,7 +48,7 @@
          moment: moment,
          save: function() {
              stallion.request({
-                 url: '/st-publisher/update-site-settings',
+                 url: '/st-publisher/config/update-site-settings',
                  method: 'POST',
                  data: this.data,
                  success: function(o) {
@@ -63,7 +63,7 @@
          fetchData: function(callback) {
              var self = this;
              stallion.request({
-                 url: '/st-publisher/site-settings',
+                 url: '/st-publisher/config/site-settings',
                  success: function (o) {
                      self.data = o;
                      

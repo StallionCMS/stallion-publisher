@@ -84,7 +84,7 @@
          fetchData: function(callback) {
              var self = this;
              stallion.request({
-                 url: '/st-publisher/files?page=' + self.page + '&deleted=' + self.withDeleted,
+                 url: '/st-publisher/files/library?page=' + self.page + '&deleted=' + self.withDeleted,
                  method: 'GET',
                  success: function(o) {
                      self.page = o.pager;

@@ -28,7 +28,7 @@
          data: function(transition) {
              var self = this;
              stallion.request({
-                 url: '/st-publisher/list-blogs',
+                 url: '/st-publisher/content/list-blogs',
                  method: 'GET',
                  success: function(o) {
                      if (o.blogs && o.blogs.length === 1) {
@@ -60,7 +60,7 @@
              }
              localStorage.stLastSelectedBlogId = blogId;
              stallion.request({
-                 url:'/st-publisher/posts/new-for-editing',
+                 url:'/st-publisher/content/new-for-editing',
                  method: 'POST',
                  data: {
                      type: 'post',

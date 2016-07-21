@@ -67,7 +67,7 @@
          fetchData: function(callback) {
              var self = this;
              stallion.request({
-                 url: '/st-publisher/global-modules/list',
+                 url: '/st-publisher/content/global-modules/list',
                  success: function (o) {
                      self.items = o.modules;
                      if (callback) callback();

@@ -20,10 +20,13 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.publisher.PublisherSettings;
 import io.stallion.requests.IRequest;
 import io.stallion.services.Log;
+import io.stallion.services.S3StorageService;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
+import io.stallion.reflection.PropertyUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.imgscalr.Scalr;
 import org.parboiled.common.FileUtils;
@@ -31,18 +34,26 @@ import org.parboiled.common.FileUtils;
 import javax.imageio.ImageIO;
 import javax.servlet.http.Part;
 
+import static io.stallion.utils.Literals.*;
+
+
 
 public class UploadRequestProcessor {
     private IRequest stRequest;
     private UploadedFile uploaded = new UploadedFile();
+    private String uploadsFolder;
 
-    public UploadRequestProcessor(IRequest stRequest) {
+    public UploadRequestProcessor(String uploadsFolder, IRequest stRequest) {
         this.stRequest = stRequest;
+        if (!uploadsFolder.endsWith("/")) {
+            uploadsFolder += "/";
+        }
+        this.uploadsFolder = uploadsFolder;
     }
 
-    public UploadRequestProcessor uploadToPath(String basePath) {
+    public UploadRequestProcessor upload() {
         try {
-            doUpload(basePath);
+            doUpload();
             return this;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -50,9 +61,9 @@ public class UploadRequestProcessor {
     }
 
 
-    private void doUpload(String basePath) throws IOException {
+    private void doUpload() throws IOException {
         Long id = DataAccessRegistry.instance().getTickets().nextId();
-        String url = "{cdnUrl}/st-publisher/view-uploaded-file/" + id + "?ts=" + DateUtils.mils();
+        String url = "{cdnUrl}/st-publisher/files/view/" + id + "?ts=" + DateUtils.mils();
 
         stRequest.setAsMultiPartRequest();
 
@@ -61,11 +72,10 @@ public class UploadRequestProcessor {
         String fileName = getFileNameFromPart(filePart);
         String extension = FilenameUtils.getExtension(fileName);
         String relativePath = GeneralUtils.slugify(FilenameUtils.getBaseName(fileName)) + "-" + DateUtils.mils() + "." + extension;
-        if (basePath.endsWith("/")) {
-            basePath += "/";
-        }
-        String destPath = basePath + relativePath;
+        relativePath = "stallion-file-" + id + "/" + GeneralUtils.secureRandomToken(8) + "/" + relativePath;
 
+        String destPath = uploadsFolder + relativePath;
+        FileUtils.forceMkdir(new File(destPath).getParentFile());
         uploaded
                 .setCloudKey(relativePath)
                 .setExtension(extension)
@@ -104,8 +114,61 @@ public class UploadRequestProcessor {
         if ("image".equals(uploaded.getType())) {
             handleImage(destPath);
         }
+        if (PublisherSettings.getInstance().isUseCloudStorageForUploads()) {
+            transferAllToS3();
+        }
+    }
+
+    protected void transferAllToS3() {
+        for(String part: list("", "thumb", "medium", "small")) {
+            transferToS3(part);
+        }
+    }
+
+    protected void transferToS3(String part) {
+        String cloudKeyProperty = "cloudKey";
+        String rawUrlProperty = "rawUrl";
+        if (!empty(part)) {
+            cloudKeyProperty = part + "CloudKey";
+            rawUrlProperty = part + "RawUrl";
+        }
+        String cloudKey = (String)PropertyUtils.getProperty(uploaded, cloudKeyProperty);
+        Log.info("Cloud key for {0} is {1}", cloudKeyProperty, cloudKey);
+        if (empty(cloudKey)) {
+            return;
+        }
+        File file = new File(uploadsFolder + cloudKey);
+        if (!file.exists()) {
+            Log.info("No file {0}", file.getAbsolutePath());
+            return;
+        }
+
+        String newCloudKey = PublisherSettings.getInstance().getUploadsPathPrefix() + cloudKey;
+        if (newCloudKey.startsWith("/")) {
+            newCloudKey = newCloudKey.substring(1);
+        }
+        Log.info("Upload to s3 file {0} bucket {1} key: {2}", file.getAbsolutePath(), PublisherSettings.getInstance().getUploadsBucket(), newCloudKey);
+        S3StorageService.instance().uploadFile(
+                file,
+                PublisherSettings.getInstance().getUploadsBucket(),
+                newCloudKey,
+                true
+        );
+        PropertyUtils.setProperty(uploaded, cloudKeyProperty, newCloudKey);
+        String baseUrl = or(
+                PublisherSettings.getInstance().getUploadsBucketBaseUrl(),
+                "https://s3.amazonaws.com/" + PublisherSettings.getInstance().getUploadsBucket());
+        if (!baseUrl.endsWith("/")) {
+            baseUrl = baseUrl + "/";
+        }
+        PropertyUtils.setProperty(uploaded, rawUrlProperty, baseUrl + newCloudKey);
+
+        file.delete();
+
+
 
     }
+
 
     protected void handleImage(String path) {
         try {
@@ -147,12 +210,13 @@ public class UploadRequestProcessor {
         baos.close();
 
         String base = FilenameUtils.removeExtension(orgPath);
-        String thumbnailPath = base + "." + postfix + "." + uploaded.getExtension();
+        String relativePath = FilenameUtils.getBaseName(uploaded.getCloudKey()).replace(this.uploadsFolder, "") + "." + postfix + "." + uploaded.getExtension();
+        String thumbnailPath = this.uploadsFolder + relativePath;
         Log.info("Write all byptes to {0}", thumbnailPath);
         FileUtils.writeAllBytes(scaledImageInByte, new File(thumbnailPath));
 
-        String relativePath = FilenameUtils.getBaseName(uploaded.getCloudKey()) + "." + postfix + "." + uploaded.getExtension();
-        String url = "{cdnUrl}/st-publisher/view-uploaded-file/" + uploaded.getId() + "/" + postfix + "?ts=" + DateUtils.mils();
+
+        String url = "{cdnUrl}/st-publisher/files/view/" + uploaded.getId() + "/" + postfix + "?ts=" + DateUtils.mils();
         if (postfix.equals("thumb")) {
             uploaded.setThumbCloudKey(relativePath);
             uploaded.setThumbRawUrl(url);

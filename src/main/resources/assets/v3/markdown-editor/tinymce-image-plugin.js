@@ -1,5 +1,5 @@
 
-stPublisher.initTinyImagePlugin = function(tinymce, vueTag) {
+stPublisher.initTinyImagePlugin = function(tinymce) {
     tinymce.PluginManager.add('example', function(editor, url) {
         // Add a button that opens a window
         editor.addButton('stimage', {

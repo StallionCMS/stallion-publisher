@@ -58,38 +58,9 @@ import static io.stallion.utils.Literals.*;
 
 @MinRole(Role.STAFF_LIMITED)
 @Produces("application/json")
-public class AdminEndpoints implements EndpointResource {
+@Path("/content")
+public class ContentEndpoints implements EndpointResource {
 
-    @GET
-    @Path("/dashboard")
-    @Produces("text/html")
-    public String dashboard() {
-        //Context.getResponse().getPageFooterLiterals().addDefinedBundle("admin3-js");
-        //Context.getResponse().getPageHeadLiterals().addDefinedBundle("admin3-css");
-        Map pageContext = map();
-        pageContext.put("siteUrl", Settings.instance().getSiteUrl());
-        Map ctx = map(val("adminContextJson", Sanitize.htmlSafeJson(pageContext)));
-        return TemplateRenderer.instance().renderTemplate("publisher:admin3.jinja", ctx);
-    }
-
-
-    @GET
-    @Path("/files")
-    @Produces("application/json")
-    public Object getFiles(@QueryParam("page") Integer page) {
-        page = or(page, 1);
-        Map ctx =  map(val("pager", UploadedFileController.instance().filterChain().sort("uploadedAt", "desc").pager(page)));
-        return ctx;
-    }
-
-    @GET
-    @Path("/images")
-    @Produces("application/json")
-    public Object getImageFiles(@QueryParam("page") Integer page) {
-        page = or(page, 1);
-        Map ctx =  map(val("pager", UploadedFileController.instance().filter("type", "image").sort("uploadedAt", "desc").pager(page, 100)));
-        return ctx;
-    }
 
 
 
@@ -113,83 +84,19 @@ public class AdminEndpoints implements EndpointResource {
 
 
 
-    @POST
-    @Path("/upload-file")
-    @Produces("application/json")
-    public Object uploadFile() {
-
-        String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
-        if (!new File(folder).isDirectory()) {
-            new File(folder).mkdirs();
-        }
-        UploadRequestProcessor processor = new UploadRequestProcessor(Context.getRequest()).uploadToPath(folder);
-        UploadedFile uf = processor.getUploaded();
-        UploadedFileController.instance().save(uf);
-        return uf;
-    }
-
-    @GET
-    @Path("/view-uploaded-file/:fileId/thumb")
-    public Object viewUploadedThumbFile(@PathParam("fileId") Long fileId) {
-        String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
-        UploadedFile uf = UploadedFileController.instance().forId(fileId);
-        if (empty(uf.getThumbCloudKey())) {
-            throw new NotFoundException("File not found.");
-        }
-        String fullPath = folder + uf.getThumbCloudKey();
-        File file = new File(fullPath);
-        sendAssetResponse(file);
-        throw new ResponseComplete();
-    }
-
-    @GET
-    @Path("/view-uploaded-file/:fileId/medium")
-    public Object viewUploadedMediumFile(@PathParam("fileId") Long fileId) {
-        String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
-        UploadedFile uf = UploadedFileController.instance().forId(fileId);
-        if (empty(uf.getMediumCloudKey())) {
-            throw new NotFoundException("File not found.");
-        }
-
-        String fullPath = folder + uf.getMediumCloudKey();
-        File file = new File(fullPath);
-        sendAssetResponse(file);
-        throw new ResponseComplete();
-    }
-
-    @GET
-    @Path("/view-uploaded-file/:fileId")
-    public Object viewUploadedFile(@PathParam("fileId") Long fileId) {
-        String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
-        UploadedFile uf = UploadedFileController.instance().forId(fileId);
-        String fullPath = folder + uf.getCloudKey();
-        File file = new File(fullPath);
-        sendAssetResponse(file);
-        throw new ResponseComplete();
-    }
-
-
-    public void sendAssetResponse(File file) {
-        try {
-            sendAssetResponse(new FileInputStream(file), file.lastModified(), file.length(), file.getAbsolutePath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void sendAssetResponse(InputStream stream, long modifyTime, long contentLength, String fullPath) throws IOException {
-        new ServletFileSender(Context.getRequest(), Context.getResponse()).sendAssetResponse(stream, modifyTime, contentLength, fullPath);
-    }
-
 
 
 
     @GET
     @Path("/posts")
     @Produces("application/json")
-    public Object getPosts(@QueryParam("page") Integer page) {
+    public Object getPosts(@QueryParam("page") Integer page, @QueryParam("search") String search) {
         page = or(page, 1);
-        Map ctx =  map(val("pager", ContentController.instance().filter("type", "post").filter("initialized", true).sort("updatedAt", "desc").pager(page)));
+        FilterChain<Content> chain = ContentController.instance().filter("type", "post").filter("initialized", true);
+        if (!empty(search)) {
+            chain = chain.search(search, "title");
+        }
+        Map ctx =  map(val("pager", chain.sort("updatedAt", "desc").pager(page)));
         return ctx;
     }
 
@@ -198,9 +105,13 @@ public class AdminEndpoints implements EndpointResource {
     @GET
     @Path("/pages")
     @Produces("application/json")
-    public Object getPages(@QueryParam("page") Integer page) {
+    public Object getPages(@QueryParam("page") Integer page, @QueryParam("search") String search) {
         page = or(page, 1);
-        Map ctx =  map(val("pager", ContentController.instance().filter("type", "page").filter("initialized", true).sort("updatedAt", "desc").pager(page)));
+        FilterChain<Content> chain = ContentController.instance().filter("type", "page").filter("initialized", true);
+        if (!empty(search)) {
+            chain = chain.search(search, "title");
+        }
+        Map ctx =  map(val("pager", chain.sort("updatedAt", "desc").pager(page)));
         return ctx;
     }
 
@@ -218,7 +129,7 @@ public class AdminEndpoints implements EndpointResource {
 
 
     @GET
-    @Path("/posts/:postId/latest-draft")
+    @Path("/:postId/latest-draft")
     @Produces("application/json")
     public Map<String, Object> getPostLatestDraft(@PathParam("postId") Long postId) {
         ContentVersion newVersion = ContentsVersionController.instance().filter("postId", postId).sort("versionDate", "desc").first();
@@ -269,7 +180,7 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @POST
-    @Path("/posts/new-for-editing")
+    @Path("/new-for-editing")
     @Produces("application/json")
     public Object newPostForEditing(
             @BodyParam(value = "blogId", allowEmpty = true) Long blogId,
@@ -329,7 +240,7 @@ public class AdminEndpoints implements EndpointResource {
 
 
     @GET
-    @Path("/posts/choose-page-template-context")
+    @Path("/choose-page-template-context")
     @Produces("application/json")
     public Object chosePageTemplateContext() {
         Map ctx = map();
@@ -342,7 +253,7 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @GET
-    @Path("/posts/:postId/load-versions")
+    @Path("/:postId/load-versions")
     @Produces("application/json")
     public Map loadVersions(@PathParam("postId") Long postId, @QueryParam("loadAll") Boolean loadAll) {
 
@@ -357,14 +268,14 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @GET
-    @Path("/posts/:postId/preview")
+    @Path("/:postId/preview")
     @Produces("text/html")
     public String previewPost(@PathParam("postId") Long postId, @PathParam("versionId") Long versionId) {
         return viewPostVersion(postId, 0L);
     }
 
     @GET
-    @Path("/posts/:postId/view-latest-version")
+    @Path("/:postId/view-latest-version")
     @Produces("text/html")
     public String viewLatestVersion(@PathParam("postId") Long postId) {
         ContentVersion newVersion = ContentsVersionController.instance().filter("postId", postId).sort("versionDate", "desc").first();
@@ -377,7 +288,7 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @GET
-    @Path("/posts/:postId/view-version/:versionId")
+    @Path("/:postId/view-version/:versionId")
     @Produces("text/html")
     public String viewPostVersion(@PathParam("postId") Long postId, @PathParam("versionId") Long versionId) {
         Content item;
@@ -416,7 +327,7 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @POST
-    @Path("/posts/:postId/publish/:versionId")
+    @Path("/:postId/publish/:versionId")
     @Produces("application/json")
     public Object publish(@PathParam("postId") Long postId, @PathParam("versionId") Long versionId) {
 
@@ -452,7 +363,7 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @POST
-    @Path("/posts/make-version-most-recent")
+    @Path("/make-version-most-recent")
     @Produces("application/json")
     public Object makeVersionMostRecent(@BodyParam("postId") Long postId, @BodyParam("versionId") Long versionId) {
         ContentVersion version = ContentsVersionController.instance().forId(versionId);
@@ -475,7 +386,7 @@ public class AdminEndpoints implements EndpointResource {
     }
 
     @POST
-    @Path("/posts/:postId/update-draft")
+    @Path("/:postId/update-draft")
     @Produces("application/json")
     public Object updateDraft(@PathParam("postId") Long postId, @ObjectParam ContentVersion updatedVersion) {
 
@@ -533,6 +444,7 @@ public class AdminEndpoints implements EndpointResource {
 
     @GET
     @Path("/list-global-modules")
+    @MinRole(Role.STAFF)
     public Object listGlobalModules() {
         Map ctx = map(val("modules", TemplateConfig.instance().getGlobalModules()));
         return ctx;
@@ -552,18 +464,13 @@ public class AdminEndpoints implements EndpointResource {
         return ctx;
     }
 
-    @GET
-    @Path("/site-settings")
-    public Map getSiteSettings() {
-        return SiteSettingsStatic.getAllSettings();
+
+    public ContentController contents() {
+        return ContentController.instance();
     }
 
-
-    @POST
-    @Path("/update-site-settings")
-    public Object updateSiteSettings(@MapParam Map<String, String> siteSettings) {
-        SiteSettingsStatic.putSettings(siteSettings);
-        return true;
+    public ContentsVersionController contentVerions() {
+        return ContentsVersionController.instance();
     }
 
 }

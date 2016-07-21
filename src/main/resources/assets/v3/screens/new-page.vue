@@ -12,7 +12,7 @@
                     <div class="recent-page-choice" v-for='page in recentPages' style="overflow: hidden; width: 250px; height: 300px; display: inline-block; margin-right: 20px;">
                         <div>{{ page.title }}</div>
                         <div style="position: absolute; z-index: 100; height: 250px; width: 300px; opacity: .2; padding-top: 100px; padding-left: 40px; background-color: white;"><button class="btn btn-primary">Clone</button></div>
-                        <iframe v-bind:src="'/st-publisher/posts/' + page.id + '/view-latest-version'" class="frame-25" style="width: 1000px; height: 800px;"></iframe>
+                        <iframe v-bind:src="'/st-publisher/content/' + page.id + '/view-latest-version'" class="frame-25" style="width: 1000px; height: 800px;"></iframe>
                     </div>
                 </div>
             </div>
@@ -54,7 +54,7 @@
          data: function(transition) {
              var self = this;
              stallion.request({
-                 url: '/st-publisher/posts/choose-page-template-context',
+                 url: '/st-publisher/content/choose-page-template-context',
                  method: 'GET',
                  success: function(o) {
                      self.templates = o.templates;
@@ -76,7 +76,7 @@
              var self = this;
              console.log('new page cloneId ', cloneId, 'template ', template);
              stallion.request({
-                 url:'/st-publisher/posts/new-for-editing',
+                 url:'/st-publisher/content/new-for-editing',
                  method: 'POST',
                  data: {
                      type: 'page',

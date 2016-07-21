@@ -17,6 +17,7 @@
 package io.stallion.publisher;
 
 import io.stallion.assets.*;
+import io.stallion.exceptions.ConfigException;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.publisher.comments.CommentsController;
 import io.stallion.publisher.comments.CommentsEndpoints;
@@ -30,7 +31,6 @@ import io.stallion.settings.Settings;
 import io.stallion.sitemaps.SiteMapController;
 import io.stallion.sitemaps.SiteMapItem;
 import io.stallion.templating.TemplateRenderer;
-import io.stallion.utils.ResourceHelpers;
 
 import java.util.List;
 
@@ -64,6 +64,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
 
     @Override
     public void boot() throws Exception {
+        validateSettings();
 
         // Register controllers
         TemplateConfig.load();
@@ -84,9 +85,12 @@ public class PublisherPlugin extends StallionJavaPlugin {
 
         // Register endpoints
 
-        ResourceToEndpoints converter = new ResourceToEndpoints("/st-publisher");
+
         List<EndpointResource> resources = list(
-                new AdminEndpoints(),
+                new MainEndpoints(),
+                new ConfigEndpoints(),
+                new UploadedFileEndpoints(),
+                new ContentEndpoints(),
                 new CommentsEndpoints(),
                 new ContactsEndpoints(),
                 new GlobalModuleEndpoints(),
@@ -94,6 +98,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
         );
         for (EndpointResource resource: resources) {
             Log.finer("Register resource {0}", resource.getClass().getName());
+            ResourceToEndpoints converter = new ResourceToEndpoints("/st-publisher");
             EndpointsRegistry.instance().addEndpoints(converter.convert(resource).toArray(new RestEndpointBase[]{}));
         }
 
@@ -121,6 +126,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableMarkdownTag());
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableImageTag());
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableTextTag());
+        TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableRichTextTag());
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new EditableImageCollectionTag());
 
 
@@ -350,6 +356,21 @@ public class PublisherPlugin extends StallionJavaPlugin {
         );
         */
 
+
+    }
+
+    private void validateSettings() {
+        PublisherSettings publisherSettings = PublisherSettings.getInstance();
+        Settings settings = Settings.instance();
+        if (publisherSettings.isUseCloudStorageForUploads())
+        {
+            if (settings.getCloudStorage() == null || empty(settings.getCloudStorage().getAccessToken())) {
+                throw new ConfigException("In your publisher.toml you enabled the setting for cloud storage, but you did not define a [cloudStorage] section in stallion.toml with an accessTokena and secretKey setting.");
+            }
+            if (empty(publisherSettings.getUploadsBucket())) {
+                throw new ConfigException("You did not define a setting in publisher.toml called 'uploadsBucket' which could contain the s3 bucket to upload files to.");
+            }
+        }
 
     }
 }

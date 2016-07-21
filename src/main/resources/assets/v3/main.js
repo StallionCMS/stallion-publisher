@@ -9,8 +9,10 @@ console.log('main.js has been loaded');
     var admin = {};
 
     admin.init = function() {
-        console.log('init');
 
+        if ($('#stallion-publisher-main-vue-app').length < 1) {
+            return;
+        }
 
         // The router needs a root component to render.
         // For demo purposes, we will just use an empty one
@@ -47,7 +49,15 @@ console.log('main.js has been loaded');
                 name: 'pages',
                 component: vueComponents['contents-table']
             },
+            '/pages/:page': {
+                name: 'pages',
+                component: vueComponents['contents-table']
+            },
             '/posts': {
+                name: 'posts',
+                component: vueComponents['contents-table']
+            },
+            '/posts/:page': {
                 name: 'posts',
                 component: vueComponents['contents-table']
             },
@@ -83,11 +93,12 @@ console.log('main.js has been loaded');
         // Now we can start the app!
         // The router will create an instance of App and mount to
         // the element matching the selector #app.
-        router.start(App, '#vue-app')
+        router.start(App, '#stallion-publisher-main-vue-app')
 
     };
     
     //admin.init();
+    Dropzone.autoDiscover = false;
     $(document).ready(admin.init);
         
 }());

@@ -19,7 +19,7 @@
          var self = this;
          
          stallion.request({
-             url: '/st-publisher/active-authors',
+             url: '/st-publisher/content/active-authors',
              success: function(o) {
                  var data = [];
                  o.authors.forEach(function(au) {

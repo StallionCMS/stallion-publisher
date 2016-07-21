@@ -9,6 +9,7 @@
         <page-element-image v-if="element.type==='image'" :element="elementClone" :update-callback="update"></page-element-image>
         <page-element-image-collection v-if="element.type==='image-collection'" :element="elementClone" :update-callback="update"></page-element-image-collection>
         <page-element-markdown v-if="element.type==='markdown'" :element="elementClone" :update-callback="update"></page-element-markdown>
+        <page-element-rich-text v-if="element.type==='rich_text'" :element="elementClone" :update-callback="update"></page-element-rich-text>
         <page-element-text v-if="element.type==='text'" :element="elementClone" :update-callback="update"></page-element-text>
     </div>
 </template>

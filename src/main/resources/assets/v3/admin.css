@@ -162,11 +162,14 @@ autogrow-textarea .form-control {
     background-color: #F0F0F0;
 }
 
-.dropzone {
+.st-file-dropzone {
     max-width: 600px;
     background-color: #FCFCFC;
+    width: 100%;
+    border: 1px solid #999;
+    min-height: 200px;
 }
-.dropzone .dz-message {
+.st-file-dropzone .dz-message {
     font-size: 18px;
 }
 
@@ -178,7 +181,7 @@ autogrow-textarea .form-control {
 .small-image-upload-target-column image-uploader .dz-default.dz-message {
     margin: 0px;
 }
-.small-image-upload-target-column image-uploader .image-dropzone.dropzone {
+.small-image-upload-target-column image-uploader .image-dropzone.st-file-dropzone {
     min-height: 50px;
 }
 .add-image-button-column > div {

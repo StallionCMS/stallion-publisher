@@ -66,7 +66,7 @@
          fetchData: function() {
              var self = this;
              stallion.request({
-                 url: '/st-publisher/images?page=' + self.page + '&deleted=' + self.withDeleted,
+                 url: '/st-publisher/files/images?page=' + self.page + '&deleted=' + self.withDeleted,
                  success: function (o) {
                      self.pager = o.pager;
                      self.items = o.pager.items;

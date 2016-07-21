@@ -1,48 +1,145 @@
-
+<style lang="scss">
+ .tinymce-editor-vue {
+     .tiny-target {
+         width: 100%;
+         height: 300px;
+         border: 1px solid #DDD;
+     }
+     .loading-overlay {
+         position: absolute;
+         z-index: 100;
+         font-size: 20px;
+         padding-top: 20px;
+         padding-left: 20px;
+     }
+ }
+</style>
 <template>
-    <div>
-        <textarea style="" id="my-tiny-editor"></textarea>
+    <div class="tinymce-editor-vue">
+        <div class="loading-overlay">Loading editor &hellip;</div>
+        <textarea style="" class="tiny-target" ></textarea>
         <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
         <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback"></insert-link-modal>
     </div>
 </template>
 <script>
  module.exports = {
+     props: {
+         html: String,
+         widgets: Array,
+         tinyOptions: Object,
+         options: Object,
+         changeCallback: Function
+     },
      data: function() {
          return {
              showWidgetModal: false,
              activeWidgetType: '',
              activeWidgetData: {},
-             showInsertLinkModal: false
+             showInsertLinkModal: false,
+             ticks: new Date().getTime()
          }
      },
      ready: function() {
          var self = this;
+         var id = 'tiny-' + stPublisher.generateUUID();
+         $(this.$el).find('textarea').attr('id', id);
+
+         var customOptions = this.tinyOptions || {};
+         
          requirejs([
              'tinyMCE'
          ], function (tinymce) {
              console.log(tinymce);
              //var ele = $(this.$el).find('textarea').get(0);
              self.tinymce = tinymce;
-             stPublisher.initTinyImagePlugin(tinymce, self);
-             
-             tinymce.init({
-                 selector: '#my-tiny-editor',
+             stPublisher.initTinyImagePlugin(tinymce);
+
+             var options = {
+                 selector: '#' + id,
                  statusbar: false,
                  plugins: 'autoresize textcolor colorpicker textpattern imagetools paste charmap example',
                  toolbar1: '| bold italic | alignleft aligncenter alignright | bullist numlist outdent indent blockquote | link image | stlink stimage stinsert ',
                  menubar: false,
-                 //toolbar2: 'bold forecolor backcolor ',
+                 content_css: stPublisherAdminContext.siteUrl + '/st-resource/publisher/tinymce/tinymce-content.css?ts=' + self.ticks + ',' + stPublisherAdminContext.siteUrl + '/st-resource/publisher/public/contacts-always.css?vstring=' + self.ticks,
                  init_instance_callback : function(editor) {
+                     editor.setContent(self.html);
+
                      self.editor = editor;
                      editor.vueTag = self;
-                 }                 
-             });
+                     $(self.$el).find('.loading-overlay').hide();
+                     self.addWidgetToolbarToHtml();                     
+                 },
+                 setup: function(editor) {
 
-             // your code here
+                     editor.on('change', function(e) {
+                         if (self.changeCallback) {
+                             self.changeCallback();
+                         }
+                     });
+                 }                 
+             };
+             Object.keys(customOptions).forEach(function(key) {
+                 options[key] = customOptions[key];
+             });
+             
+             tinymce.init(options);
+
          });         
      },
      methods: {
+         getData: function() {
+             var self = this;
+             if (!this.editor) {
+                 return {
+                     html: this.html,
+                     widgets: this.widgets
+                 }
+             }
+             return {
+                 widgets: this.getEditorCleanedWidgets(),
+                 html: this.getEditorCleanHtml()
+             };
+         },
+         getEditorCleanHtml: function() {
+             var self = this;
+             var html = this.editor.getContent({format : 'raw'});
+             var $html = $('<div>' + html + '</div>');
+             $html.find('.widget-toolbar').remove();
+             this.widgets.forEach(function(w) {
+                 var eleId = 'wrap-widget-' + w.guid;
+                 var $existing = $(self.editor.getBody()).find('#' + eleId);
+                 if ($existing.length < 1) {
+                     return;
+                 }
+                 // Reset the HTML
+                 $existing.find('.widget-html').html(w.html);
+             });
+             return $html.html();
+         },
+         getEditorCleanedWidgets: function() {
+             var self = this;
+             var cleanedWidgets = [];
+             this.widgets.forEach(function(w) {
+                 var eleId = 'wrap-widget-' + w.guid;
+                 var $existing = $(self.editor.getBody()).find('#' + eleId);
+                 if ($existing.length > 0) {
+                     cleanedWidgets.push(w);
+                 }
+             });
+             return cleanedWidgets;
+         },
+         addWidgetToolbarToHtml: function() {
+             var self = this;
+             this.widgets.forEach(function(widget) {
+                 var eleId = 'wrap-widget-' + widget.guid;
+                 var $wrapper = $(self.editor.getBody()).find('#' + eleId);
+                 if ($wrapper.length < 1) {
+                     return;
+                 }
+                 self.addToolbarForWidgetWrapper(widget, $wrapper);
+             });
+         },
          insertLinkCallback: function(link) {
              console.log('data ', link);
              var $ele = $('<a></a>').attr('href', link).html(link);
@@ -50,8 +147,40 @@
              this.editor.insertContent($ele.get(0).outerHTML);
          },
          insertWidgetCallback: function(widget) {
+             var self = this;
              console.log('insertWidgetCallback');
-             this.editor.insertContent(widget.html);
+             var eleId = 'wrap-widget-' + widget.guid;
+             var existing = $(this.editor.getBody()).find('#' + eleId);
+             if (existing.length) {
+                 existing.find('.widget-html').html(widget.html);
+                 this.widgets.forEach(function(w) {
+                     if (w.guid === widget.guid) {
+                         w.data = widget.data;
+                         w.html = widget.html;
+                         return false;
+                     }
+                 });
+             } else {
+                 this.editor.insertContent('<div contenteditable="false" id="' + eleId + '" class="st-widget-wrapper st-widget-' + widget.type + '"  ><div class="widget-html">' + widget.html + '</div></div>');
+                 this.widgets.push(widget);
+                 var $wrapper = $(this.editor.getBody()).find('#' + eleId);
+                 self.addToolbarForWidgetWrapper(widget, $wrapper);
+             }
+         },
+         addToolbarForWidgetWrapper: function(widget, $wrapper) {
+             var self = this;
+             var eleId = $wrapper.attr('id');
+             $wrapper.prepend($('<div class="widget-toolbar"><a class="widget-edit-link" href="javascript:;">Edit widget</a> | <a class="delete-widget-link" href="javascript:;">Delete</a></div>'));
+             $wrapper.find('.widget-edit-link').bind('click', function() {
+                 debugger;
+                 self.activeWidgetType = widget.type;
+                 self.activeWidgetData = widget;
+                 self.showWidgetModal = true;
+             });
+             $wrapper.find('.delete-widget-link').bind('click', function() {
+                 $wrapper.remove();
+             });
+             
          }
      }
  }

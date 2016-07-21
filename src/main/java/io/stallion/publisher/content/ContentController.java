@@ -16,11 +16,13 @@
 
 package io.stallion.publisher.content;
 
+import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.settings.Settings;
+import io.stallion.users.Role;
 
 import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.emptyInstance;
@@ -51,6 +53,29 @@ public class ContentController extends DisplayableModelController<Content> {
     public FilterChain<Content> posts() {
         return filter("type", "post");
     }
+
+    public boolean canEdit(Content content) {
+        if (Context.getUser().isInRole(Role.STAFF)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean canView(Content content) {
+        if (Context.getUser().isInRole(Role.STAFF)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean canPublish(Content content) {
+        if (Context.getUser().isInRole(Role.STAFF)) {
+            return true;
+        }
+        return false;
+    }
+
+
 
 
     @Override

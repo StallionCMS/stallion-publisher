@@ -10,6 +10,7 @@
 # If comment moderation is on, who should get moderation emails?
 #moderatorEmails = ["someone@somwehere.com"]
 #notifyEmails = ["maker@stallion.io"]
+useMarkdown = false
 
 
 [[blogs]]

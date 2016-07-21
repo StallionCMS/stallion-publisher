@@ -41,10 +41,11 @@
                                 <input type="radio" name="options" v-model="tab" value="options"> Options
                             </label>
                         </div>
-                        &nbsp; &nbsp; <a href="/st-publisher/posts/{{post.postId}}/view-latest-version" target="_blank"">Preview in new tab</a>
+                        &nbsp; &nbsp; <a href="/st-publisher/content/{{post.postId}}/view-latest-version" target="_blank"">Preview in new tab</a>
                     </div>
                     <div v-show="tab==='editor'">
-                        <markdown-editor v-ref:maincontent editor-id="main-content-editor" :markdown="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></markdown-editor>
+                        <tinymce-editor v-if="!useMarkdown" v-ref:maincontent :html="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></tinymce-editor>
+                        <markdown-editor v-if="useMarkdown" v-ref:maincontent editor-id="main-content-editor" :markdown="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></markdown-editor>
                         <div class="editable-page-element-wrapper" v-for="element in post.elements">
                             <label>Edit <em>{{element.name}}</em> section</label>
                             <page-element name="pageElementEditable" :element-name="element.name" :change-callback="onPageElementChange" :element="element" ></page-element>
@@ -140,7 +141,7 @@
                             </div>
                         </div>
                         <div v-show="dirty" class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
-                        <iframe sandbox="allow-forms allow-scripts" class="preview-iframe mobile" v-bind:class="{'dirty': dirty}" style="width: 100%; height: 100%; min-height: 600px; " v-bind:src="'/st-publisher/posts/' + contentId +  '/view-latest-version?t=' + now" name="previewIframe"></iframe>
+                        <iframe sandbox="allow-forms allow-scripts" class="preview-iframe mobile" v-bind:class="{'dirty': dirty}" style="width: 100%; height: 100%; min-height: 600px; " v-bind:src="'/st-publisher/content/' + contentId +  '/view-latest-version?t=' + now" name="previewIframe"></iframe>
                     </div><!-- -end live preview column -->
                 </div><!-- end col-md-6  -->
             </div><!-- end row -->
@@ -169,7 +170,7 @@
              previewOrCollaborate: 'preview',
              post: {},
              dirty: false,
-             siteUrl: 'http://localhost' // stPublisherAdminContext.siteUrl
+             siteUrl: stPublisherAdminContext.siteUrl
          };
      },
      route: {
@@ -194,7 +195,7 @@
          loadContent: function(contentId, callback) {
              var self = this;
              self.postLoaded = false;
-             var url = '/st-publisher/posts/' + contentId + "/latest-draft";
+             var url = '/st-publisher/content/' + contentId + "/latest-draft";
              stallion.request({
                  url: url,
                  method: 'GET',
@@ -212,7 +213,7 @@
              }
              console.log('publish post ');
              stallion.request({
-                 url: '/st-publisher/posts/' + self.contentId + '/publish/' + self.versionId,
+                 url: '/st-publisher/content/' + self.contentId + '/publish/' + self.versionId,
                  method: 'POST',
                  success: function(post) {
                      stallion.showSuccess("Post " + post.title + " has been published.");
@@ -269,11 +270,10 @@
          saveDraft: function(callback) {
              console.log('save draft');
              var self = this;
-             var markdownEditorData = self.$refs['maincontent'].getData();
+             var editorData = self.$refs['maincontent'].getData();
              var post = JSON.parse(JSON.stringify(self.post));
-             post.originalContent = markdownEditorData.markdown;
-             post.widgets = markdownEditorData.widgets;
-
+             post.originalContent = editorData.markdown || editorData.html || '';
+             post.widgets = editorData.widgets;
              
 
              var originalJson = JSON.stringify(this.originalPost);
@@ -284,7 +284,7 @@
                  return;
              }
              stallion.request({
-                 url: '/st-publisher/posts/' + self.contentId + '/update-draft',
+                 url: '/st-publisher/content/' + self.contentId + '/update-draft',
                  method: 'POST',
                  data: post,
                  success: function(postVersion) {
@@ -308,7 +308,7 @@
          saveDraftAndReloadPreview: function() {
              var self = this;
              self.saveDraft(function() {
-                 $(self.$el).find('.preview-iframe').attr('src', '/st-publisher/posts/' + self.contentId + '/view-latest-version?t=' + new Date().getTime());
+                 $(self.$el).find('.preview-iframe').attr('src', '/st-publisher/content/' + self.contentId + '/view-latest-version?t=' + new Date().getTime());
                  
                  self.previewNotDirty();
              });
@@ -339,7 +339,7 @@
                  self.shouldBeScheduled = o.post.scheduled;
                  self.lastWidgetCount = o.post.widgets.length;
                  self.dirty = false;
-                 $(self.$el).find('.preview-iframe').attr('src', '/st-publisher/posts/' + self.contentId + '/view-latest-version?t=' + new Date().getTime());
+                 $(self.$el).find('.preview-iframe').attr('src', '/st-publisher/content/' + self.contentId + '/view-latest-version?t=' + new Date().getTime());
              });
          }
      },

@@ -52,6 +52,8 @@ import io.stallion.utils.DateUtils;
 import io.stallion.utils.Literals;
 import io.stallion.utils.json.JSON;
 import io.stallion.utils.json.RestrictedViews;
+import static io.stallion.utils.Literals.*;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
@@ -273,7 +275,7 @@ public class CommentsEndpoints implements EndpointResource {
         } else {
             Context.getResponse().setContentType("text/javascript");
         }
-        return org.apache.commons.io.IOUtils.toString(url);
+        return org.apache.commons.io.IOUtils.toString(url, UTF8);
     }
 
     @GET

@@ -1431,7 +1431,8 @@
 
   Dropzone.autoDiscover = true;
 
-  Dropzone.discover = function() {
+    Dropzone.discover = function() {
+
     var checkElements, dropzone, dropzones, _i, _len, _results;
     if (document.querySelectorAll) {
       dropzones = document.querySelectorAll(".dropzone");

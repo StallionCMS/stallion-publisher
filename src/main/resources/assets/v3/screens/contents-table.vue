@@ -10,6 +10,11 @@
     <h3 v-if="isPages">Pages</h3>    
     <h3 v-if="$loadingRouteData">Loading &hellip;</h3>
     <h3 v-if="!$loadingRouteData && !items.length">No posts yet</h3>
+    <div class="form-group">
+        <form @submit.prevent="doSearch">
+            <input type="text" class="form-control" placeholder="Search for page" v-model="searchTerm">
+        </form>
+    </div>
     <table v-if="!$loadingRouteData && items.length" class="pure-table comments-table table table-striped">
         <thead>
             <tr>
@@ -39,7 +44,13 @@
                 </td>
             </tr>
         </tbody>
-        
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <data-table-pager :make-link="makePageLink" "v-if="pager!==null" :page="page" :pager="pager" :base-path="'!/posts'" :page="page"></data-table-pager>
+                </td>
+            </tr>
+        </tfoot>
     </table>
         
     </div> 
@@ -48,20 +59,24 @@
 <script>
  module.exports = {
      data: function() {
-         console.log('contents table data func ', this.$route.name);
          return {
              isPages: false,
              isPosts: false,
              withDeleted: false,
              page: 1,
              pager: null,
-             items: []
+             items: [],
+             searchTerm: ''
          };
      },
      route: {
          data: function(transition) {
+             console.log('posts page?');
              var self = this;
-             console.log('route contents table');
+             if (this.$route.params.page) {
+                 this.page = parseInt(this.$route.params.page, 10);
+             }
+             this.searchTerm = this.$route.query.search || '';
              this.fetchData(function(o) {
                  transition.next({
                      pager: o.pager, 
@@ -73,15 +88,26 @@
          }
      },
      methods: {
+         doSearch: function() {
+             this.page = 1;
+             window.location.hash = '!/' + this.$route.name + '/' + this.page + '?search=' + encodeURIComponent(this.searchTerm);
+         },
          moment: function(a, b, c) {
              return moment(a, b, c);
          },
+         makePageLink: function(page) {
+             return '#!/' + this.$route.name + '/' + page + '?search=' + encodeURIComponent(this.searchTerm || '');
+         },
          fetchData: function(callback) {
-             var url = '/st-publisher/posts'
+             var self = this;
+             var url = '/st-publisher/content/posts'
              if (this.$route.name === 'pages') {
-                 url = '/st-publisher/pages'
+                 url = '/st-publisher/content/pages'
              }
              url += '?page=' + this.page + '&deleted=' + this.withDeleted;
+             if (this.searchTerm && this.searchTerm.length > 2) {
+                 url += '&search=' + encodeURIComponent(this.searchTerm);
+             }
              stallion.request({
                  url: url,
                  success: function (o) {
@@ -93,7 +119,7 @@
                      }
                  },
                  error: function(o, form, xhr) {
-                     console.log('error loading dashboard', o, xhr);
+
                  }
              });
          }

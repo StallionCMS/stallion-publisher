@@ -3,8 +3,8 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
     tinymce.PluginManager.add('example', function(editor, url) {
         // Add a button that opens a window
         editor.addButton('stimage', {
-            text: 'Insert Image',
-            icon: false,
+            text: '',
+            icon: 'icon-image2 icomoon',            
             onclick: function() {
                 editor.vueTag.activeWidgetType = 'image';
                 editor.vueTag.activeWidgetData = {};
@@ -13,7 +13,7 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
         });
 
         editor.addButton('stinsert', {
-            text: 'Insert [+]',
+            text: 'Insert +',
             icon: false,
             onclick: function() {
                 editor.vueTag.activeWidgetType = '';
@@ -23,8 +23,8 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
         });
 
         editor.addButton('stlink', {
-            text: 'Link [+]',
-            icon: false,
+            text: '',
+            icon: 'icon-link icomoon',
             onclick: function() {
                 var node = editor.selection.getNode();
                 if (node.tagName.toUpperCase() === 'A') {

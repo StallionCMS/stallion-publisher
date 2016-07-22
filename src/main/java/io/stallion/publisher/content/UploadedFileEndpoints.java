@@ -78,6 +78,7 @@ public class UploadedFileEndpoints implements EndpointResource {
     @POST
     @Path("/upload-file")
     @Produces("application/json")
+    @MinRole(Role.MEMBER)
     public Object uploadFile() {
 
         String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";

@@ -271,3 +271,24 @@
 
 
 
+.mce-i-icon-link:before {
+    content: "\ec99";
+}
+
+.mce-i-icon-image2:before {
+    content: "\e93c";    
+}
+
+.icomoon {
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

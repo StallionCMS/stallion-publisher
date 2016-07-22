@@ -16,6 +16,11 @@
                         </a>
                     </div>
                     <div class="widget-option">
+                        <a href="javascript:;" @click="selectWidget('image-simple', 'Choose Image to Insert')">
+                            <span class="icon icon-image2"></span> Sourced Image 
+                        </a>
+                    </div>
+                    <div class="widget-option">
                         <a href="javascript:;" @click="selectWidget('image-collection', 'Configure Image Collection')">
                             <span class="icon icon-images3"></span> Image Collection/Gallery
                         </a>
@@ -33,7 +38,8 @@
                 </div>
                 <div v-if="widgetType">
                     <embed-widget-configure v-ref:active v-if="widgetType==='embed'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert"></embed-widget-configure>
-                    <image-widget-configure v-ref:active v-if="widgetType==='image'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='image'"></image-widget-configure>
+                    <image-widget-configure v-ref:active v-if="widgetType==='image'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" ></image-widget-configure>
+                    <image-simple-configure v-ref:active v-if="widgetType==='image-simple'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" ></image-widget-configure>
                     <image-collection-widget-configure v-ref:active v-if="widgetType==='image-collection'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='image-collection'"></image-collection-widget-configure>
                     <html-widget-configure v-ref:active v-if="widgetType==='html'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='html'"></html-widget-configure>
                     <html-form-widget-configure v-ref:active v-if="widgetType==='html-form'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='html-form'"></html-form-widget-configure>

@@ -11,8 +11,16 @@
     margin-top: 0em;
 }
 
-autogrow-textarea .form-control {
+.autogrow-textarea.form-control {
     min-height: 50px;
+}
+.autogrow-textarea.form-control {
+    height: 50px;
+}
+
+.autogrow-textarea.form-control.autogrow-single-line {
+    min-height: 36px;
+    height: 36px;
 }
 
  .fade {

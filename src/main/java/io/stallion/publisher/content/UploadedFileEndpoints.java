@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.stallion.Context;
+import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.exceptions.*;
 import io.stallion.requests.ResponseComplete;
 import io.stallion.requests.ServletFileSender;
@@ -46,9 +47,14 @@ public class UploadedFileEndpoints implements EndpointResource {
     @GET
     @Path("/library")
     @Produces("application/json")
+    @MinRole(Role.MEMBER)
     public Object getFiles(@QueryParam("page") Integer page) {
         page = or(page, 1);
-        Map ctx =  map(val("pager", UploadedFileController.instance().filterChain().sort("uploadedAt", "desc").pager(page)));
+        FilterChain<UploadedFile> chain = UploadedFileController.instance().filterChain();
+        if (!Context.getUser().isInRole(Role.STAFF_LIMITED)) {
+            chain = chain.filter("ownerId", Context.getUser().getId());
+        }
+        Map ctx =  map(val("pager", chain.sort("uploadedAt", "desc").pager(page, 100)));
         return ctx;
     }
 
@@ -56,9 +62,14 @@ public class UploadedFileEndpoints implements EndpointResource {
     @GET
     @Path("/images")
     @Produces("application/json")
+    @MinRole(Role.MEMBER)
     public Object getImageFiles(@QueryParam("page") Integer page) {
         page = or(page, 1);
-        Map ctx =  map(val("pager", UploadedFileController.instance().filter("type", "image").sort("uploadedAt", "desc").pager(page, 100)));
+        FilterChain<UploadedFile> chain = UploadedFileController.instance().filter("type", "image");
+        if (!Context.getUser().isInRole(Role.STAFF_LIMITED)) {
+            chain = chain.filter("ownerId", Context.getUser().getId());
+        }
+        Map ctx =  map(val("pager", chain.sort("uploadedAt", "desc").pager(page, 100)));
         return ctx;
     }
 
@@ -80,13 +91,16 @@ public class UploadedFileEndpoints implements EndpointResource {
     }
 
     @GET
-    @Path("/view/:fileId/thumb")
+    @Path("/view/:secret/:fileId/thumb")
     @MinRole(Role.ANON)
-    public Object viewUploadedThumbFile(@PathParam("fileId") Long fileId) {
+    public Object viewUploadedThumbFile(@PathParam("secret") String secret, @PathParam("fileId") Long fileId) {
         String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
         UploadedFile uf = UploadedFileController.instance().forId(fileId);
         if (empty(uf.getThumbCloudKey())) {
             throw new io.stallion.exceptions.NotFoundException("File not found.");
+        }
+        if (!uf.getSecret().equals(secret)) {
+            throw new ClientException("Invalid file token.");
         }
         String fullPath = folder + uf.getThumbCloudKey();
         File file = new File(fullPath);
@@ -95,13 +109,16 @@ public class UploadedFileEndpoints implements EndpointResource {
     }
 
     @GET
-    @Path("/view/:fileId/medium")
+    @Path("/view/:secret/:fileId/medium")
     @MinRole(Role.ANON)
-    public Object viewUploadedMediumFile(@PathParam("fileId") Long fileId) {
+    public Object viewUploadedMediumFile(@PathParam("secret") String secret, @PathParam("fileId") Long fileId) {
         String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
         UploadedFile uf = UploadedFileController.instance().forId(fileId);
         if (empty(uf.getMediumCloudKey())) {
             throw new io.stallion.exceptions.NotFoundException("File not found.");
+        }
+        if (!uf.getSecret().equals(secret)) {
+            throw new ClientException("Invalid file token.");
         }
 
         String fullPath = folder + uf.getMediumCloudKey();
@@ -111,11 +128,15 @@ public class UploadedFileEndpoints implements EndpointResource {
     }
 
     @GET
-    @Path("/view/:fileId")
+    @Path("/view/:secret/:fileId/:slug")
     @MinRole(Role.ANON)
-    public Object viewUploadedFile(@PathParam("fileId") Long fileId) {
+    public Object viewUploadedFile(@PathParam("secret") String secret, @PathParam("fileId") Long fileId, @PathParam("slug") String slug) {
         String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
-        UploadedFile uf = UploadedFileController.instance().forId(fileId);
+        UploadedFile uf = UploadedFileController.instance().forIdOrNotFound(fileId);
+        if (!uf.getSecret().equals(secret)) {
+            throw new ClientException("Invalid file token.");
+        }
+
         String fullPath = folder + uf.getCloudKey();
         File file = new File(fullPath);
         sendAssetResponse(file);

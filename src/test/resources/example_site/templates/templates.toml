@@ -19,6 +19,23 @@ Copyright 2016 Big Company Inc.
 template = "page.jinja"
 thumbnail = "page.png"
 
+
+[[pageTemplates]]
+template = "markdown-page.jinja"
+thumbnail = "page.png"
+useMarkdown = true
+
+[[pageTemplates]]
+template = "rich-page.jinja"
+thumbnail = "page.png"
+
+[[pageTemplates]]
+template = "listicle-page.jinja"
+thumbnail = "page.png"
+contentEditable = false
+
+
+
 [[pageTemplates]]
 template = "landing-page.jinja"
 thumbnail = "landing-page.png"

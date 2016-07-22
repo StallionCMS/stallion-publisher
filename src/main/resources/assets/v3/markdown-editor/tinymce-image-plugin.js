@@ -26,6 +26,14 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
             text: 'Link [+]',
             icon: false,
             onclick: function() {
+                var node = editor.selection.getNode();
+                if (node.tagName.toUpperCase() === 'A') {
+                    editor.vueTag.activeLinkUrl = node.getAttribute('href');
+                    editor.vueTag.activeLinkText = node.innerHTML;
+                    editor.selection.select(node);
+                } else {
+                    editor.vueTag.activeLinkText = editor.selection.getContent();
+                }
                 editor.vueTag.showInsertLinkModal = true;
             }
         });

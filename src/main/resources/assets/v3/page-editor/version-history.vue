@@ -18,7 +18,7 @@
                 <tbody>
                     <tr v-for='item in pager.items'>
                         <td>
-                            <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" href="/st-publisher/posts/{{item.postId}}/view-version/{{item.id}}" target="_blank">view</a><br>
+                            <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" href="/st-publisher/content/{{item.postId}}/view-version/{{item.id}}" target="_blank">view</a><br>
                             <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" @click='restoreVersion(item)'>restore as draft</a><br>
                         </td>
                         <td>{{ moment(item.versionDate * 1000).fromNow() }}</td>
@@ -59,7 +59,7 @@
          loadVersions: function() {
              var self = this;
              stallion.request({
-                 url: '/st-publisher/posts/' + self.contentId + '/load-versions?loadAll=' + self.loadAll,
+                 url: '/st-publisher/content/' + self.contentId + '/load-versions?loadAll=' + self.loadAll,
                  success: function(result) {
                      self.pager = result.pager;
                      self.loading = false;
@@ -70,7 +70,7 @@
              var self = this;
              stallion.request({
                  method: 'POST',
-                 url: '/st-publisher/posts/make-version-most-recent',
+                 url: '/st-publisher/content/make-version-most-recent',
                  data: {
                      postId: self.contentId,
                      versionId: version.id

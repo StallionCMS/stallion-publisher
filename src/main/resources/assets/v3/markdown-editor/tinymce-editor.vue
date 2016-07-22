@@ -4,6 +4,7 @@
          width: 100%;
          height: 300px;
          border: 1px solid #DDD;
+         visibility: hidden;
      }
      .loading-overlay {
          position: absolute;
@@ -17,9 +18,9 @@
 <template>
     <div class="tinymce-editor-vue">
         <div class="loading-overlay">Loading editor &hellip;</div>
-        <textarea style="" class="tiny-target" ></textarea>
+        <textarea style="" class="tiny-target" v-model="html" ></textarea>
         <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
-        <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback"></insert-link-modal>
+        <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback" :hide-internal-pages="options.hideInternalPages" :link="activeLinkUrl" :text="activeLinkText"></insert-link-modal>
     </div>
 </template>
 <script>
@@ -36,6 +37,8 @@
              showWidgetModal: false,
              activeWidgetType: '',
              activeWidgetData: {},
+             activeLinkText: '',
+             activeLinkUrl: '',
              showInsertLinkModal: false,
              ticks: new Date().getTime()
          }
@@ -59,11 +62,10 @@
                  selector: '#' + id,
                  statusbar: false,
                  plugins: 'autoresize textcolor colorpicker textpattern imagetools paste charmap example',
-                 toolbar1: '| bold italic | alignleft aligncenter alignright | bullist numlist outdent indent blockquote | link image | stlink stimage stinsert ',
+                 toolbar1: '| bold italic | styleselect | bullist numlist outdent indent blockquote removeformat | undo redo | stlink stimage stinsert ',
                  menubar: false,
                  content_css: stPublisherAdminContext.siteUrl + '/st-resource/publisher/tinymce/tinymce-content.css?ts=' + self.ticks + ',' + stPublisherAdminContext.siteUrl + '/st-resource/publisher/public/contacts-always.css?vstring=' + self.ticks,
                  init_instance_callback : function(editor) {
-                     editor.setContent(self.html);
 
                      self.editor = editor;
                      editor.vueTag = self;
@@ -140,10 +142,16 @@
                  self.addToolbarForWidgetWrapper(widget, $wrapper);
              });
          },
-         insertLinkCallback: function(link) {
-             console.log('data ', link);
-             var $ele = $('<a></a>').attr('href', link).html(link);
-             //debugger;
+         insertLinkCallback: function(link, text) {
+             var self = this;
+             if (!text) {
+                 text = this.editor.selection.getContent();
+             }
+             if (!text) {
+                 text = link;
+             }
+             console.log('insert link ', link, text);
+             var $ele = $('<a></a>').attr('href', link).html(text);
              this.editor.insertContent($ele.get(0).outerHTML);
          },
          insertWidgetCallback: function(widget) {
@@ -152,7 +160,9 @@
              var eleId = 'wrap-widget-' + widget.guid;
              var existing = $(this.editor.getBody()).find('#' + eleId);
              if (existing.length) {
-                 existing.find('.widget-html').html(widget.html);
+                 self.editor.undoManager.transact(function() {
+                     existing.find('.widget-html').html(widget.html);
+                 });
                  this.widgets.forEach(function(w) {
                      if (w.guid === widget.guid) {
                          w.data = widget.data;
@@ -161,10 +171,12 @@
                      }
                  });
              } else {
-                 this.editor.insertContent('<div contenteditable="false" id="' + eleId + '" class="st-widget-wrapper st-widget-' + widget.type + '"  ><div class="widget-html">' + widget.html + '</div></div>');
-                 this.widgets.push(widget);
-                 var $wrapper = $(this.editor.getBody()).find('#' + eleId);
-                 self.addToolbarForWidgetWrapper(widget, $wrapper);
+                 self.editor.undoManager.transact(function() {
+                     self.editor.insertContent('<div contenteditable="false" id="' + eleId + '" class="st-widget-wrapper st-widget-' + widget.type + '"  ><div class="widget-html">' + widget.html + '</div></div>');
+                     self.widgets.push(widget);
+                     var $wrapper = $(self.editor.getBody()).find('#' + eleId);
+                     self.addToolbarForWidgetWrapper(widget, $wrapper);
+                 });
              }
          },
          addToolbarForWidgetWrapper: function(widget, $wrapper) {
@@ -172,13 +184,15 @@
              var eleId = $wrapper.attr('id');
              $wrapper.prepend($('<div class="widget-toolbar"><a class="widget-edit-link" href="javascript:;">Edit widget</a> | <a class="delete-widget-link" href="javascript:;">Delete</a></div>'));
              $wrapper.find('.widget-edit-link').bind('click', function() {
-                 debugger;
                  self.activeWidgetType = widget.type;
                  self.activeWidgetData = widget;
                  self.showWidgetModal = true;
              });
              $wrapper.find('.delete-widget-link').bind('click', function() {
-                 $wrapper.remove();
+                 //debugger;
+                 self.editor.undoManager.transact(function() {
+                     $wrapper.remove();
+                 });
              });
              
          }

@@ -24,7 +24,7 @@
      ready: function() {
          var self = this;
          stallion.request({
-             url: '/st-publisher/all-live-contents',
+             url: '/st-publisher/content/all-live-contents',
              success: function(o) {
                  self.items = o.pager.items;
                  self.initSelect();

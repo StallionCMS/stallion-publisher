@@ -19,6 +19,7 @@ package io.stallion.publisher.content;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
+import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.publisher.PublisherSettings;
 import io.stallion.requests.IRequest;
@@ -63,7 +64,8 @@ public class UploadRequestProcessor {
 
     private void doUpload() throws IOException {
         Long id = DataAccessRegistry.instance().getTickets().nextId();
-        String url = "{cdnUrl}/st-publisher/files/view/" + id + "?ts=" + DateUtils.mils();
+        String secret = GeneralUtils.randomTokenBase32(14);
+
 
         stRequest.setAsMultiPartRequest();
 
@@ -74,12 +76,16 @@ public class UploadRequestProcessor {
         String relativePath = GeneralUtils.slugify(FilenameUtils.getBaseName(fileName)) + "-" + DateUtils.mils() + "." + extension;
         relativePath = "stallion-file-" + id + "/" + GeneralUtils.secureRandomToken(8) + "/" + relativePath;
 
+        String url = "{cdnUrl}/st-publisher/files/view/" + secret + "/" + id + "/" + fileName + "?ts=" + DateUtils.mils();
+
         String destPath = uploadsFolder + relativePath;
         FileUtils.forceMkdir(new File(destPath).getParentFile());
         uploaded
                 .setCloudKey(relativePath)
                 .setExtension(extension)
                 .setName(fileName)
+                .setSecret(secret)
+                .setOwnerId(Context.getUser().getId())
                 .setUploadedAt(DateUtils.utcNow())
                 .setType(UploadedFileController.getTypeForExtension(extension))
                 .setRawUrl(url)
@@ -215,8 +221,7 @@ public class UploadRequestProcessor {
         Log.info("Write all byptes to {0}", thumbnailPath);
         FileUtils.writeAllBytes(scaledImageInByte, new File(thumbnailPath));
 
-
-        String url = "{cdnUrl}/st-publisher/files/view/" + uploaded.getId() + "/" + postfix + "?ts=" + DateUtils.mils();
+        String url = "{cdnUrl}/st-publisher/files/view/" + uploaded.getSecret() + "/" + uploaded.getId() + "/" + postfix + "?ts=" + DateUtils.mils();
         if (postfix.equals("thumb")) {
             uploaded.setThumbCloudKey(relativePath);
             uploaded.setThumbRawUrl(url);

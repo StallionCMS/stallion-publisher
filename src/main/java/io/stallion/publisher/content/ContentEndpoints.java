@@ -162,6 +162,7 @@ public class ContentEndpoints implements EndpointResource {
 
 
 
+
         for(PageElement ele: elements) {
             PageElement savedEle = newVersion.getElement(ele.getName());
             if (emptyInstance(savedEle)) {
@@ -175,6 +176,18 @@ public class ContentEndpoints implements EndpointResource {
         newVersion.setElements(elements);
 
         Map context = map(val("post", newVersion));
+
+        String template = ContentController.instance().getTemplate(newVersion);
+        Boolean useMarkdown = null;
+        boolean contentEditable = true;
+        for (PageTemplateDefinition def: TemplateConfig.instance().getPageTemplates()) {
+            if (def.getTemplate().equals(template)) {
+                useMarkdown = def.getUseMarkdown();
+                contentEditable = def.isContentEditable();
+            }
+        }
+        context.put("useMarkdown", useMarkdown);
+        context.put("contentEditable", contentEditable);
         //context.put("templateElements", elements);
         return context;
     }

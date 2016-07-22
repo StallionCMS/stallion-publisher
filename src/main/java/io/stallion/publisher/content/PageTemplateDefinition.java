@@ -17,11 +17,14 @@
 package io.stallion.publisher.content;
 
 
+import javax.persistence.Column;
+
 public class PageTemplateDefinition {
     private String template = "";
     private String thumb = "";
     private boolean special = false;
     private boolean contentEditable = true;
+    private Boolean useMarkdown;
 
     public String getTemplate() {
         return template;
@@ -56,6 +59,16 @@ public class PageTemplateDefinition {
 
     public PageTemplateDefinition setContentEditable(boolean contentEditable) {
         this.contentEditable = contentEditable;
+        return this;
+    }
+
+
+    public Boolean getUseMarkdown() {
+        return useMarkdown;
+    }
+
+    public PageTemplateDefinition setUseMarkdown(Boolean useMarkdown) {
+        this.useMarkdown = useMarkdown;
         return this;
     }
 }

@@ -35,6 +35,8 @@ public class UploadedFile extends ModelBase {
     private ZonedDateTime uploadedAt;
     private Integer height = 0;
     private Integer width = 0;
+    private Long ownerId = 0L;
+    private String secret = "";
 
     // Thumb limited to 350px wide or 250px tall
     private String thumbCloudKey = "";
@@ -96,6 +98,26 @@ public class UploadedFile extends ModelBase {
 
     }
 
+
+    @Column
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public UploadedFile setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+        return this;
+    }
+
+    @Column
+    public String getSecret() {
+        return secret;
+    }
+
+    public UploadedFile setSecret(String secret) {
+        this.secret = secret;
+        return this;
+    }
 
     @Column(length = 255)
     public String getRawUrl() {

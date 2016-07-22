@@ -7,7 +7,7 @@
 <template>
     <div class="page-element-text">
         <div class="form-group">
-            <autogrow-textarea v-model="value"></autogrow-textarea>
+            <autogrow-text v-model="value"></autogrow-text>
         </div>
     </div>
 </template>

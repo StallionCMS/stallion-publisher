@@ -44,8 +44,10 @@
                         &nbsp; &nbsp; <a href="/st-publisher/content/{{post.postId}}/view-latest-version" target="_blank"">Preview in new tab</a>
                     </div>
                     <div v-show="tab==='editor'">
-                        <tinymce-editor v-if="!useMarkdown" v-ref:maincontent :html="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></tinymce-editor>
-                        <markdown-editor v-if="useMarkdown" v-ref:maincontent editor-id="main-content-editor" :markdown="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></markdown-editor>
+                        <div v-show="contentEditable">
+                            <tinymce-editor :options="{hideInternalPages: true}" v-if="!useMarkdown" v-ref:maincontent :html="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></tinymce-editor>
+                            <markdown-editor v-if="useMarkdown" v-ref:maincontent editor-id="main-content-editor" :markdown="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></markdown-editor>
+                        </div>
                         <div class="editable-page-element-wrapper" v-for="element in post.elements">
                             <label>Edit <em>{{element.name}}</em> section</label>
                             <page-element name="pageElementEditable" :element-name="element.name" :change-callback="onPageElementChange" :element="element" ></page-element>
@@ -165,8 +167,10 @@
              templateElements: [],
              shouldBeScheduled: false,
              previewMode: 'mobile',
+             contentEditable: false,
              lastWidgetCount: 0,
              now: new Date().getTime(),
+             useMarkdown: stPublisherAdminContext.useMarkdown,
              previewOrCollaborate: 'preview',
              post: {},
              dirty: false,
@@ -186,6 +190,10 @@
                  data.contentId = contentId;
                  data.shouldBeScheduled = o.post.scheduled;
                  data.lastWidgetCount = o.post.widgets.length;
+                 data.contentEditable = o.contentEditable;
+                 if (o.useMarkdown !== null && o.useMarkdown !== undefined) {
+                     data.useMarkdown = o.useMarkdown;
+                 }
                  transition.next(data);
              };
              this.loadContent(contentId, callback);

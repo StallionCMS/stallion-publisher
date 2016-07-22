@@ -1,15 +1,10 @@
 <template>
-    <textarea class="autogrow-textarea form-control" v-model="value"></textarea>
+    <textarea class="autogrow-textarea form-control"></textarea>
 </template>
 
 <script>
  module.exports = {
-     props: {
-         value: {
-             twoWay: true
-         }
-     },
-     compiled: function() {
+     ready: function() {
          stallion.autoGrow({}, $(this.$el));
      }
  };

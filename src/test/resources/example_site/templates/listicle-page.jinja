@@ -1,0 +1,30 @@
+{% extends "base.jinja" %}
+{% block main_body %}
+<div class="posts">
+    <section class="post">
+        <header class="post-header">
+            <h2 class="post-title">{{ page.title }}</h2>
+        </header>
+        <div class="post-description">
+          <div class="listicle-item"
+               <div>
+                 <h2>{% editable_text header1 %}{% end_editable %}</h2>
+                 <div>{% editable_image image1 %}{% end_editable %}</div>
+                 <div>{% editable_markdown content1 %}{% end_editable %}</div>
+               </div>
+               <div>
+                 <h2>{% editable_text header2 %}{% end_editable %}</h2>
+                 <div>{% editable_image image2 %}{% end_editable %}</div>
+                 <div>{% editable_markdown content2 %}{% end_editable %}</div>
+               </div>
+               <div>
+                 <h2>{% editable_text header3 %}{% end_editable %}</h2>
+                 <div>{% editable_image image3 %}{% end_editable %}</div>
+                 <div>{% editable_markdown content3 %}{% end_editable %}</div>
+               </div>
+               
+          
+        </div>
+    </section>
+</div><!--end posts-->
+{% endblock %}

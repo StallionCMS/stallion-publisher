@@ -20,13 +20,24 @@
  module.exports = {
      props: {
          options: Object,
-         formAction: "/st-publisher/files/upload-file"
+         formAction: {
+             type: String,
+             default: "/st-publisher/files/upload-file"
+         },
+         after: Function
      },
      ready: function() {
+         var self = this;
          var opts = this.options || {};
          if (!opts.dictDefaultMessage) {
              opts.dictDefaultMessage = "Drag one more more files here. Or click to open a file picker.";
          }
+         opts.init = function() {
+             this.on("success", function(info, file) { 
+                 self.after(file);
+                 this.removeFile(info);
+             });
+         };
          this.dropzone = new Dropzone($(this.$el).find('.st-file-dropzone').get(0), opts);
      }
  };

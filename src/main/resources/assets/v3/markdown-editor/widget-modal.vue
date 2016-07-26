@@ -83,7 +83,7 @@
 
          },
          cancel: function() {
-
+             this.$refs.themodal.close();
          },
          insertWidget: function() {
              var previousGuid = this.widgetData.guid || '';

@@ -62,7 +62,7 @@
                  selector: '#' + id,
                  statusbar: false,
                  plugins: 'autoresize textcolor colorpicker textpattern imagetools paste charmap example',
-                 toolbar1: '| bold italic | styleselect | bullist numlist outdent indent blockquote removeformat | undo redo | stlink stimage stinsert ',
+                 toolbar1: 'bold italic | styleselect | bullist numlist outdent indent blockquote removeformat | undo redo | stlink stimage stinsert ',
                  menubar: false,
                  content_css: stPublisherAdminContext.siteUrl + '/st-resource/publisher/tinymce/tinymce-content.css?ts=' + self.ticks + ',' + stPublisherAdminContext.siteUrl + '/st-resource/publisher/public/contacts-always.css?vstring=' + self.ticks,
                  init_instance_callback : function(editor) {

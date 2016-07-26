@@ -12,6 +12,17 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
             }
         });
 
+        editor.addButton('stimagesimple', {
+            text: '',
+            icon: 'icon-image2 icomoon',            
+            onclick: function() {
+                editor.vueTag.activeWidgetType = 'image-simple';
+                editor.vueTag.activeWidgetData = {};
+                editor.vueTag.showWidgetModal = true;
+            }
+        });
+
+        
         editor.addButton('stinsert', {
             text: 'Insert +',
             icon: false,

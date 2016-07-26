@@ -1,16 +1,24 @@
 
-<style>
+<style lang="scss">
+ .file-library-vue {
+     .file-library {
+         margin-top: 0px;
+     }
+ }
 
+     
 </style>
 
 
 <template>
-    <div class="file-library">
-        <h3>File Library {{ispicker}}</h3>
+    <div class="file-library-vue">
+        <h3 class="file-library">File Library</h3>
         <loading-div v-if="$loadingRouteData"></loading-div>
         <h3 v-if="!$loadingRouteData && !items.length">No files yet</h3>
         <div class="form-group">
-            <a href="#/file-upload" class="btn btn-primary btn-xl">Upload new file</a>
+            <a v-if="isPicker" href="#/file-upload" class="btn btn-primary btn-xl">Upload new file</a>
+            <a v-if="!isPicker && !showUploader" href="javascript:;" @click="showUploader=true" class="btn btn-primary btn-xl">Upload new file</a>
+            <file-upload-target v-if="showUploader" :after="uploadComplete"></file-upload-target>
         </div>
         <table v-if="!$loadingRouteData && items.length" class="pure-table table table-striped">
             <thead>
@@ -55,6 +63,7 @@
      data: function() {
          return {
              items: [],
+             showUploader: false,
              page: 1,
              pager: null,
              withDeleted: false
@@ -74,6 +83,13 @@
          pickFile: function(file) {
              this.callback(file);
          },
+         uploadComplete: function(file) {
+             this.showUploader = false;
+             if (this.pickFile) {
+                 this.callback(file);
+             }
+             this.fetchData();
+         },
          moment: function(a, b, c) {
              return moment(a, b, c);
          },
@@ -87,7 +103,7 @@
                  url: '/st-publisher/files/library?page=' + self.page + '&deleted=' + self.withDeleted,
                  method: 'GET',
                  success: function(o) {
-                     self.page = o.pager;
+                     self.pager = o.pager;
                      self.items = o.pager.items;
                      if (callback) {
                          callback();

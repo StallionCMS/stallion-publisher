@@ -6,53 +6,14 @@
 
 <template>
     <div>
-    <h3 v-if="!isPages">Posts</h3>
-    <h3 v-if="isPages">Pages</h3>    
-    <h3 v-if="$loadingRouteData">Loading &hellip;</h3>
-    <h3 v-if="!$loadingRouteData && !items.length">No posts yet</h3>
-    <div class="form-group">
-        <form @submit.prevent="doSearch">
-            <input type="text" class="form-control" placeholder="Search for page" v-model="searchTerm">
-        </form>
-    </div>
-    <table v-if="!$loadingRouteData && items.length" class="pure-table comments-table table table-striped">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Last updated</th>
-                <th>Title</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="post in items">
-                <td class="page-actions">
-                    <a class="btn btn-xs btn-default" href="#/edit-content/{{post.id}}"">Edit</a>
-                    <a v-if="!post.currentlyPublished" class="btn-open btn btn-xs btn-default" target="_blank" href="/st-publisher/posts/{{ post.id }}/preview">Preview</a>
-                    <a v-if="post.currentlyPublished" class="btn-open btn btn-xs btn-default" target="_blank" href="{{ post.previewUrl }}">View</a>
-                </td>
-                <td>
-                    {{moment(post.updatedAt).fromNow()}}
-                </td>
-                <td>
-                    {{post.title}}
-                </td>
-                <td>
-                    <span v-if="post.currentlyPublished">Published</span>
-                    <span v-if="!post.currentlyPublished && post.draft">Draft</span>
-                    <span v-if="!post.currentlyPublished && !post.draft">Scheduled</span>
-                </td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="4">
-                    <data-table-pager :make-link="makePageLink" "v-if="pager!==null" :page="page" :pager="pager" :base-path="'!/posts'" :page="page"></data-table-pager>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
-        
+        <h3 v-if="$loadingRouteData">Loading &hellip;</h3>
+        <div v-if="!$loadingRouteData">
+            <st-data-table :table-definition="tableDefinition" :columns="columns" label="post" :browser-url-template="'#!/posts'" :data-url="'/st-publisher/content/posts'" :route="$route" table-class="table table-striped">
+                <div class="actions-slot" slot="actions">
+                    <button class="btn btn-primary">Add Article</button>
+                </div>
+            </st-data-table>
+        </div>
     </div> 
 </template>
 
@@ -66,9 +27,40 @@
              page: 1,
              pager: null,
              items: [],
-             searchTerm: ''
+             searchTerm: '',
+             columns: [
+                 {
+                     actions: [{
+                         className: 'btn btn-default btn-xs',
+                         label: 'Edit'
+                     }]
+                 },
+                 {
+                     title: 'Updated At',
+                     render: function(item) {
+                         return moment(item.updatedAt).fromNow();
+                     }
+                 },
+                 {
+                     title: 'Title',
+                     field: 'title'
+                 },
+                 {
+                     title: 'Status',
+                     render: function(item) {
+                         if (item.currentlyPublished) {
+                             return 'Published';
+                         } else if (!item.currentlyPublished && item.draft) {
+                             return 'Draft';
+                         } else {
+                             return 'Scheduled';
+                         }
+                     }
+                 }
+             ]
          };
-     },
+     }
+     /*
      route: {
          data: function(transition) {
              console.log('posts page?');
@@ -123,6 +115,6 @@
                  }
              });
          }
-     }
+     }*/
  }
 </script>

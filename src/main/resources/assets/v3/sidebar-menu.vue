@@ -1,15 +1,22 @@
-
+<style lang="scss">
+ .sidebar-menu-vue {
+     .material-icons {
+         font-size: 18px;
+         vertical-align: -20%;
+     }
+ }
+</style>
 <template>
-    <div id="sidebar-menu">
+    <div id="sidebar-menu" class="sidebar-menu-vue">
         <ul class="nav nav-sidebar">
             <!--<li class="dashboard"><a href="#/"><span class="icon-map2"></span> Overview <span class="sr-only">(current)</span></a></li>-->
-            <li class="newPost posts"><a class="partial-width" href="#/posts"><span class="icon-newspaper"></span> Posts</a> <a class="new-thing-link" v-link="{ path: '/new-post' }">new post</a></li>
+            <li class="newPost posts"><a class="partial-width" href="#/posts"><i class="material-icons">note</i> Posts</a> <a class="new-thing-link" v-link="{ path: '/new-post' }">new post</a></li>
             <li class="pages newPage">
                 <a class="partial-width" href="#/pages">
-                    <span class="icon-file-text"></span> Pages</a>
+                    <i class="material-icons">description</i> Pages</a>
                 <a class="new-thing-link" v-link="{ path: '/new-page' }">new page</a>
             </li>
-            <li class="comments"><a href="#/comments"><span class="icon-bubble2"></span> Comments</a></li>
+            <li class="comments"><a href="#/comments"><i class="material-icons">forum</i> Comments</a></li>
             <li class="contacts"><a href="#/contacts"><span class="icon-users"></span> Contacts</a></li>
             <li class="files"><a href="#/files"><span class="icon-images"></span> Files/Media</a></li>
         </ul>

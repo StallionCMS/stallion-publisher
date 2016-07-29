@@ -1,5 +1,6 @@
 <style lang="scss">
  .st-data-table-vue {
+     
      .data-table-header {
          padding-right: 20px;
          .table-title {
@@ -46,14 +47,36 @@
          .cancel-search:hover {
              color: #555;
          }
-                  
-         [slot="actions"] {
+         [slot="actions"], [slot="filters"] {
              display: inline-block;
              float: right;
              text-align: right;
+             margin-left: 20px;
          }
      }
-     
+     .cell-editable {
+         border-left: 1px solid transparent;
+         border-right: 1px solid transparent;
+     }
+     .cell-editable:hover {
+         cursor: pointer;
+         border: 1px dashed #ccc;
+     }
+     th.sortable:hover {
+         background-color: #eee;
+         cursor: pointer;
+     }
+     th.sorted {
+         background-color: #ccc;
+     }
+     th.sorted.sorted-desc:after {
+         content: " \25BE";
+     }
+     th.sorted.sorted-asc:after {
+         content: " \25B4";
+     }
+              
+
  }
  .st-data-table-vue.fixed-headers {
      thead, .data-table-header {
@@ -82,23 +105,23 @@
  
 </style>
 <template>
-    <div class="st-data-table-vue fixed-headers" v-bind:class="{'fixed-headers': this.infiniteScroll}">
+    <div class="st-data-table-vue" v-bind:class="{'fixed-headers': this.infiniteScroll}">
         <div class="data-table-header">
             <slot name="header">
                 <h2 class="table-title">{{ title }}</h2>
                 <form @submit.prevent="doSearch" class="table-search form-inline">
                     <div class="input-group search-input-group">
-                        <input type="text" class="form-control search-field" placeholder="Search for article" v-model="searchTerm">
+                        <input type="text" class="form-control search-field" placeholder="Search for {{ label }}" v-model="searchTerm">
                         <span v-show="searchTerm && searchTerm.length >= 3" @click="searchTerm=''" class="cancel-search">✕</span>
                         <button type="submit" class="btn btn-primary input-group-addon search-button"><i class="material-icons">search</i></button>
                     </div>
                 </form>
-                <slot name="filters">
-
-                </slot>                
                 <slot name="actions">
 
                 </slot>
+                <slot name="filters">
+                    
+                </slot>                
             </slot>
         </div>
         <div class="table-wrap">
@@ -108,7 +131,7 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th v-for="col in columns">{{ col.title }}</th>
+                    <th v-bind:class="{'sorted': sortField===col.field, 'sorted-desc': sortDirection==='desc', 'sortable': col.sortable, 'sorted-asc': sortDirection==='asc'}"v-for="col in columns" @click="sortColumn(col)">{{ col.title }}</th>
                 </tr>
             </thead>
             <tbody v-if="loading">
@@ -127,12 +150,12 @@
                 </tr>
             </tbody>
             <tbody v-if="!loading && items.length">
-                <tr v-for="(rowNumber, item) in items" v-if="!item.$hidden" track-by="id">
-                    <td v-for="(colNumber, col) in columns" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)">
-                        <template v-if="item.$isEditing">
-                            <component :is="col.editableComponent" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber" :callback="onEditCallback" :refresh="refresh"></component>
+                <tr v-for="(rowNumber, item) in items" v-if="!item.$hidden" track-by="id" class="data-table-row-index-{{ rowNumber }} data-table-row-id-{{ item.id }}">
+                    <td v-for="(colNumber, col) in columns" @click="onCellClicked(item, col, rowNumber, colNumber, $event)" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)" v-bind:class="[col.editableComponent? 'cell-editable': '', col.className]">
+                        <template v-if="item.$isEditing === colNumber">
+                            <component :is="col.editableComponent" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber" :callback="onEditCallback" :refresh="refresh" :cancel="cancelEdit"></component>
                         </template>
-                        <template v-if="!item.$isEditing">
+                        <template v-if="item.$isEditing !== colNumber">
                             <template v-if="col.component">
                                 <component :is="col.component" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber"></component>
                             </template>
@@ -164,7 +187,7 @@
             <tfoot>
                 <tr>
                     <td colspan="{{ columns.length }}">
-                        <data-table-pager :make-link="makePageLink" "v-if="pager!==null" :page="page" :pager="pager" :base-path="'!/posts'" :page="page"></data-table-pager>
+                        <data-table-pager :make-link="makePageLink" v-if="pager!==null && !infiniteScroll" :page="page" :pager="pager" :base-path="'!/posts'" :page="page"></data-table-pager>
                     </td>
                 </tr>
             </tfoot>
@@ -201,6 +224,9 @@
          autoSearch: {
              default: false
          },
+         singleClickEditing: {
+             default: false
+         },
          isAttached: true,
          initialDataLoaded: false,
          labelPlural: '',
@@ -214,6 +240,7 @@
      },
      data: function() {
          var self = this;
+         console.log('dt data');
 
          if (!this.loadData && !this.dataUrl) {
              console.log("either load-data callback function is required or 'data-url' property must be passed in.");
@@ -224,7 +251,10 @@
 
          
          var columnsNew = [];
+         var index = 0;
          this.columns.forEach(function(col) {
+             col.$index = index;
+             index++;
              if (col === '__row_selector') {
                  columnsNew.push({
                      isRowSelector: true
@@ -253,34 +283,21 @@
          // If route exists, parse from route
 
          if (this.route) {
-             this.page = parseInt(this.route.params.page || this.route.query.page || 1, 10) || 1;
-             this.searchTerm = this.route.search || '',
-             this.sortField = this.route.sort || '';
-             if (this.sortField.indexOf('-') === 0) {
-                 this.sortDirection = 'desc';
-                 this.sortField = this.sortDirection.substr(1);
-             } else {
-                 this.sortDirection = 'asc';
-             }
-             this.filters = [];
-             if (this.route.query.filters) { 
-                 try {
-                     this.filters = JSON.parse(this.route.query.filters);
-                 } catch(e) {
-                     stallion.showError('Invalid "filters" in query');
-                     console.log(e, this.route.query.filters);
-                 }
-             }
+
+
          }
 
          // Build the data object
 
+
+         
          var data = {
              items: [],
              loading: true,
              hasMore: false,
              isScrolling: false,
-             scrollPage: 1
+             scrollPage: 1,
+             pager: {}
          };
 
          data.filtersByField = {};
@@ -290,17 +307,25 @@
          return data;
 
      },
+     created: function() {
+         console.log('dt created');
+         this.loadInitialData();
+     },
+     compiled: function() {
+         console.log('dt compiledn');
+     },
+     ready: function() {
+         console.log('dt ready');
+     },
      attached: function() {
-         
+         console.log('dt attached');
          var self = this;
          this.isAttached = true;
          if (this.initialDataLoaded) {
              this.afterAttachedAndLoaded();
          }
      },
-     created: function() {
-         this.loadInitialData();
-     },
+
      methods: {
          doSearch: function() {
              this.page = 1;
@@ -310,16 +335,45 @@
              var self = this;
              setTimeout(function() {
                  var $table = $(self.$el).find('table');
-                 self.scrolify($table, $(window).height() - (40 + 28 + 38 + 20));
+                 if (self.infiniteScroll) {
+                     self.scrolify($table, $(window).height() - (40 + 28 + 38 + 20));
+                 }
              }, 50);
          },
-         onEditCallback: function() {
-             
+         onEditCallback: function(item, field, value) {
          },
          onCellDoubleClicked: function(item, col, rowNumber, colNumber, $event) {
-             if (col.editableComponent) {
-                 item.$isEditing = true;
+             if (col.editableComponent && !this.singleClickEditing) {
+                 item.$isEditing = colNumber;
+                 this.items.$set(rowNumber, item)
              }
+         },
+         onCellClicked: function(item, col, rowNumber, colNumber, $event) {
+             if (col.editableComponent && this.singleClickEditing) {
+                 item.$isEditing = colNumber;
+                 this.items.$set(rowNumber, item)
+             }
+         },
+         cancelEdit: function(item, col) {
+             item.$isEditing = false;
+             this.items.$set(item.$index, item)
+         },
+         sortColumn: function(col) {
+             if (!col.sortable) {
+                 return;
+             }
+             if (col.field === this.sortField) {
+                 if (this.sortDirection === 'asc') {
+                     this.sortDirection = 'desc';
+                 } else {
+                     this.sortDirection = 'asc';
+                 }
+             } else {
+                 this.sortField = col.field;
+                 this.sortDirection = 'asc';
+             }
+             this.page = 0;
+             this.refresh();
          },
          renderCell: function(item, col, index) {
              if (typeof(col) === 'string') {
@@ -329,23 +383,65 @@
              } else {
                  var format = col.format || '';
                  var value = item[col.field];
-                 if (format === 'currency') {
-                     return value
-                 } else if (format === 'number') {
+                 if (!format) {
                      return value;
-                 } else if (format.indexOf('string:') === 0) {
-                     return value;
-                 } else if (format.indexOf('moment:') === 0) {
-                     
+                 }
+                 if (format === 'number') {
+                     if (value.toLocaleString) {
+                         return value.toLocaleString();
+                     } else {
+                         return value;
+                     }
+                 } else if (format === 'dollars') {
+                     try {
+                         var fmt = new Intl.NumberFormat(
+                             "en-US",
+                             { style: "currency", currency: "USD",
+                               minimumFractionDigits: 2 });
+                         return fmt.format(value);
+                     } catch(e) {
+                         console.log(e);
+                     }
+                     return '$' + value;
+                 } else if (format.indexOf('moment:') === 0 || format.indexOf('epochSeconds:') === 0) {
+                     // See if value is in seconds since the epoch instead of milliseconds
+                     if (!value) {
+                         return '';
+                     }
+                     if (format.indexOf('epochSeconds:') === 0) {
+                         value = value * 1000;
+                     }
+                     var timeZone = moment.tz.guess();
+                     if (stPublisherAdminContext && stPublisherAdminContext.user && stPublisherAdminContext.timeZoneId) {
+                         timeZone = stPublisherAdminContext.user.timeZoneId;
+                     }
+                     return moment.tz(value, timeZone).format(format.substr(format.indexOf(':') + 1));
+                 } else if(format) {
+                     sprintf(format, value);
                  }
                  return value;
              }
+         },
+         clearFilter: function(field) {
+             var filters = [];
+             this.filters.forEach(function(filter) {
+                 if (filter.name !== field) {
+                     filters.push(filter);
+                 }
+             });
+             this.filters = filters;
+         },
+         clearAllFilters: function() {
+             this.filters = [];
+         },
+         addFilter: function(field, value, op) {
+             op = op || '=';
+             this.filters.push({name: field, value: value, op: op});
          },
          toTitleCase: function(str) {
              return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
          },
          triggerItemEvent: function(event, item, col, rowNumber, colNumber) {
-             console.log('trigger item event ', event, item, col);
              this.$dispatch(event, item, col, rowNumber, colNumber);
          },
          refresh: function() {
@@ -356,12 +452,16 @@
              var self = this;
              this.loading = true;
              function callback(pager) {
-                 console.log('called back! ', pager);
+                 var index = 0;
+                 pager.items.forEach(function(item) {
+                     item.$index = index;
+                     index++;
+                 });
                  self.pager = pager;
                  self.items = pager.items;
+                 
                  self.loading = false;
                  self.hasMore = pager.hasNextPage;
-                 console.log('has more data ', self.hasMore);
                  if (!self.initialDataLoaded) {
                      self.initialDataLoaded = true;
                      if (self.isAttached) {
@@ -378,19 +478,22 @@
              }
              this.isScrolling = true;
              function callback(pager) {
+                 var index = self.items.length;
+                 pager.items.forEach(function(item) {
+                     item.$index = index;
+                     index++;
+                 });
                  self.items = self.items.concat(pager.items);
                  //self.items = [{}];
                  //console.log('found new items ', pager.items.length, pager.items[pager.items.length-1].title);
                  //self.pager = pager;
                  //self.$set('items', pager.ite);
                  self.hasMore = pager.hasNextPage;
-                 console.log('has more data ', self.hasMore);
                  self.fetchingMore = false;
                  self.isScrolling = false;
                  
              };
              this.scrollPage++;
-             console.log('fetch more page ', this.scrollPage);
              self.doFetchData(callback, this.scrollPage);
          },
          doFetchData: function(callback, page) {
@@ -412,9 +515,16 @@
                      }
                      url += '&sort=' + sort;
                  }
+                 if (this.filters) {
+                     url += '&filters=' + encodeURIComponent(JSON.stringify(this.filters));
+                 }
                  stallion.request({
                      url: url,
                      success: function(o) {
+                         o.pager.items.forEach(function(item) {
+                             item.$isEditing = false;
+                             item.$hidden = false;
+                         });
                          callback(o.pager);
                      }
                  });
@@ -425,7 +535,11 @@
          },
          hardRefresh: function() {
              var url = this.makePageLink(this.page) + '&t=' + new Date().getTime();
-             window.location.hash = url;
+             var parts = url.split('?');
+             StallionApplicationRouter.go({
+                 path: parts[0],
+                 query: parts[1]
+             });
          },
          makeUrl: function(page, searchTerm, filters, sortField, sortDirection) {
              var sort = '';
@@ -447,7 +561,7 @@
                  sort: sort
              };
              Object.keys(params).forEach(function(key) {
-                 url = url.replace(new RegExp('{{\s*' + key + '\s*}}', 'g'), params[key] || '');
+                 url = url.replace(new RegExp('{{\\s*' + key + '\\s*}}', 'g'), params[key] || '');
              });
              return url;
          },
@@ -495,35 +609,63 @@
                  $(this).width($(this).attr("data-item-original-width"));
              });        
              $(this.$el).find(".scrollable-wrapper").on('scroll', function() {
-                 console.log('wrap scrolL!');
                  if(($(this).scrollTop() + $(this).innerHeight() + 20) >= $(this)[0].scrollHeight) {
-                     console.log('fetch new data!');
                      self.appendData();
                  }
              });
-             /*
-             oTblDiv.on('scroll', function() {
-                console.log('scrolL!');
-                 if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-                     alert('end reached');
+         },
+         updateFromRoute: function() {
+             this.page = parseInt(this.route.params.page || this.route.query.page || 1, 10) || 1;
+             console.log('route ', this.route, 'page', this.page);             
+             this.searchTerm = this.route.params.search || this.route.query.search || '',
+             this.sortField = this.route.params.sort || this.route.query.sort || '';
+             if (this.sortField.indexOf('-') === 0) {
+                 this.sortDirection = 'desc';
+                 this.sortField = this.sortDirection.substr(1);
+             } else {
+                 this.sortDirection = 'asc';
+             }
+             this.filters = [];
+             if (this.route.query.filters) { 
+                 try {
+                     this.filters = JSON.parse(this.route.query.filters);
+                 } catch(e) {
+                     stallion.showError('Invalid "filters" in query');
+                     console.log(e, this.route.query.filters);
                  }
-             })*/         
+             }
+             this.refresh();
+             window.scrollTo(0, 0);
          }
      },
      watch: {
+         route: function(cur, prev) {
+             console.log('route changed');
+             this.updateFromRoute();
+         },
          searchTerm: function(cur, prev) {
-             console.log('seach term changed ', cur, prev);
              if (this.loading) {
                  return;
              }
              if (cur !== prev) {
                  if (cur === '' || cur.length >= 3) {
-                     console.log('reload data');
                      this.page = 1;
                      this.loadInitialData();
                  }
              }
          } 
+     },
+     events: {
+         'cell-value-updated': function(item, field, value, col) {
+             item.$isEditing = false;
+             if (field) {
+                 item[field] = value;
+             }
+             this.items.$set(item.$index, item);             
+             return true;
+             
+         }
      }
+
  };
 </script>

@@ -296,3 +296,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+
+
+#stallion-publisher-main-vue-app .data-table-header {
+    margin-top: 25px;
+}

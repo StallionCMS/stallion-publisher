@@ -25,6 +25,7 @@ import io.stallion.publisher.comments.CommentsTag;
 import io.stallion.publisher.comments.SeleniumEndpoints;
 import io.stallion.publisher.contacts.*;
 import io.stallion.publisher.content.*;
+import io.stallion.publisher.liveTesting.TomeEndpoints;
 import io.stallion.restfulEndpoints.*;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -84,6 +85,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
         GlobalModuleVersionController.register();
 
 
+
         // Register endpoints
 
 
@@ -95,7 +97,8 @@ public class PublisherPlugin extends StallionJavaPlugin {
                 new CommentsEndpoints(),
                 new ContactsEndpoints(),
                 new GlobalModuleEndpoints(),
-                new SeleniumEndpoints()
+                new SeleniumEndpoints(),
+                new TomeEndpoints()
         );
         for (EndpointResource resource: resources) {
             Log.finer("Register resource {0}", resource.getClass().getName());

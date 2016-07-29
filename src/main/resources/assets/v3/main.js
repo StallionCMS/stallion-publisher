@@ -1,5 +1,5 @@
 
-
+var StallionApplicationRouter = null;
 
 (function() {
 
@@ -36,6 +36,7 @@
             '/new-page': {
                 component: vueComponents['new-page']
             },
+            
             '/new-post': {
                 component: vueComponents['new-post']
             },
@@ -84,14 +85,25 @@
             },
             '/settings/site-information': {
                 component: vueComponents['settings-site-information']
-            }            
-        })
+            },
+            '/tomes': {
+                component: vueComponents['tomes-table']
+            },
+            '/tomes/*any': {
+                component: vueComponents['tomes-table']
+            },
+        });
+
+        router.beforeEach(function(transition) {
+            console.log('routing!');
+            transition.next();
+        });
         
         // Now we can start the app!
         // The router will create an instance of App and mount to
         // the element matching the selector #app.
         router.start(App, '#stallion-publisher-main-vue-app')
-
+        StallionApplicationRouter = router;
     };
     
     //admin.init();

@@ -1,6 +1,6 @@
 
 <style lang="scss">
- .data-table-page-vue {
+ .data-table-pager-vue {
      .pager-link {
          border: 1px solid #999;
          display: inline-block;
@@ -15,7 +15,7 @@
 </style>
 
 <template>
-    <div class="data-table-page-vue">
+    <div class="data-table-pager-vue">
         <div v-if="pager && pager.pageCount > 1">
             <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==1}" :href="makeLink(1)">First</a>
             <a v-for="num in pager.surroundingPages" :href="makeLink(num)" v-bind:class="{'pager-link': true, 'current-page': num==page}">

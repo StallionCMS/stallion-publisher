@@ -30,7 +30,8 @@
          widgets: Array,
          tinyOptions: Object,
          options: Object,
-         changeCallback: Function
+         changeCallback: Function,
+         onKeyPress: Function
      },
      data: function() {
          return {
@@ -53,7 +54,6 @@
          requirejs([
              'tinyMCE'
          ], function (tinymce) {
-             console.log(tinymce);
              //var ele = $(this.$el).find('textarea').get(0);
              self.tinymce = tinymce;
              stPublisher.initTinyImagePlugin(tinymce);
@@ -79,6 +79,14 @@
                              self.changeCallback();
                          }
                      });
+
+                     if (self.onKeyPress) {
+                         editor.on('keypress', function(e) {
+                             if (self.onKeyPress) {
+                                 self.onKeyPress(e);
+                             }
+                         });
+                     }
                  }                 
              };
              Object.keys(customOptions).forEach(function(key) {

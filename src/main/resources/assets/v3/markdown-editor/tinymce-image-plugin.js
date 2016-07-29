@@ -14,18 +14,31 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
 
         editor.addButton('stimagesimple', {
             text: '',
-            icon: 'icon-image2 icomoon',            
+            icon: 'icon-image2 icomoon',
+            tooltip: 'Insert Image',
             onclick: function() {
                 editor.vueTag.activeWidgetType = 'image-simple';
                 editor.vueTag.activeWidgetData = {};
                 editor.vueTag.showWidgetModal = true;
             }
         });
-
+ 
+        editor.addButton('stembed', {
+            text: '',
+            icon: 'icon-embed2 icomoon',
+            tooltip: 'Embed Tweet, Video, etc.',
+            onclick: function() {
+                editor.vueTag.activeWidgetType = 'embed';
+                editor.vueTag.activeWidgetData = {};
+                editor.vueTag.showWidgetModal = true;
+            }
+        });
+        
         
         editor.addButton('stinsert', {
             text: 'Insert +',
             icon: false,
+            tooltip: 'Insert Image, Gallery, Embed, etc.',
             onclick: function() {
                 editor.vueTag.activeWidgetType = '';
                 editor.vueTag.activeWidgetData = {};
@@ -36,6 +49,7 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
         editor.addButton('stlink', {
             text: '',
             icon: 'icon-link icomoon',
+            tooltip: 'Insert Link',
             onclick: function() {
                 var node = editor.selection.getNode();
                 if (node.tagName.toUpperCase() === 'A') {
@@ -53,6 +67,7 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
         editor.addButton('stgallery', {
             text: 'Insert Gallery',
             icon: false,
+            tooltip: 'Insert Gallery',
             onclick: function() {
                 editor.vueTag.activeWidgetType = 'image-collection';
                 editor.vueTag.activeWidgetData = {};
@@ -60,15 +75,6 @@ stPublisher.initTinyImagePlugin = function(tinymce) {
             }
         });
 
-        editor.addButton('stembed', {
-            text: 'Insert Embed',
-            icon: false,
-            onclick: function() {
-                editor.vueTag.activeWidgetType = 'embed';
-                editor.vueTag.activeWidgetData = {};
-                editor.vueTag.showWidgetModal = true;
-            }
-        });
     });  
         
 };

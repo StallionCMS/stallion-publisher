@@ -279,6 +279,10 @@
     content: "\e93c";    
 }
 
+.mce-i-icon-embed2:before {
+    content: "\eecd";    
+}
+
 .icomoon {
     font-family: 'icomoon' !important;
     speak: none;

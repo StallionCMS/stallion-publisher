@@ -16,12 +16,13 @@
 
 <template>
     <div class="data-table-page-vue">
-        <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==1}" :href="makeLink(1)">First</a>
-        <a v-for="num in pager.surroundingPages" :href="makeLink(num)" v-bind:class="{'pager-link': true, 'current-page': num==page}">
-            {{num}}
-        </a>
-        <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==pager.pageCount}" :href="makeLink(pager.pageCount)">Last</a>
-
+        <div v-if="pager && pager.pageCount > 1">
+            <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==1}" :href="makeLink(1)">First</a>
+            <a v-for="num in pager.surroundingPages" :href="makeLink(num)" v-bind:class="{'pager-link': true, 'current-page': num==page}">
+                {{num}}
+            </a>
+            <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==pager.pageCount}" :href="makeLink(pager.pageCount)">Last</a>
+        </div>
     </div>
 </template>
 <script>
@@ -39,7 +40,6 @@
          pager: Object
      },
      data: function() {
-         console.log('load data table ' + this.pager, ' ', this.baseUrl);
          return {
              
          };

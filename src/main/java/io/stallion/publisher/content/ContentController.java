@@ -20,6 +20,7 @@ import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.DisplayableModelController;
+import io.stallion.dataAccess.PartialStash;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
@@ -34,11 +35,7 @@ public class ContentController extends DisplayableModelController<Content> {
         return (ContentController) DataAccessRegistry.instance().get("contents");
     }
     public static void register() {
-        DataAccessRegistration registration = new DataAccessRegistration()
-                .setModelClass(Content.class)
-                .setControllerClass(ContentController.class)
-                .setBucket("contents");
-        DataAccessRegistry.instance().register(registration);
+        DataAccessRegistry.instance().registerDbModel(Content.class, ContentController.class, PartialStash.class);
 
     }
 

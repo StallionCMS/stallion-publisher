@@ -18,6 +18,7 @@ package io.stallion.publisher.content;
 
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.PartialStash;
 import io.stallion.dataAccess.StandardModelController;
 
 import java.util.Map;
@@ -30,11 +31,7 @@ public class UploadedFileController extends StandardModelController<UploadedFile
         return (UploadedFileController) DataAccessRegistry.instance().get("uploaded_files");
     }
     public static void register() {
-        DataAccessRegistration registration = new DataAccessRegistration()
-                .setBucket("uploaded_files")
-                .setModelClass(UploadedFile.class)
-                .setControllerClass(UploadedFileController.class);
-        DataAccessRegistry.instance().register(registration);
+        DataAccessRegistry.instance().registerDbModel(UploadedFile.class, UploadedFileController.class, PartialStash.class);
     }
 
     public static String getTypeForExtension(String ext) {

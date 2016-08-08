@@ -24,6 +24,7 @@ import java.util.Set;
 import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DisplayableModelController;
+import io.stallion.dataAccess.NoStash;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.json.JSON;
@@ -36,7 +37,7 @@ public class ContentsVersionController extends DisplayableModelController<Conten
         return _instance;
     }
     public static void register() {
-        _instance = (ContentsVersionController)DataAccessRegistry.instance().registerDbModel(ContentVersion.class, ContentsVersionController.class, false);
+        _instance = (ContentsVersionController)DataAccessRegistry.instance().registerDbModel(ContentVersion.class, ContentsVersionController.class, NoStash.class);
     }
 
     private static Set<String> ignoreUpdateFields = set("id", "versionDate", "postId", "checkpoint", "oldUrls");

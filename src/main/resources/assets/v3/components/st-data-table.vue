@@ -230,6 +230,12 @@
          singleClickEditing: {
              default: false
          },
+         extraDataFields: {
+             type: Array,
+             default: function() {
+                 return [];
+             }
+         },
          isAttached: true,
          initialDataLoaded: false,
          labelPlural: '',
@@ -302,6 +308,10 @@
              scrollPage: 1,
              pager: {}
          };
+
+         this.extraDataFields.forEach(function(field) {
+             data[field] = '';
+         });
 
          data.filtersByField = {};
          this.filters.forEach(function(filter) {
@@ -529,6 +539,13 @@
                          o.pager.items.forEach(function(item) {
                              item.$isEditing = false;
                              item.$hidden = false;
+                         });
+                         self.extraDataFields.forEach(function(field) {
+                             console.log('check extra data field ', field);
+                             if (o[field] !== undefined) {
+                                 console.log('set extra ', field, o[field]);
+                                 self[field] = o[field];
+                             }
                          });
                          callback(o.pager);
                      }

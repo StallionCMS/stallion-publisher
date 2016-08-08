@@ -6,6 +6,7 @@
 /vendor/simplemde.min.css
 /vendor/vue.js
 /vendor/vue-router.js
+/vendor/vuex.js
 /vendor/select2.min.css
 /vendor/dropzone.js
 /vendor/dropzone.css

@@ -13,10 +13,10 @@
              display: inline-block;
          }
          .search-input-group {
-             width: 500px;
+             width: 300px;
              margin-left: 20px;
              .form-control {
-                 width: 450px;
+                 width: 250px;
                  height: 40px;
              }
          }
@@ -159,10 +159,13 @@
                             <template v-if="col.component">
                                 <component :is="col.component" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber"></component>
                             </template>
-                            <template v-if="col.actions">
-                                <button v-for="action in col.actions" class="{{ action.className }}" @click="triggerItemEvent(action.event, item, col, rowNumber, colNumber)">{{ action.label }}</button>
+                            <template v-if="col.getLink">
+                                <a v-bind:href="col.getLink(item)">{{ col.getLabel(item) }}</a>
                             </template>
-                            <template v-if="!col.component && !col.actions">
+                            <template v-if="col.actions">
+                                <a v-for="action in col.actions" class="{{ action.className }}" v-show="action.shown ? action.shown(item) : true " v-bind:href="action.getLink ? action.getLink(item) : 'javascript:;' " @click="triggerItemEvent(action.event, item, col, rowNumber, colNumber)">{{ action.getLabel ? action.getLabel(item) : action.label }}</a>
+                            </template>
+                            <template v-if="!col.component && !col.actions && !col.getLink">
                                 <template v-if="col.allowHtml">
                                     {{{ renderCell(item, col, rowNumber, colNumber) }}}
                                 </template>
@@ -235,12 +238,12 @@
          sortField: String,
          page: Number,
          route: Object,
+         title: String,
          filters: Array,
          infiniteScroll: true
      },
      data: function() {
          var self = this;
-         console.log('dt data');
 
          if (!this.loadData && !this.dataUrl) {
              console.log("either load-data callback function is required or 'data-url' property must be passed in.");
@@ -308,17 +311,13 @@
 
      },
      created: function() {
-         console.log('dt created');
          this.loadInitialData();
      },
      compiled: function() {
-         console.log('dt compiledn');
      },
      ready: function() {
-         console.log('dt ready');
      },
      attached: function() {
-         console.log('dt attached');
          var self = this;
          this.isAttached = true;
          if (this.initialDataLoaded) {
@@ -383,6 +382,10 @@
              } else {
                  var format = col.format || '';
                  var value = item[col.field];
+                 var index = col.field.indexOf('.');
+                 if (value === undefined && index > -1) {
+                     value = item[col.field.substr(0, index)][col.field.substr(index + 1)];
+                 }
                  if (!format) {
                      return value;
                  }
@@ -417,7 +420,7 @@
                      }
                      return moment.tz(value, timeZone).format(format.substr(format.indexOf(':') + 1));
                  } else if(format) {
-                     sprintf(format, value);
+                     return sprintf(format, value);
                  }
                  return value;
              }
@@ -455,6 +458,7 @@
                  var index = 0;
                  pager.items.forEach(function(item) {
                      item.$index = index;
+                     item._index = index;
                      index++;
                  });
                  self.pager = pager;
@@ -481,6 +485,7 @@
                  var index = self.items.length;
                  pager.items.forEach(function(item) {
                      item.$index = index;
+                     item._index = index;
                      index++;
                  });
                  self.items = self.items.concat(pager.items);
@@ -616,7 +621,6 @@
          },
          updateFromRoute: function() {
              this.page = parseInt(this.route.params.page || this.route.query.page || 1, 10) || 1;
-             console.log('route ', this.route, 'page', this.page);             
              this.searchTerm = this.route.params.search || this.route.query.search || '',
              this.sortField = this.route.params.sort || this.route.query.sort || '';
              if (this.sortField.indexOf('-') === 0) {
@@ -631,7 +635,6 @@
                      this.filters = JSON.parse(this.route.query.filters);
                  } catch(e) {
                      stallion.showError('Invalid "filters" in query');
-                     console.log(e, this.route.query.filters);
                  }
              }
              this.refresh();
@@ -640,7 +643,6 @@
      },
      watch: {
          route: function(cur, prev) {
-             console.log('route changed');
              this.updateFromRoute();
          },
          searchTerm: function(cur, prev) {

@@ -92,6 +92,7 @@
                 <executions>
                     <execution>
                         <id>bundle-assets</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>bundle-assets</goal>
                         </goals>

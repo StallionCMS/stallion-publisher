@@ -36,9 +36,8 @@
                         <option value=">12<20">$12 to $20</option>
                         <option value=">20">greater than A$20</option>
                     </select>
-                    <select v-model="filterAuthors" class="form-control authors-filter" placeholder="Filter by Author" multiple>
-                        <option :value="author" v-for="author in authors">{{ author }}</option>
-                    </select>
+                    <select2-field :class-name="authors-filter form-control" :value.sync="filterAuthors" :select-values="authors" :select2-options="{'placeholder': 'Filter by author', 'width': 320}" :multiple="true">
+                    </select2-field>
                 </div>
                 <div class="actions-slot" slot="actions">
                     
@@ -155,24 +154,25 @@
              width: 300,
              placeholder: 'Filter by author'
          }).on('change', function() {
-
              console.log('filter authors select changed val is: ', $(this).val());
              var val = $(this).val();
-             if (!val) {
-                 self.$refs.tometable.clearFilter('author');
-             } else {
-                 self.$refs.tometable.clearFilter('author');
-                 self.$refs.tometable.addFilter('author', $(this).val(), 'any');
-             }
-             self.$refs.tometable.refresh();
          });
          ;
 
          }
      },
-     ready: function() {
-     },
      watch: {
+         filterAuthors: function(val, old) {
+             var self = this;
+             console.log('authors changed ', val);
+             if (!val) {
+                 self.$refs.tometable.clearFilter('author');
+             } else {
+                 self.$refs.tometable.clearFilter('author');
+                 self.$refs.tometable.addFilter('author', val, 'any');
+             }
+             self.$refs.tometable.refresh();
+         },
          filterPrice: function(cur, old) {
              var self = this;
              this.$refs.tometable.clearFilter('price');

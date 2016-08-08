@@ -73,7 +73,7 @@ public class UploadRequestProcessor {
         final Part filePart = stRequest.getPart("file");
         String fileName = getFileNameFromPart(filePart);
         String extension = FilenameUtils.getExtension(fileName);
-        String relativePath = GeneralUtils.slugify(FilenameUtils.getBaseName(fileName)) + "-" + DateUtils.mils() + "." + extension;
+        String relativePath = GeneralUtils.slugify(truncate(FilenameUtils.getBaseName(fileName), 75)) + "-" + DateUtils.mils() + "." + extension;
         relativePath = "stallion-file-" + id + "/" + GeneralUtils.secureRandomToken(8) + "/" + relativePath;
 
         String url = "{cdnUrl}/st-publisher/files/view/" + secret + "/" + id + "/" + fileName + "?ts=" + DateUtils.mils();

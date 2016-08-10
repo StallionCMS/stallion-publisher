@@ -16,7 +16,13 @@
  module.exports = {
      props: {
          updateCallback: Function,
-         element: Object
+         element: Object,
+         options: {
+             type: Object,
+             default: function() {
+                 return {};
+             }
+         }
      },
      data: function() {
          return {

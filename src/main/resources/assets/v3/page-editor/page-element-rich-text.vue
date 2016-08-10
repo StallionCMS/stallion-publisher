@@ -9,7 +9,7 @@
 <template>
     <div class="page-element-rich-text-vue">
         <div class="form-group">
-            <tinymce-editor v-ref:editor :html="element.content" :widgets="element.widgets" :editor-id="'md-element-editor-' + element.name" :change-callback="markdownChanged"></tinymce-editor>
+            <tinymce-editor v-ref:editor :html="element.content" :widgets="element.widgets" :editor-id="'md-element-editor-' + element.name" :change-callback="markdownChanged" :tiny-options="options.tinyOptions" :name="element.name" :on-init="options.onInit" :on-setup="options.onSetup" :options="options.options"></tinymce-editor>
         </div>
     </div>
 </template>
@@ -18,9 +18,23 @@
  module.exports = {
      props: {
          updateCallback: Function,
-         element: Object
+         element: Object,
+         options: {
+             type: Object,
+             default: function() {
+                 return {};
+             }
+         }
+         
      },
      data: function() {
+         if (!this.options.tinyOptions) {
+             this.options.tinyOptions = {};
+         }
+         if (!this.options.options) {
+             this.options.options = {};
+         }
+
          return {
 
          }

@@ -11,12 +11,12 @@
                         </a>
                     </div>
                     <div class="widget-option">
-                        <a href="javascript:;" @click="selectWidget('image', 'Choose Image to Insert')">
+                        <a href="javascript:;" @click="selectWidget('image', 'Choose Image to Insert', 'Insert Image')">
                             <span class="icon icon-image2"></span> Image
                         </a>
                     </div>
                     <div class="widget-option">
-                        <a href="javascript:;" @click="selectWidget('image-simple', 'Choose Image to Insert')">
+                        <a href="javascript:;" @click="selectWidget('image-simple', 'Choose Image to Insert', 'Insert Image')">
                             <span class="icon icon-image2"></span> Sourced Image 
                         </a>
                     </div>
@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div slot="footer">
-                <button class="btn btn-primary btn-md" :disabled="!okToInsert" @click="insertWidget">Insert Widget</button>
+                <button class="btn btn-primary btn-md" :disabled="!okToInsert" @click="insertWidget">{{ insertLabel }}</button>
                 <a @click="cancel" href="javascript:;">Cancel</a>
             </div>
         </modal-base>
@@ -60,6 +60,10 @@
              twoWay: true
          },
          callback: Function,
+         insertLabel: {
+             type: String,
+             default: 'Insert'
+         },
          widgetType: '',
          widgetData: null
      },
@@ -96,7 +100,7 @@
              this.callback(widgetData);
              this.$refs.themodal.close();
          },
-         selectWidget: function(type, title) {
+         selectWidget: function(type, title, insertLabel) {
              if (this.widgetData && this.widgetData.type) {
                  this.activeWidgetData = this.widgetData;
              } else {
@@ -106,6 +110,7 @@
                  }
              }
              this.widgetType = type;
+             this.insertLabel = insertLabel || this.insertLabel;
              this.title = title || this.title;
          }
      }

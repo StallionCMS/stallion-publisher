@@ -33,6 +33,7 @@ import io.stallion.requests.ResponseComplete;
 import io.stallion.requests.ServletFileSender;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.MinRole;
+import io.stallion.restfulEndpoints.XSRF;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
@@ -79,6 +80,7 @@ public class UploadedFileEndpoints implements EndpointResource {
     @Path("/upload-file")
     @Produces("application/json")
     @MinRole(Role.MEMBER)
+    @XSRF(false)
     public Object uploadFile() {
 
         String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";

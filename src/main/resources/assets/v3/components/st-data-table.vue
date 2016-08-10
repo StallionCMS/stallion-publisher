@@ -242,6 +242,7 @@
          searchTerm: String,
          sortDirection: String,
          sortField: String,
+         customFilter: String,
          page: Number,
          route: Object,
          title: String,
@@ -290,10 +291,8 @@
          this.page = this.page || 1;
 
          // If route exists, parse from route
-
          if (this.route) {
-
-
+             this.updateFromRoute();
          }
 
          // Build the data object
@@ -533,6 +532,9 @@
                  if (this.filters) {
                      url += '&filters=' + encodeURIComponent(JSON.stringify(this.filters));
                  }
+                 if (this.customFilter) {
+                     url += '&customFilter=' + encodeURIComponent(this.customFilter);
+                 }
                  stallion.request({
                      url: url,
                      success: function(o) {
@@ -646,6 +648,7 @@
              } else {
                  this.sortDirection = 'asc';
              }
+             this.customFilter = this.route.query.customFilter || '';
              this.filters = [];
              if (this.route.query.filters) { 
                  try {

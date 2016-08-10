@@ -18,7 +18,7 @@
 <template>
     <div class="tinymce-editor-vue">
         <div class="loading-overlay">Loading editor &hellip;</div>
-        <textarea style="" class="tiny-target" v-model="html" ></textarea>
+        <textarea :name="name" style="" class="tiny-target" v-model="html" ></textarea>
         <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
         <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback" :hide-internal-pages="options.hideInternalPages" :link="activeLinkUrl" :text="activeLinkText"></insert-link-modal>
     </div>
@@ -30,8 +30,11 @@
          widgets: Array,
          tinyOptions: Object,
          options: Object,
+         name: String,
          changeCallback: Function,
-         onKeyPress: Function
+         onKeyPress: Function,
+         onSetup: Function,
+         onInit: Function
      },
      data: function() {
          return {
@@ -40,6 +43,8 @@
              activeWidgetData: {},
              activeLinkText: '',
              activeLinkUrl: '',
+             tinymce: null,
+             editor: null,
              showInsertLinkModal: false,
              ticks: new Date().getTime()
          }
@@ -70,7 +75,12 @@
                      self.editor = editor;
                      editor.vueTag = self;
                      $(self.$el).find('.loading-overlay').hide();
-                     self.addWidgetToolbarToHtml();                     
+                     self.addWidgetToolbarToHtml();
+
+                     if (self.onInit) {
+                         self.onInit(editor, self);
+                     }
+                     
                  },
                  setup: function(editor) {
 
@@ -86,6 +96,10 @@
                                  self.onKeyPress(e);
                              }
                          });
+                     }
+
+                     if (self.onSetup) {
+                         self.onSetup(editor, self);
                      }
                  }                 
              };

@@ -17,10 +17,7 @@
             <div class="form-group"></div>
             <div class="form-group">
                 <label>Insert the URL of the image here:</label>
-                <input type="text" class="form-control" name="src" >
-            </div>
-            <div class="form-group">
-                <button class="btn btn-primary" v-on:click="urlChange"">Use this image</button>
+                <input type="text" class="form-control" name="src" v-model="externalSrc" >
             </div>
         </div>
     </div>
@@ -34,6 +31,7 @@
      data: function() {
          return {
              tab: 'library',
+             externalSrc: '',
              image: {}
          }
      },
@@ -46,6 +44,9 @@
          },
          saveChanges: function() {
              console.log('save changes', this.image);
+             if (this.callback) {
+                 this.callback(this.image);
+             }
              return this.image;
          },
          selectImage: function(imageInfo) {
@@ -55,6 +56,17 @@
                  console.log('call callback');
                  this.callback(imageInfo);
              }
+         }
+     },
+     watch: {
+         externalSrc: function(src) {
+             this.image = {
+                 url: src,
+                 thumbUrl: src,
+                 mediumUrl: src,
+                 smallurl: src,
+                 name: src
+             };
          }
      }
  };

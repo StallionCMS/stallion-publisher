@@ -29,7 +29,7 @@ import io.stallion.dataAccess.db.converters.JsonListConverter;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="global_modules")
+@Table(name="stallion_publisher_global_modules")
 public class GlobalModule extends ModelBase {
     private String name = "";
     private String rawContent = "";

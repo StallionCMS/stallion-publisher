@@ -22,7 +22,7 @@ import io.stallion.dataAccess.UniqueKey;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="site_settings")
+@Table(name="stallion_publisher_site_settings")
 public class SiteSettingRecord extends ModelBase {
 
     private String name = "";

@@ -25,7 +25,7 @@ import io.stallion.utils.json.JSON;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="notifications")
+@Table(name="stallion_publisher_notifications")
 public class Notification extends ModelBase {
     private String key;
     private Long contactId;

@@ -17,6 +17,7 @@
 package io.stallion.publisher.content;
 
 import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.LocalMemoryStash;
 import io.stallion.dataAccess.StandardModelController;
 
 
@@ -26,6 +27,6 @@ public class SiteSettingsController extends StandardModelController<SiteSettingR
     }
 
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(SiteSettingRecord.class, SiteSettingsController.class, true);
+        DataAccessRegistry.instance().registerDbModel(SiteSettingRecord.class, SiteSettingsController.class, LocalMemoryStash.class, "site_settings");
     }
 }

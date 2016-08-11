@@ -21,7 +21,7 @@ import java.time.ZonedDateTime;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="global_module_versions")
+@Table(name="stallion_publisher_global_module_versions")
 public class GlobalModuleVersion extends GlobalModule {
     private Long globalModuleId;
     private ZonedDateTime versionDate;

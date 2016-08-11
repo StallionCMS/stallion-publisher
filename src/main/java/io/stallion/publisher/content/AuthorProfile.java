@@ -22,7 +22,7 @@ import io.stallion.dataAccess.UniqueKey;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="author_profiles")
+@Table(name="stallion_publisher_author_profiles")
 public class AuthorProfile extends ModelBase {
     private Long userId;
     private String bio;

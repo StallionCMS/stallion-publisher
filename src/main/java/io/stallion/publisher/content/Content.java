@@ -34,7 +34,7 @@ import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
-@Table(name = "contents")
+@Table(name = "stallion_publisher_contents")
 public class Content extends StandardDisplayableModel {
     private Long authorId = 0L;
     private Long updatedAt = 0L;

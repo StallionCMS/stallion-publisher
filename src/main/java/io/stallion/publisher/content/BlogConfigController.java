@@ -16,9 +16,7 @@
 
 package io.stallion.publisher.content;
 
-import io.stallion.dataAccess.DataAccessRegistry;
-import io.stallion.dataAccess.DataAccessRegistration;
-import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.*;
 import io.stallion.publisher.PublisherSettings;
 
 import static io.stallion.utils.Literals.empty;
@@ -30,7 +28,7 @@ public class BlogConfigController extends StandardModelController<BlogConfig> {
     }
 
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(BlogConfig.class, BlogConfigController.class, true);
+        DataAccessRegistry.instance().registerDbModel(BlogConfig.class, BlogConfigController.class, LocalMemoryStash.class, "blog_configs");
         for (BlogConfig config: PublisherSettings.getInstance().getBlogs()) {
             BlogConfig existing = null;
             if (!empty(config.getId())) {

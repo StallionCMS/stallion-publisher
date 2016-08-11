@@ -23,7 +23,7 @@ import javax.persistence.Column;
 import javax.persistence.Table;
 
 
-@Table(name="blog_configs")
+@Table(name="stallion_publisher_blog_configs")
 public class BlogConfig extends ModelBase {
     private String internalName;
     private String title;

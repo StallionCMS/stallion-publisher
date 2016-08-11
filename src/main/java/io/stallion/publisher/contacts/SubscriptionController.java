@@ -21,6 +21,7 @@ import io.stallion.Context;
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.StandardModelController;
 import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.publisher.PublisherSettings;
@@ -113,7 +114,7 @@ public class SubscriptionController extends StandardModelController<Subscription
     }
 
     public static void register() {
-        Context.dal().registerDbModel(Subscription.class, SubscriptionController.class, false);
+        Context.dal().registerDbModel(Subscription.class, SubscriptionController.class, NoStash.class, "subscriptions");
     }
 
 

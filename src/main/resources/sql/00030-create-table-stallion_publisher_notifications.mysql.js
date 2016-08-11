@@ -1,16 +1,16 @@
 db.execute('''
-CREATE TABLE IF NOT EXISTS `notifications` (
+CREATE TABLE IF NOT EXISTS `stallion_publisher_notifications` (
 `id` bigint(20) unsigned NOT NULL,
     `key`  varchar(60)  NULL ,
     `createdat`  bigint(20)  NULL ,
     `contactid`  bigint(20)  NULL ,
     `frequency`  varchar(30)  NULL ,
-    `seen`  bit(1)  NULL ,
     `callbackclassname`  varchar(255)  NULL ,
     `callbackplugin`  varchar(75)  NULL ,
     `extradata`  longtext  NULL ,
     `sendat`  bigint(20)  NULL ,
     `periodkey`  varchar(50)  NULL ,
+    `seen`  bit(1)  NULL ,
     `subscriptionid`  bigint(20)  NULL ,
     `sent`  bit(1)  NULL ,
     `sentat`  bigint(20)  NULL ,

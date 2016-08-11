@@ -40,7 +40,7 @@ import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
-@Table(name="comments")
+@Table(name="stallion_publisher_comments")
 public class Comment extends ModelBase {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd-HHmmss");

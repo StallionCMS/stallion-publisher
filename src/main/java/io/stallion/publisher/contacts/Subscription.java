@@ -26,7 +26,7 @@ import io.stallion.utils.GeneralUtils;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="subscriptions")
+@Table(name="stallion_publisher_subscriptions")
 public class Subscription extends ModelBase  {
     private String name;
     private String ownerKey;

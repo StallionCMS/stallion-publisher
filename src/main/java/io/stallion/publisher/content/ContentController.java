@@ -35,7 +35,7 @@ public class ContentController extends DisplayableModelController<Content> {
         return (ContentController) DataAccessRegistry.instance().get("contents");
     }
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(Content.class, ContentController.class, PartialStash.class);
+        DataAccessRegistry.instance().registerDbModel(Content.class, ContentController.class, PartialStash.class, "contents");
 
     }
 

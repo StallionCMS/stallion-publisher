@@ -37,7 +37,7 @@ public class ContentsVersionController extends DisplayableModelController<Conten
         return _instance;
     }
     public static void register() {
-        _instance = (ContentsVersionController)DataAccessRegistry.instance().registerDbModel(ContentVersion.class, ContentsVersionController.class, NoStash.class);
+        _instance = (ContentsVersionController)DataAccessRegistry.instance().registerDbModel(ContentVersion.class, ContentsVersionController.class, NoStash.class, "content_versions");
     }
 
     private static Set<String> ignoreUpdateFields = set("id", "versionDate", "postId", "checkpoint", "oldUrls");

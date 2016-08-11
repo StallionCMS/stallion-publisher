@@ -37,7 +37,7 @@ public class TestCrud extends AppIntegrationCaseBase {
         booter.boot();
     }
 
-    //@Test
+    @Test
     public void testCrud() {
         new GenerateFixtureData().generate();
     }

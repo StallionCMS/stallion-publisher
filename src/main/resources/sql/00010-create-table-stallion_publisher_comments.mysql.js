@@ -1,5 +1,5 @@
 db.execute('''
-CREATE TABLE IF NOT EXISTS `comments` (
+CREATE TABLE IF NOT EXISTS `stallion_publisher_comments` (
 `id` bigint(20) unsigned NOT NULL,
     `state`  varchar(30)  NULL ,
     `threadid`  bigint(20)  NULL ,

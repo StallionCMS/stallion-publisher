@@ -31,7 +31,7 @@ import java.util.Set;
 import static io.stallion.utils.Literals.map;
 import static io.stallion.utils.Literals.set;
 
-@Table(name="contacts")
+@Table(name="stallion_publisher_contacts")
 public class Contact extends ModelBase implements Contactable {
     private String givenName = "";
     private String familyName = "";

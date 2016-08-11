@@ -19,6 +19,7 @@ package io.stallion.publisher.content;
 import static io.stallion.utils.Literals.*;
 
 import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.LocalMemoryStash;
 import io.stallion.dataAccess.StandardModelController;
 import io.stallion.utils.Markdown;
 
@@ -28,7 +29,7 @@ public class GlobalModuleController extends StandardModelController<GlobalModule
         return (GlobalModuleController) DataAccessRegistry.instance().get("global_modules");
     }
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(GlobalModule.class, GlobalModuleController.class);
+        DataAccessRegistry.instance().registerDbModel(GlobalModule.class, GlobalModuleController.class, LocalMemoryStash.class, "global_modules");
         for(GlobalModule def: TemplateConfig.instance().getGlobalModules()) {
             GlobalModule module = instance().forUniqueKey("name", def.getName());
             if (module == null) {

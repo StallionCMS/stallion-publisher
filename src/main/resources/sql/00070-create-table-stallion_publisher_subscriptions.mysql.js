@@ -1,11 +1,11 @@
 db.execute('''
-CREATE TABLE IF NOT EXISTS `subscriptions` (
+CREATE TABLE IF NOT EXISTS `stallion_publisher_subscriptions` (
 `id` bigint(20) unsigned NOT NULL,
     `name`  varchar(100)  NULL ,
     `createdat`  bigint(20)  NULL ,
+    `optoutdate`  bigint(20)  NULL ,
     `contactid`  bigint(20)  NULL ,
     `frequency`  varchar(30)  NULL ,
-    `optoutdate`  bigint(20)  NULL ,
     `ownerkey`  varchar(150)  NULL ,
     `optindate`  bigint(20)  NULL ,
     `canchangefrequency`  bit(1)  NULL ,

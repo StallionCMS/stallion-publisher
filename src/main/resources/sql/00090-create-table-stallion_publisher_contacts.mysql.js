@@ -1,10 +1,15 @@
 db.execute('''
-CREATE TABLE IF NOT EXISTS `contacts` (
+CREATE TABLE IF NOT EXISTS `stallion_publisher_contacts` (
 `id` bigint(20) unsigned NOT NULL,
     `displayname`  varchar(200)  NULL ,
     `email`  varchar(150)  NULL ,
+    `honorific`  varchar(50)  NULL ,
+    `optedout`  bit(1)  NULL ,
+    `totallyoptedout`  bit(1)  NULL ,
     `givenname`  varchar(100)  NULL ,
     `familyname`  varchar(100)  NULL ,
+    `disabled`  bit(1)  NULL ,
+    `extra`  longtext  NULL ,
     `secrettoken`  varchar(60)  NULL ,
     `website`  varchar(255)  NULL ,
     `evercookie`  varchar(60)  NULL ,
@@ -14,11 +19,6 @@ CREATE TABLE IF NOT EXISTS `contacts` (
     `verifysentat`  bigint(20)  NULL ,
     `verifyrejectedat`  bigint(20)  NULL ,
     `verifiedemail`  bit(1)  NULL ,
-    `disabled`  bit(1)  NULL ,
-    `honorific`  varchar(50)  NULL ,
-    `optedout`  bit(1)  NULL ,
-    `totallyoptedout`  bit(1)  NULL ,
-    `extra`  longtext  NULL ,
     `deleted`  bit(1)  NULL ,
   `row_updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

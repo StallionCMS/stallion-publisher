@@ -17,6 +17,7 @@
 package io.stallion.publisher.content;
 
 import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.StandardModelController;
 import io.stallion.utils.DateUtils;
 
@@ -27,7 +28,7 @@ public class GlobalModuleVersionController extends StandardModelController<Globa
     }
 
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(GlobalModuleVersion.class, GlobalModuleVersionController.class, false);
+        DataAccessRegistry.instance().registerDbModel(GlobalModuleVersion.class, GlobalModuleVersionController.class, NoStash.class, "global_module_versions");
     }
     public GlobalModuleVersion newVersionFromOldVersion(GlobalModuleVersion module) {
         return newVersion(module, module.getGlobalModuleId());

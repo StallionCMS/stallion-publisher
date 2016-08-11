@@ -19,6 +19,7 @@ package io.stallion.publisher.comments;
 import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.StandardModelController;
 import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.publisher.contacts.*;
@@ -45,7 +46,7 @@ public class CommentsController extends StandardModelController<Comment> {
     }
 
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(Comment.class, CommentsController.class, false);
+        DataAccessRegistry.instance().registerDbModel(Comment.class, CommentsController.class, NoStash.class, "comments");
     }
 
 

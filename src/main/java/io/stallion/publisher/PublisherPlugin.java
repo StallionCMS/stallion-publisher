@@ -47,6 +47,20 @@ public class PublisherPlugin extends StallionJavaPlugin {
     @Override
     public List<String> getSqlMigrations() {
         return list(
+                "00010-create-table-stallion_publisher_comments",
+                "00020-create-table-stallion_publisher_content_versions",
+                "00030-create-table-stallion_publisher_notifications",
+                "00040-create-table-stallion_publisher_blog_configs",
+                "00050-create-table-stallion_publisher_author_profiles",
+                "00060-create-table-stallion_publisher_uploaded_files",
+                "00070-create-table-stallion_publisher_subscriptions",
+                "00080-create-table-stallion_publisher_contents",
+                "00090-create-table-stallion_publisher_contacts",
+                "00100-create-table-stallion_publisher_form_submissions",
+                "00110-create-table-stallion_publisher_global_modules",
+                "00120-create-table-stallion_publisher_site_settings",
+                "00130-create-table-stallion_publisher_global_module_versions"
+                /*
                 "00010-create-table-comments",
                 "00040-create-table-content_versions",
                 "00050-create-table-notifications",
@@ -61,6 +75,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
                 "00150-create-table-site_settings",
                 "00160-create-table-global_module_versions",
                 "00170-alter-uploaded_files-add-2"
+                */
         );
     }
 
@@ -70,6 +85,7 @@ public class PublisherPlugin extends StallionJavaPlugin {
 
         // Register controllers
         TemplateConfig.load();
+
         BlogConfigController.register();
         ContentController.register();
         ContentsVersionController.register();

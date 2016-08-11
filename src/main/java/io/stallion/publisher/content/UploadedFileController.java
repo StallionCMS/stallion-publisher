@@ -31,7 +31,7 @@ public class UploadedFileController extends StandardModelController<UploadedFile
         return (UploadedFileController) DataAccessRegistry.instance().get("uploaded_files");
     }
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(UploadedFile.class, UploadedFileController.class, PartialStash.class);
+        DataAccessRegistry.instance().registerDbModel(UploadedFile.class, UploadedFileController.class, PartialStash.class, "uploaded_files");
     }
 
     public static String getTypeForExtension(String ext) {

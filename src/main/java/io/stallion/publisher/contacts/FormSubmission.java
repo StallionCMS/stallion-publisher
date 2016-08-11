@@ -26,7 +26,7 @@ import javax.persistence.Table;
 import java.util.HashMap;
 import java.util.Map;
 
-@Table(name="form_submissions")
+@Table(name="stallion_publisher_form_submissions")
 public class FormSubmission extends ModelBase {
 
     private String email = "";

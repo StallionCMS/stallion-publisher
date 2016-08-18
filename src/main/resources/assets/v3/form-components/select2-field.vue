@@ -10,7 +10,7 @@
          multiple: {
              default: false
          },
-         select2Options: Object,
+         selectOptions: Object,
          selectValues: Array,
          className: '',
          value: {
@@ -33,12 +33,14 @@
          });
          this.selectValues = selectValues;
          this.options = this.options || {};
+         this.selectOptions = this.selectOptions || {};
          return {};
      },
      ready: function() {
          var self = this;
+         console.log('selectOptions for select2 ', this.selectOptions);
          $(this.$el)
-               .select2(this.select2Options)
+               .select2(this.selectOptions)
                .on('change', function() {
                    // Not sure why this doesn't automatically update
                    self.value = $(this).val();

@@ -14,12 +14,13 @@
 /vendor/moment.js
 /vendor/moment-timezone-with-data-2010-2020.js
 /vendor/pikaday.js
+/vendor/pikaday.css
 /vendor/sortable.js
 /vendor/select2.js
 /vendor/to-markdown.js
 /vendor/jquery.oembed.js
 /vendor/simplemde.js
-/vendor/bootstrap.min.js
+/vendor/bootstrap.js
 /v3/common.js
 /vendor/require.js
 v3/*.css

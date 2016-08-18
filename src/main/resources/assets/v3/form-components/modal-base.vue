@@ -1,8 +1,18 @@
 
-
+<style lang="scss">
+ .modal-base-vue.modal .modal-footer {
+     button {
+         float: left;
+     }
+     a {
+         float: right;
+         vertical-align: -60%;
+     }
+ }
+</style>
 
 <template>
-    <div class="modal {{cssClass}}" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-base-vue modal {{cssClass}}" role="dialog" aria-labelledby="myLargeModalLabel">
         <div class="modal-dialog  {{ modalClass }}" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -21,7 +31,7 @@
                 </div>
                 <div class="modal-footer">
                     <slot name="footer">
-                        <button class="btn btn-primary btn-large" v-on:click="saveChanges">Save Changes</button>
+                        <button class="btn btn-primary btn-large st-button-submit" v-on:click="saveChanges">Save Changes</button>
                         <a href="javascript:;" v-on:click="close" style="float:right;">Cancel</a>
                     </slot>
                 </div>
@@ -35,7 +45,8 @@
  module.exports = {
      props: {
          shown: {
-             twoWay: true
+             twoWay: true,
+             default: false
          },
          title: null,
          tag: '',
@@ -80,6 +91,9 @@
          }
      },
      methods: {
+         open: function() {
+             this.shown = true;
+         },
          modalCallback: function() {
              this.callback.apply(this, arguments);
              this.close();

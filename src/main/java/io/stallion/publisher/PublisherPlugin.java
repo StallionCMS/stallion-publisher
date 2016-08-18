@@ -18,6 +18,7 @@ package io.stallion.publisher;
 
 import io.stallion.assets.*;
 import io.stallion.exceptions.ConfigException;
+import io.stallion.hooks.HookRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.publisher.comments.CommentsController;
 import io.stallion.publisher.comments.CommentsEndpoints;
@@ -100,6 +101,9 @@ public class PublisherPlugin extends StallionJavaPlugin {
         GlobalModuleController.register();
         GlobalModuleVersionController.register();
 
+
+        // Hooks
+        HookRegistry.instance().register(new ContentSlugLookupHook());
 
 
         // Register endpoints

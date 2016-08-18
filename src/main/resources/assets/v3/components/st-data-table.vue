@@ -54,6 +54,10 @@
              margin-left: 20px;
          }
      }
+     .cell-action-link {
+         display: inline-block;
+         margin-right: 5px;
+     }
      .cell-editable {
          border-left: 1px solid transparent;
          border-right: 1px solid transparent;
@@ -108,14 +112,19 @@
     <div class="st-data-table-vue" v-bind:class="{'fixed-headers': this.infiniteScroll}">
         <div class="data-table-header">
             <slot name="header">
-                <h2 class="table-title">{{ title }}</h2>
-                <form @submit.prevent="doSearch" class="table-search form-inline">
-                    <div class="input-group search-input-group">
-                        <input type="text" class="form-control search-field" placeholder="Search for {{ label }}" v-model="searchTerm">
-                        <span v-show="searchTerm && searchTerm.length >= 3" @click="searchTerm=''" class="cancel-search">✕</span>
-                        <button type="submit" class="btn btn-primary input-group-addon search-button"><i class="material-icons">search</i></button>
-                    </div>
-                </form>
+                <slot name="title">
+                    <h2 class="table-title">{{ title }}</h2>
+                </slot>
+                <slot name="search">
+                    <form @submit.prevent="doSearch" class="table-search form-inline">
+                        <div class="input-group search-input-group">
+                            <input type="text" class="form-control search-field" placeholder="Search for {{ label }}" v-model="searchTerm">
+                            <span v-show="searchTerm && searchTerm.length >= 3" @click="searchTerm=''" class="cancel-search">✕</span>
+                            <button type="submit" class="btn btn-primary input-group-addon search-button"><i class="material-icons">search</i></button>
+                        </div>
+                    </form>
+                </slot>
+                </slot>
                 <slot name="actions">
 
                 </slot>
@@ -131,7 +140,7 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th v-bind:class="{'sorted': sortField===col.field, 'sorted-desc': sortDirection==='desc', 'sortable': col.sortable, 'sorted-asc': sortDirection==='asc'}"v-for="col in columns" @click="sortColumn(col)">{{ col.title }}</th>
+                    <th v-bind:class="[sortField===col.field ? 'sorted' : '', sortDirection==='desc' ? 'sorted-desc': '', col.sortable ? 'sortable' : '', sortDirection==='asc' ? 'sorted-asc': '', 'header-' + col.className, 'st-header-cell']" v-for="col in columns" @click="sortColumn(col)" v-if="!col.hidden">{{ col.title }}</th>
                 </tr>
             </thead>
             <tbody v-if="loading">
@@ -151,7 +160,7 @@
             </tbody>
             <tbody v-if="!loading && items.length">
                 <tr v-for="(rowNumber, item) in items" v-if="!item.$hidden" track-by="id" class="data-table-row-index-{{ rowNumber }} data-table-row-id-{{ item.id }}">
-                    <td v-for="(colNumber, col) in columns" @click="onCellClicked(item, col, rowNumber, colNumber, $event)" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)" v-bind:class="[col.editableComponent? 'cell-editable': '', col.className]">
+                    <td v-for="(colNumber, col) in columns" @click="onCellClicked(item, col, rowNumber, colNumber, $event)" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)" v-bind:class="[col.editableComponent? 'cell-editable': '', col.className]" v-if="!col.hidden" >
                         <template v-if="item.$isEditing === colNumber">
                             <component :is="col.editableComponent" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber" :callback="onEditCallback" :refresh="refresh" :cancel="cancelEdit"></component>
                         </template>
@@ -163,7 +172,7 @@
                                 <a v-bind:href="col.getLink(item)">{{ col.getLabel(item) }}</a>
                             </template>
                             <template v-if="col.actions">
-                                <a v-for="action in col.actions" class="{{ action.className }}" v-show="action.shown ? action.shown(item) : true " v-bind:href="action.getLink ? action.getLink(item) : 'javascript:;' " @click="triggerItemEvent(action.event, item, col, rowNumber, colNumber)">{{ action.getLabel ? action.getLabel(item) : action.label }}</a>
+                                <a v-for="action in col.actions" class="cell-action-link {{ action.className }}" v-show="action.shown ? action.shown(item) : true " v-bind:href="action.getLink ? action.getLink(item) : 'javascript:;' " @click="action.event ? triggerItemEvent(action.event, item, col, rowNumber, colNumber): action.click(item, col, rowNumber, colNumber)">{{ action.getLabel ? action.getLabel(item) : action.label }}</a>
                             </template>
                             <template v-if="!col.component && !col.actions && !col.getLink">
                                 <template v-if="col.allowHtml">
@@ -247,6 +256,7 @@
          route: Object,
          title: String,
          filters: Array,
+         filterBys: Array,
          infiniteScroll: true
      },
      data: function() {
@@ -445,6 +455,11 @@
          },
          clearAllFilters: function() {
              this.filters = [];
+             this.filterBys = '';
+         },
+         clearFiltersAndRefresh: function() {
+             this.clearAllFilters();
+             this.refresh();
          },
          addFilter: function(field, value, op) {
              op = op || '=';
@@ -518,7 +533,10 @@
                  this.loadData(this, page, callback);
              } else {
                  var url = this.dataUrl;
-                 url += '?page=' + page;
+                 if (!url.indexOf('?') > -1) {
+                     url += '?';
+                 }
+                 url += '&page=' + page;
                  if (this.searchTerm.length > 2) {
                      url += '&search=' + encodeURIComponent(this.searchTerm);
                  }
@@ -534,6 +552,11 @@
                  }
                  if (this.customFilter) {
                      url += '&customFilter=' + encodeURIComponent(this.customFilter);
+                 }
+                 if (this.filterBys) {
+                     this.filterBys.forEach(function(f) {
+                         url += '&filter_by=' + f;
+                     });
                  }
                  stallion.request({
                      url: url,
@@ -657,6 +680,9 @@
                      stallion.showError('Invalid "filters" in query');
                  }
              }
+             if (this.route.query.filter_by) {
+                 this.filterBys = [this.route.query.filter_by];
+             }
              this.refresh();
              window.scrollTo(0, 0);
          }
@@ -686,7 +712,12 @@
              this.items.$set(item.$index, item);             
              return true;
              
+         },
+         'clear-filters': function() {
+             console.log('clear filters');
+             this.clearFiltersAndRefresh();
          }
+         
      }
 
  };

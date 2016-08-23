@@ -36,9 +36,23 @@ public class AuthorProfileController extends StandardModelController<AuthorProfi
     public static void register() {
         DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("authors")
+                .setTableName("stallion_publisher_author_profiles")
                 .setModelClass(AuthorProfile.class)
                 .setControllerClass(AuthorProfileController.class);
         DataAccessRegistry.instance().register(registration);
+    }
+
+    public AuthorProfile getOrCreate(Long userId) {
+        AuthorProfile profile = forUserId(userId);
+        if (profile == null) {
+            profile = new AuthorProfile().setUserId(userId);
+            save(profile);
+        }
+        return profile;
+    }
+
+    public AuthorProfile forUserId(Long userId) {
+        return forUniqueKey("userId", userId);
     }
 
     public List<UserAuthor> listAllAuthors() {

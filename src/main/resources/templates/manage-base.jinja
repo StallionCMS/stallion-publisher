@@ -1,0 +1,73 @@
+{% extends "stallion:common-base.jinja" %}
+{% block builtin_head_bundles %}
+
+<!--assets.compiledBundle("admin3.css") -->
+{{ assets.assetBundle("publisher", "manage.bundle.css") }}
+{% endblock %}
+
+{% block bundle_css %}
+
+{% endblock %}
+{% block extra_meta %}
+
+{% endblock %}
+
+{% block body_content %}
+<div class="">
+  <div id="stallion-publisher-main-vue-app">
+    <div class="">
+      <div class="publisher-sidebar-column">
+        <div class="logo-wrap">
+          <img class="stallion-logo" src="https://stallion.io/st-assets/stallion-rearing-red-299.png?ts=1456278540000" />
+        </div>
+        <div id="sidebar-target">
+          <publisher-sidebar-menu v-ref:sidebar></publisher-sidebar-menu>
+        </div>
+        <p>&nbsp;</p>
+        <div id="sidebar-config-container"></div>
+        <ul class="nav nav-sidebar">
+        </ul>
+      </div>
+      <div class="main-manage-column">
+        <router-view class="view" transition="test" transition-mode="out-in" v-ref:main ></router-view>
+      </div>
+    </div>
+  </div><!--end main-vue-app-->
+</div>
+{% endblock %}
+
+{%-- block builtin_footer_bundles --%}
+
+{%-- endblock --%}
+{%-- block bundle_js --%}
+<!--assets.compiledBundle("admin3.js") -->
+{{ assets.assetBundle("publisher", "manage.bundle.js") }}
+{%-- endblock --%}
+
+{% block pre_end_body %}
+
+<script type="text/javascript">
+
+    var stPublisherAdminContext = {{ adminContextJson }};
+
+    require.config({
+        baseUrl: "/st-assets/",
+        paths: {
+            "select2": "{{ assets.resource('v2/select2.min.js', 'publisher').replaceAll("\\.js$", '') }}",
+            "tinyMCE": "https://cdn.tinymce.com/4/tinymce.min"
+        },
+        waitSeconds: 15,
+        shim: {
+           tinyMCE: {
+               exports: 'tinyMCE',
+               init: function () {
+                   this.tinyMCE.DOM.events.domLoaded = true;
+                   return this.tinyMCE;
+                }
+            }
+        }
+    });
+
+</script>
+
+{% endblock %}

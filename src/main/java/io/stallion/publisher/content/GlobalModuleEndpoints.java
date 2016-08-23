@@ -18,8 +18,10 @@ package io.stallion.publisher.content;
 
 import static io.stallion.utils.Literals.*;
 
+import java.util.List;
 import java.util.Map;
 
+import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.BodyParam;
 import io.stallion.restfulEndpoints.EndpointResource;
@@ -60,7 +62,9 @@ public class GlobalModuleEndpoints implements EndpointResource {
     @GET
     @Path("/list")
     public Object listGlobalModules() {
-        return map(val("modules", GlobalModuleController.instance().all()));
+        List<GlobalModule> modules = GlobalModuleController.instance().all();
+        Pager<GlobalModule> pager = new Pager<GlobalModule>().setCurrentItems(modules);
+        return map(val("pager", pager));
     }
 
     @GET

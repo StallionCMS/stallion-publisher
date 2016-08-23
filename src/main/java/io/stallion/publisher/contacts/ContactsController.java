@@ -33,6 +33,7 @@ public class ContactsController extends StandardModelController<Contact> {
     public static void register() {
         DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("contacts")
+                .setTableName("stallion_publisher_contacts")
                 .setModelClass(Contact.class)
                 .setControllerClass(ContactsController.class);
         DataAccessRegistry.instance().register(registration);

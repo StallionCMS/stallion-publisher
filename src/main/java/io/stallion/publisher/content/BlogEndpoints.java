@@ -19,6 +19,7 @@ package io.stallion.publisher.content;
 import io.stallion.Context;
 import io.stallion.dataAccess.file.TextItem;
 import io.stallion.dataAccess.filtering.FilterChain;
+import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.settings.Settings;
@@ -70,7 +71,10 @@ public class BlogEndpoints implements EndpointResource {
     }
 
     private FilterChain<Content> filterChain() {
-        return posts().filterChain().filter("blogId", config.getId()).filter("published", true);
+        return posts().filterChain().filter("blogId", config.getId())
+                .filter("draft", false)
+                .filterBy("publishDate", DateUtils.utcNow(), FilterOperator.LESS_THAN_OR_EQUAL)
+                ;
     }
 
     @GET

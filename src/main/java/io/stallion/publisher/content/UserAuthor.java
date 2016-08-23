@@ -31,6 +31,10 @@ public class UserAuthor {
     private AuthorProfile author;
     private IUser user;
 
+    public Long getId() {
+        return user.getId();
+    }
+
     public AuthorProfile getAuthor() {
         return author;
     }

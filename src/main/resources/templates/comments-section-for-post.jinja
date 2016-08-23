@@ -2,10 +2,11 @@
   {% if threadComments.size() > 0 %}
     <h3 class="comments-header above-comments">Comments</h3>
   {% endif %}
-  {% for comment in commentsContext.comments %}
-      <div riot-tag="comment" class="st-comment-{{ comment.id }} st-comment-wrapper" data-comment-id="{{ comment.id }}">
+  <div id="st-comments-html-indexable">
+       {% for comment in commentsContext.comments %}
+      <div  class="st-comment-{{ comment.id }} st-comment-wrapper" data-comment-id="{{ comment.id }}">
         <hr>
-      <div class="st-comment-byline">
+        <div class="st-comment-byline">
         {% if comment.authorWebSite %}
         <a href="{{ comment.authorWebSite }}" rel="nofollow">{{ comment.authorDisplayName }}</a>
         {% else %}
@@ -15,11 +16,9 @@
       <div class="st-comment-body">{{ comment.bodyHtml }}</div>
     </div><!--end comment-->
   {% endfor %}
-  <div class="new-comment-wrapper">
-    <div id="new-comments-riot-target" riot-tag="comments-dynamic"></div><!--end new-comments-->
   </div>
-  <div class="st-comments-form-wrapper" riot-tag="comment-form">
-    
+  <div id="st-comments-section-target">
+    <comments-section :thread-id="{{ page.id }}" :parent-title="'{{ page.title }}'" :parent-permalink="'{{ page.permalink }}'"></comments-section>
   </div>
 </div>
 

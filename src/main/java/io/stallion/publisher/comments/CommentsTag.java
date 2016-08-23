@@ -41,7 +41,7 @@ public class CommentsTag implements Tag {
 
 
 
-            Context.getResponse().getPageFooterLiterals().addDefinedBundle("publisher:public.js");
+            //Context.getResponse().getPageFooterLiterals().addDefinedBundle("publisher:public.js");
 
 
 

@@ -28,6 +28,7 @@ public class FormSubmissionController extends StandardModelController<FormSubmis
     public static void register() {
         DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("form_submissions")
+                .setTableName("stallion_publisher_form_submissions")
                 .setModelClass(FormSubmission.class)
                 .setControllerClass(FormSubmissionController.class);
         DataAccessRegistry.instance().register(registration);

@@ -10,7 +10,19 @@
     plugin.isInitialized = false;
     
     plugin.ready = function() {
-        plugin.compileRiot();
+        plugin.initCommentsSection();
+    };
+
+    plugin.initCommentsSection = function() {
+        var ele = $('#st-comments-section-target');
+        if (ele.length < 1) {
+            return;
+        }
+        var app = new Vue({
+            el: '#st-comments-section-target'
+        })
+        $('#st-comments-html-indexable').hide();
+
     };
 
     window.stCommentsOnLoadCaptcha = function() {

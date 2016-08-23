@@ -1,0 +1,340 @@
+.p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.space-top {
+    margin-bottom: 0em;
+    margin-top: 1em;
+}
+.space-bottom {
+    margin-bottom: 1em;
+    margin-top: 0em;
+}
+
+.autogrow-textarea.form-control {
+    min-height: 50px;
+}
+.autogrow-textarea.form-control {
+    height: 50px;
+}
+
+.publisher-sidebar-column {
+    width: 220px;
+    position: fixed;
+    top: 0px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+}
+.main-manage-column {
+    width: 100%;
+    padding-left: 220px;
+    margin-left: 0px;
+    > div {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    > div.table-page {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+}
+
+#stallion-publisher-main-vue-app {
+    .st-breadcrumbs {
+        margin-top: 1em;
+        a, span {
+            color: #888;
+            text-decoration: none;
+            font-weight: 500;
+        }
+    }
+}
+
+
+.st-data-table-vue {
+    table {
+        margin-top: 2em;
+    }
+    td:first-child {
+        padding-left: 20px;
+    }
+}
+
+
+.autogrow-textarea.form-control.autogrow-single-line {
+    min-height: 36px;
+    height: 36px;
+}
+
+ .fade {
+   opacity: 0;
+   -webkit-transition: opacity 0.1s linear;
+      -moz-transition: opacity 0.1s linear;
+       -ms-transition: opacity 0.1s linear;
+        -o-transition: opacity 0.1s linear;
+           transition: opacity 0.1s linear;
+ }
+
+
+.editable-page-element-wrapper .CodeMirror, .editable-page-element-wrapper .CodeMirror-scroll {
+    min-height: 30px;
+}
+
+.editable-page-element-wrapper {
+    margin-bottom: 2em;
+}
+.editable-page-element-wrapper .editor-statusbar {
+    display: none;
+}
+
+.CodeMirror-widget {
+
+    padding: 0px;
+    margin: 0px;
+    margin-top: -16px;
+    display: block;
+
+}
+.editor-line-with-widget .CodeMirror-line {
+    padding: 0px;
+    padding-top: 10px;
+    line-height: 1em;
+}
+
+.preview-iframe {
+    border: 1px solid #CCC;
+
+}
+
+.preview-iframe.seventy-five {
+    -ms-zoom: 0.75;
+    -moz-transform: scale(0.75);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.75);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.75);
+    -webkit-transform-origin: 0 0;
+
+}
+
+.preview-iframe.fifty {
+    -ms-zoom: 0.5;
+    -moz-transform: scale(0.5);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.5);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.5);
+    -webkit-transform-origin: 0 0;
+
+}
+
+.frame-25 {
+    -ms-zoom: 0.25;
+    -moz-transform: scale(0.25);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.25);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.25);
+    -webkit-transform-origin: 0 0;
+
+}
+
+
+.preview-iframe.dirty {
+    opacity: .2;
+}
+
+.preview-iframe.mobile {
+    max-width: 500px;
+}
+.menu-link-group {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    text-align: center;
+}
+.menu-link-group a, .menu-link-group a:hover, .menu-link-group a:active {
+    text-decoration: none;
+}
+.menu-link-group .active {
+    color: #888;
+}
+
+.preview-dirty-overlay {
+    position: absolute;
+    width: 75%;
+    padding: 40px 0px 0px 0px;
+    text-align: center;
+    background-color: transparent;
+    height: 200px;
+    z-index: 100;
+    font-size: 24px;
+}
+
+.CodeMirror {
+    padding: 0px 10px 10px 0px;
+}
+.CodeMirror-linenumber.CodeMirror-gutter-elt {
+    visibility: hidden;
+}
+
+.CodeMirror-fullscreen, .editor-toolbar.fullscreen {
+    z-index: 3000;
+}
+
+.CodeMirror-gutter.CodeMirror-linenumbers {
+    margin-left: -5px;
+    margin-top: -5px;
+}
+.commentsGutter {
+    width: 35px;
+    margin-left: -5px;
+    margin-top: -5px;
+    background-color: #CCC;
+}
+
+.nav-sidebar > li > a.new-thing-link {
+    float: right;
+    border-left: 1px solid #ddd;
+    padding: 7px 0px 7px 4px;
+    width: 70px;
+
+}
+
+.widget-option > a {
+    display: block;
+    border: 1px solid #CCC;
+    border-width: 1px 3px 1px 1px;
+    border-left: 3px solid #CCC;
+    padding: 10px 10px 10px 10px;
+    font-size: 18px;
+}
+.widget-option > a:hover {
+    text-decoration: none;
+    background-color: #F0F0F0;
+}
+
+.st-file-dropzone {
+    max-width: 600px;
+    background-color: #FCFCFC;
+    width: 100%;
+    border: 1px solid #999;
+    min-height: 200px;
+}
+.st-file-dropzone .dz-message {
+    font-size: 18px;
+}
+
+/* Image Library, Image collection widget */
+
+.small-image-upload-target-column image-uploader .title {
+    display: none;
+}
+.small-image-upload-target-column image-uploader .dz-default.dz-message {
+    margin: 0px;
+}
+.small-image-upload-target-column image-uploader .image-dropzone.st-file-dropzone {
+    min-height: 50px;
+}
+.add-image-button-column > div {
+    height: 94px;
+    line-height: 94px;
+}
+
+
+.editor-toolbar a.editor-insert-button {
+    width: 55px;
+}
+
+.editor-toolbar a.editor-insert-button:before {
+    content: "Insert +";
+
+}
+
+.editor-header {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.editor-header h3 {
+    margin: 0px;
+    padding: 0px;
+}
+
+
+.page-actions .btn-open {
+    width: 60px;
+}
+
+
+
+
+.paste-target {
+    width: 100%;
+    min-height: 200px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    padding: 4px;
+}
+.markdown-preview {
+    width: 100%;
+    min-height: 200px;
+}
+
+
+.tab-box {
+
+
+}
+
+.vertical-tab {
+    display: block;
+    border: 1px solid #DDD;
+    padding: 1em;
+    background-color: #F3F3F3;
+}
+
+.vertical-tab.active-tab {
+    border-right: 1px solid transparent;
+    background-color: #FFFFFF;
+}
+
+
+
+.mce-i-icon-link:before {
+    content: "\ec99";
+}
+
+.mce-i-icon-image2:before {
+    content: "\e93c";    
+}
+
+.mce-i-icon-embed2:before {
+    content: "\eecd";    
+}
+
+.icomoon {
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+#stallion-publisher-main-vue-app .data-table-header {
+    margin-top: 25px;
+}

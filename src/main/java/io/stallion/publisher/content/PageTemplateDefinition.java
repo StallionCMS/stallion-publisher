@@ -17,7 +17,11 @@
 package io.stallion.publisher.content;
 
 
+import io.stallion.assets.AssetsController;
+
 import javax.persistence.Column;
+
+import static io.stallion.utils.Literals.empty;
 
 public class PageTemplateDefinition {
     private String template = "";

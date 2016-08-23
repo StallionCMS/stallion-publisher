@@ -432,7 +432,7 @@ public class ContentEndpoints implements EndpointResource {
         ZonedDateTime fifteenAgo = DateUtils.utcNow().minusMinutes(15);
         // Set all other new saved versions in the last fifteen minutes to not be a checkpoint. Thus only the last
         // save in a given session of editing will ever be considered a checkpoint version.
-        DB.instance().execute("UPDATE content_versions SET checkpoint=0 WHERE " +
+        DB.instance().execute("UPDATE stallion_publisher_content_versions SET checkpoint=0 WHERE " +
                 "postId=? AND checkpoint=1 AND versionAuthorId=? AND versionDate > ? AND id!=? AND permanentCheckpoint=0 ",
                 postId, Context.getUser().getId(), new Timestamp(fifteenAgo.toInstant().toEpochMilli()), newVersion.getId());
 

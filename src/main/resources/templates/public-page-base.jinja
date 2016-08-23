@@ -22,7 +22,7 @@
   <link rel="alternate" type="application/rss+xml" title="{{ rss_link.title }}" href="{{ rss_link.link }}" />
   {% endfor %}
   {% block builtin_head_bundles %}
-    {{ assets.definedBundle("alwaysHeadStylesheets") }}
+    {{ assets.assetBundle("publisher", "public.bundle.css") }}
   {% endblock %}
   {% block bundle_css %}
   {{ assets.bundle("site.bundle.css") }}
@@ -39,8 +39,10 @@
   {% block body_content %}
   {% endblock %}
   {%-- block builtin_footer_bundles --%}
-      {{ assets.definedBundle("alwaysFooterJavascripts") }}
-      <script type="text/javascript">
+      {{ assets.assetBundle("publisher", "public.bundle.js") }}
+
+  <script type="text/javascript">
+
         require.config({
             baseUrl: "/st-assets/",
             paths: {
@@ -53,7 +55,7 @@
 
   {%-- endblock --%}
   {%-- block bundle_js --%}
-    {{ assets.bundle("site.bundle.js") }}
+      {{ assets.bundle("site.bundle.js") }}
   {%-- endblock --%}
   {%-- block per_request_footer_literals --%}
     {{ assets.pageFooterLiterals() }}

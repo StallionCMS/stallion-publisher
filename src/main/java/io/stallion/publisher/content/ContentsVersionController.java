@@ -22,22 +22,26 @@ import java.util.Map;
 import java.util.Set;
 
 import io.stallion.Context;
-import io.stallion.dataAccess.DataAccessRegistry;
-import io.stallion.dataAccess.DisplayableModelController;
-import io.stallion.dataAccess.NoStash;
+import io.stallion.dataAccess.*;
+import io.stallion.publisher.contacts.Contact;
+import io.stallion.publisher.contacts.ContactsController;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.StringUtils;
 
 
-public class ContentsVersionController extends DisplayableModelController<ContentVersion> {
-    private static ContentsVersionController _instance;
+public class ContentsVersionController extends StandardModelController<ContentVersion> {
     public static ContentsVersionController instance() {
-        return _instance;
+        return (ContentsVersionController)DataAccessRegistry.instance().get("content_versions");
     }
     public static void register() {
-        _instance = (ContentsVersionController)DataAccessRegistry.instance().registerDbModel(ContentVersion.class, ContentsVersionController.class, NoStash.class, "content_versions");
+        DataAccessRegistration registration = new DataAccessRegistration()
+                .setBucket("content_versions")
+                .setTableName("stallion_publisher_content_versions")
+                .setModelClass(ContentVersion.class)
+                .setControllerClass(ContentsVersionController.class);
+        DataAccessRegistry.instance().register(registration);
     }
 
     private static Set<String> ignoreUpdateFields = set("id", "versionDate", "postId", "checkpoint", "oldUrls");

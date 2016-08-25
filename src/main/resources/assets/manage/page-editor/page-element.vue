@@ -6,11 +6,7 @@
 
 <template>
     <div class="page-element">
-        <page-element-image v-if="element.type==='image'" :element="elementClone" :update-callback="update" :options="options"></page-element-image>
-        <page-element-image-collection v-if="element.type==='image-collection'" :element="elementClone" :update-callback="update" :options="options"></page-element-image-collection>
-        <page-element-markdown v-if="element.type==='markdown'" :element="elementClone" :update-callback="update" :options="options"></page-element-markdown>
-        <page-element-rich-text v-if="element.type==='rich_text'" :element="elementClone" :update-callback="update" :options="options"></page-element-rich-text>
-        <page-element-text v-if="element.type==='text'" :element="elementClone" :update-callback="update" :options="options"></page-element-text>
+        <component :is="elementTag" :element="elementClone" :update-callback="update" :options="options"></component>
     </div>
 </template>
 
@@ -28,7 +24,9 @@
          }
      },
      data: function() {
+         var elementTag = 'page-element-' + this.element.type.replace(/_/g, '-').toLowerCase();
          return {
+             elementTag: elementTag,
              elementClone: JSON.parse(JSON.stringify(this.element || {}))
          }
      },

@@ -6,7 +6,7 @@
 
 <template>
     <div class="image-simple-configure-vue">
-        <image-selector v-if="tab==='selector'" :callback="selectImageCallback"></image-selector>
+        <image-selector v-if="tab==='selector'" :allow-external-images="false" :callback="selectImageCallback"></image-selector>
         <div v-if="tab==='formatting'">
             <div style="border-bottom: 1px solid #F4F4F4; padding-bottom: 1em; margin-bottom: 1em;">
                 <img v-bind:src="image.thumbUrl"" style="max-width: 50px; max-width: 50px; display:inline-block; margin-right: 20px; border: 1px solid #CCC;">

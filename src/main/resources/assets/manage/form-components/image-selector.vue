@@ -4,7 +4,7 @@
             <ul class="nav nav-tabs" role="tablist">        
                 <li role="presentation" v-bind:class="{active: tab==='library'}" v-on:click="showTab('library')"><a class="" href="javascript:;" >Image Library</a></li>
                 <li role="presentation" v-on:click="showTab('upload')" v-bind:class="{active: tab==='upload'}"><a href="javascript:;"  >Upload</a></li>
-                <li show={!opts.hideurltab} role="presentation" v-on:click="showTab('url')" v-bind:class="{active: tab==='url'}"><a href="javascript:;" >Web Address (URL)</a></li>
+                <li v-if="allowExternalImages" show={!opts.hideurltab} role="presentation" v-on:click="showTab('url')" v-bind:class="{active: tab==='url'}"><a href="javascript:;" >Web Address (URL)</a></li>
             </ul>
         </div>
         <div v-if="tab==='library'">
@@ -26,7 +26,11 @@
 <script>
  module.exports = {
      props: {
-         callback: Function
+         callback: Function,
+         allowExternalImages: {
+             type: Boolean,
+             default: true
+         }
      },
      data: function() {
          return {

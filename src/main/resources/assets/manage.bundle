@@ -28,7 +28,7 @@
 /manage/form-components/*.vue
 /manage/components/*.vue
 /manage/text-editor/*.vue
-/manage/text-editor/tinymce-image-plugin.js
+/manage/text-editor/tinymce-plugins.js
 /manage/page-editor/*.vue
 /manage/screens/*.vue
 /manage/dashboard-home.vue

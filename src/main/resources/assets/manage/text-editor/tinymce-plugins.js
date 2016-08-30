@@ -1,5 +1,25 @@
 
-stPublisher.initTinyImagePlugin = function(tinymce) {
+stPublisher.initHeadersPlugin = function(tinymce) {
+    tinymce.PluginManager.add('headers', function(editor, url) {
+        ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre'].forEach(function(name){
+            editor.addButton("style-" + name, {
+                tooltip: "Toggle " + name,
+                text: name.toUpperCase(),
+         onClick: function() { editor.execCommand('mceToggleFormat', false, name); },
+         onPostRender: function() {
+             var self = this, setup = function() {
+                 editor.formatter.formatChanged(name, function(state) {
+                     self.active(state);
+                 });
+             };
+             editor.formatter ? setup() : editor.on('init', setup);
+         }
+     })
+  });
+});
+};
+
+stPublisher.initStallionButtonsPlugin = function(tinymce) {
     tinymce.PluginManager.add('example', function(editor, url) {
         // Add a button that opens a window
         editor.addButton('stimage', {

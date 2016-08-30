@@ -17,6 +17,7 @@
 package io.stallion.publisher;
 
 import io.stallion.assets.*;
+import io.stallion.boot.StallionRunAction;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.hooks.HookRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
@@ -27,6 +28,7 @@ import io.stallion.publisher.comments.SeleniumEndpoints;
 import io.stallion.publisher.contacts.*;
 import io.stallion.publisher.content.*;
 import io.stallion.publisher.liveTesting.TomeEndpoints;
+import io.stallion.publisher.tools.NewPublisherSiteAction;
 import io.stallion.restfulEndpoints.*;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -43,6 +45,12 @@ public class PublisherPlugin extends StallionJavaPlugin {
     @Override
     public String getPluginName() {
         return "publisher";
+    }
+
+
+    @Override
+    public List<? extends StallionRunAction> getActions() {
+        return list(new NewPublisherSiteAction());
     }
 
     @Override

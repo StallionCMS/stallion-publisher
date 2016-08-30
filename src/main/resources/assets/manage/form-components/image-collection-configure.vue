@@ -22,8 +22,8 @@
                 <em><big>No images yet.</big></em>
             </p>
             <div class="included-images-list">
-                <div v-for='img in images' class="image-thumb-box item">
-                    <a class="delete-icon" href="javascript:;" @click="deleteImage(i)">&#215;</a>
+                <div v-for='(index, img) in images'  class="image-thumb-box item">
+                    <a class="delete-icon" href="javascript:;" @click="deleteImage(index)">&#215;</a>
                     <div class="image-wrap-box">
                         <img :src="img.src" :title="img.caption" >
                     </div>
@@ -54,7 +54,7 @@
             </div>
             <div v-if="layout==='custom'" class="form-group">
                 <label>Custom CSS class(es)</label>
-                <input type="input" class="form-control" name="customCssClass" placeholder="Enter one or more CSS class names, separated by spaces." v-model="galleryOnClick" v-bind:true-value="true" v-bind:false-value="false"/>
+                <input type="input" class="form-control" name="customCssClass" placeholder="Enter one or more CSS class names, separated by spaces." v-model="customCssClass" v-bind:true-value="true" v-bind:false-value="false"/>
             </div>
             <div class="checkbox p">
                 <label><input type="checkbox" name="galleryOnClick" v-bind:true-value="true" v-bind:false-value="false" v-model="galleryOnClick"> Open slideshow mode when an image is clicked on?</label>
@@ -73,10 +73,16 @@
      },
      data: function() {
          var data = JSON.parse(JSON.stringify(this.data || {}));
+         images = data.images || [];
+         images.forEach(function(img) {
+             img.showAddLink = false;
+             img.showAddCaption = false;
+         });
          return {
              screen: 'collection',
              images: data.images  || [],
              layout: data.layout || 'image-grid-medium',
+             customCssClass: '',
              galleryOnClick: data.galleryOnClick === undefined ? true : data.galleryOnClick
          }
      },
@@ -107,19 +113,29 @@
          imageSelectCallback: function(imageInfo) {
              var self = this;
              var img = {
-                 src: imageInfo.mediumUrl,
+                 src: imageInfo.url,
                  height: imageInfo.mediumHeight || imageInfo.height,
                  width: imageInfo.mediumWidth || imageInfo.width,
                  originalSrc: imageInfo.url,
                  originalHeight: imageInfo.height,
-                 originalWidth: imageInfo.width
+                 originalWidth: imageInfo.width,
+                 showAddLink: false,
+                 showAddCaption: false
              }
              self.images.push(img);
              self.screen = 'collection';
              self.okToInsert = true;
          },
          deleteImage: function(index) {
-
+             var self = this;
+             var imagesNew = [];
+             self.images.forEach(function(img, i) {
+                 if (i === index) {
+                     return
+                 }
+                 imagesNew.push(img);
+             });
+             self.images = imagesNew;
          },
          getData: function() {
              var self = this;
@@ -127,7 +143,8 @@
              var data = {
                  galleryOnClick: self.galleryOnClick,
                  layout: self.layout,
-                 images: self.images
+                 images: self.images,
+                 customCssClass: self.customCssClass
              };
 
              data.html = self.buildHtml(data);

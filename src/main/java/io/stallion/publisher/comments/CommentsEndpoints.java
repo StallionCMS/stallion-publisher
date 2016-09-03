@@ -33,16 +33,20 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.stallion.Context;
 import io.stallion.dataAccess.filtering.FilterChain;
+import io.stallion.dataAccess.filtering.Or;
 import io.stallion.dataAccess.filtering.Pager;
+import io.stallion.dataAccess.filtering.SortDirection;
 import io.stallion.exceptions.*;
 import io.stallion.publisher.PublisherSettings;
 import io.stallion.publisher.contacts.Contact;
 import io.stallion.publisher.contacts.ContactsController;
 import io.stallion.publisher.contacts.SubscriptionFrequency;
+import io.stallion.publisher.content.ContentController;
 import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.MinRole;
 import io.stallion.restfulEndpoints.ObjectParam;
+import io.stallion.restfulEndpoints.QueryToPager;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -437,9 +441,32 @@ public class CommentsEndpoints implements EndpointResource {
     @GET
     @Path("/comments/list")
     @Produces("application/json")
-    public Object getComments(@QueryParam("page") Integer page) {
-        page = or(page, 1);
-        Map ctx =  map(val("pager", CommentsController.instance().filterChain().exclude("deleted", true).sort("id", "desc").pager(page)));
+    public Object getComments(@QueryParam("customFilter") String customFilter) {
+        FilterChain<Comment> chain = CommentsController.instance().filterChain().exclude("deleted", true);
+
+        if (!empty(customFilter)) {
+            switch (customFilter) {
+                case "pending":
+                    chain = chain.andAnyOf(
+                            new Or("state", CommentState.PENDING_MODERATION),
+                            new Or("state", CommentState.PENDING_AKISMET)
+                    );
+                    break;
+                case "approved":
+                    chain = chain.filter("approved", true);
+                    break;
+                case "deleted":
+                    chain = chain.filter("deleted", true).includeDeleted();
+                    break;
+            }
+        }
+        Pager<Comment> pager = new QueryToPager<Comment>(Context.getRequest(), CommentsController.instance(), chain)
+                .searchFields("authorEmail", "authorDisplayName", "bodyMarkdown")
+                .setDefaultSort("-id")
+                .pager()
+                ;
+        Map ctx =  map(val("pager", pager));
+
         return ctx;
     }
 

@@ -40,6 +40,7 @@ public class ContentsVersionController extends StandardModelController<ContentVe
                 .setBucket("content_versions")
                 .setTableName("stallion_publisher_content_versions")
                 .setModelClass(ContentVersion.class)
+                .setStashClass(NoStash.class)
                 .setControllerClass(ContentsVersionController.class);
         DataAccessRegistry.instance().register(registration);
     }

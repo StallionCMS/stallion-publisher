@@ -346,7 +346,10 @@
 
      },
      created: function() {
-         this.loadInitialData();
+         console.log('created, load initial data');
+         if (!this.route) {
+             this.loadInitialData();
+         }
      },
      compiled: function() {
      },
@@ -365,8 +368,8 @@
 
          },
          doSearch: function() {
-             this.page = 1;
-             this.loadInitialData();
+             //this.page = 1;
+             this.navigate({page: 1});
          },
          afterAttachedAndLoaded: function() {
              var self = this;
@@ -494,6 +497,7 @@
              this.$dispatch(event, item, col, rowNumber, colNumber);
          },
          refresh: function() {
+             console.log('refresh!!!');             
              this.loading = true;
              this.loadInitialData();
          },
@@ -610,7 +614,26 @@
                  query: parts[1]
              });
          },
+         navigate: function(newOpts) {
+             var self = this;
+             newOpts = newOpts || {};
+             Object.keys(newOpts).forEach(function(name) {
+                 self[name] = newOpts[name];
+             });
+             var url = this.makePageLink(this.page);
+             console.log('URL ', url);
+             if (url.indexOf('#!') === 0) {
+                 url = url.substr(2);
+             }
+             var parts = url.split('\\?');
+             
+             StallionApplicationRouter.go({
+                 path: parts[0],
+                 query: parts[1]
+             });
+         }, 
          makeUrl: function(page, searchTerm, filters, sortField, sortDirection) {
+             var self = this;
              var sort = '';
              if (sortField) {
                  sort = sortField;
@@ -620,20 +643,22 @@
              }
              var template = this.browserUrlTemplate;
              if (template.indexOf('?') === -1) {
-                 template += '?search={{searchTerm}}&filters={{filters}}&sort={{sort}}&page={{page}}';
+                 template += '?search={{searchTerm}}&filters={{filters}}&sort={{sort}}&page={{page}}&customFilter={{customFilter}}';
              }
              var url = template;
              var params = {
                  page: page,
                  searchTerm: searchTerm,
                  filters: JSON.stringify(filters),
-                 sort: sort
+                 sort: sort,
+                 customFilter: self.customFilter
              };
              Object.keys(params).forEach(function(key) {
                  url = url.replace(new RegExp('{{\\s*' + key + '\\s*}}', 'g'), params[key] || '');
              });
              return url;
          },
+         
          scrolify: function(tblAsJQueryObject, height){
              var self = this;
 
@@ -684,6 +709,7 @@
              });
          },
          updateFromRoute: function() {
+             console.log('update from route');
              this.page = parseInt(this.route.params.page || this.route.query.page || 1, 10) || 1;
              this.searchTerm = this.route.params.search || this.route.query.search || '',
              this.sortField = this.route.params.sort || this.route.query.sort || '';
@@ -711,6 +737,7 @@
      },
      watch: {
          route: function(cur, prev) {
+             console.log('route changed');
              this.updateFromRoute();
          },
          label: function() {

@@ -1,5 +1,9 @@
 <style>
- 
+ .comments-table-vue .st-data-table-vue .data-table-header {
+     .table-actions {
+         float: left;
+     }
+ }
 </style>
 
 
@@ -9,6 +13,14 @@
         <loading-div v-if="$loadingRouteData"></loading-div>
         <div v-if="!$loadingRouteData">
             <st-data-table v-ref:table :table-definition="tableDefinition" :columns="columns" :label="'comment'" :browser-url-template="'#!/comments'" :data-url="'/st-publisher/comments/list'" :route="$route" table-class="table">
+                <div slot="actions" class="table-actions" style="">
+                    <select class="form-control" v-model="customFilter">
+                        <option value="">All Comments</option>
+                        <option value="pending">Pending Comments</option>
+                        <option value="approved">Approved Comments</option>
+                        <option value="deleted">Deleted Comments</option>
+                    </select>
+                </div>
             </st-data-table>
         </div>
     </div>
@@ -25,6 +37,7 @@
      data: function() {
          var self = this;
          return {
+             customFilter: '',
              columns: [
                  {
                      component: {
@@ -89,6 +102,12 @@
      },
      methods: {
          
+     },
+     watch: {
+         'customFilter': function(customFilter, b) {
+             console.log('changed customFilter ', customFilter, b);
+             this.$refs.table.navigate({customFilter: customFilter});
+         }
      }
  }
 </script>

@@ -22,12 +22,14 @@ import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.PartialStash;
 import io.stallion.dataAccess.filtering.FilterChain;
+import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
+import org.joda.time.DateTime;
 
-import static io.stallion.utils.Literals.empty;
-import static io.stallion.utils.Literals.emptyInstance;
-import static io.stallion.utils.Literals.or;
+import java.time.ZonedDateTime;
+
+import static io.stallion.utils.Literals.*;
 
 
 public class ContentController extends DisplayableModelController<Content> {
@@ -72,7 +74,14 @@ public class ContentController extends DisplayableModelController<Content> {
         return false;
     }
 
+    public FilterChain<Content> publishedChain() {
+        ZonedDateTime now = utcNow().withSecond(0).withNano(0);
+        FilterChain<Content> chain = filterChain()
+                .filter("draft", false)
+                .filterBy("publishDate", now, FilterOperator.LESS_THAN_OR_EQUAL);
+        return chain;
 
+    }
 
 
     @Override

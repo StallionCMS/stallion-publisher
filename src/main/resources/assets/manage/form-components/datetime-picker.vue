@@ -1,5 +1,6 @@
 <style lang="scss">
  .datetime-picker-vue {
+     line-height: 47px;
      .select2-selection {
          height: 34px;
          border: 1px solid #ccc;
@@ -84,7 +85,7 @@
             <option value="22">10:30pm</option>
             <option value="23">11:00pm</option>
             <option value="23">11:30pm</option>
-        </select> :
+        </select>
         <select class="timezone-input form-control" v-model="timezone" name="timezone">
             <option v-for="name in timezoneNames">{{ name }}</option>
         </select>
@@ -117,10 +118,10 @@
                    tags: true,
                    createTag: function (params) {
                        // Don't offset to create a tag if there is no @ symbol
-                       if (!tagsPattern.test(params.term)) {
+                       //if (!tagsPattern.test(params.term)) {
                            // Return null to disable tag creation
-                           return null;
-                       }
+                       //    return null;
+                       //}
                        return {
                            id: params.term,
                            text: params.term

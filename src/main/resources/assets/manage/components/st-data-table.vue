@@ -1,6 +1,5 @@
 <style lang="scss">
  .st-data-table-vue {
-     
      .data-table-header {
          padding-right: 20px;
          .table-title {
@@ -127,7 +126,7 @@
                     <form @submit.prevent="doSearch" class="table-search form-inline">
                         <div class="input-group search-input-group">
                             <input type="text" class="form-control search-field" placeholder="Search for {{ label }}" v-model="searchTerm">
-                            <span v-show="searchTerm && searchTerm.length >= 3" @click="searchTerm=''" class="cancel-search">✕</span>
+                            <span v-show="searchTerm && searchTerm.length >= 3" @click="navigate({page: 1, searchTerm: ''})" class="cancel-search">✕</span>
                             <button type="submit" class="btn btn-primary input-group-addon search-button"><i class="material-icons">search</i></button>
                         </div>
                     </form>
@@ -168,7 +167,7 @@
             </tbody>
             <tbody v-if="!loading && items.length">
                 <tr v-for="(rowNumber, item) in items" v-if="!item.$hidden" track-by="id" class="data-table-row-index-{{ rowNumber }} data-table-row-id-{{ item.id }}">
-                    <td v-for="(colNumber, col) in columns" @click="onCellClicked(item, col, rowNumber, colNumber, $event)" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)" v-bind:class="[col.editableComponent? 'cell-editable': '', col.className]" v-if="!col.hidden" >
+                    <td v-for="(colNumber, col) in columns" @click="onCellClicked(item, col, rowNumber, colNumber, $event)" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)" v-bind:class="[col.editableComponent? 'cell-editable': '', col.className]" v-if="!col.hidden" :style="col.$widthWithPadding ? 'width: ' + (col.$widthWithPadding) + 'px;': ''">
                         <template v-if="item.$isEditing === colNumber">
                             <component :is="col.editableComponent" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber" :callback="onEditCallback" :refresh="refresh" :cancel="cancelEdit"></component>
                         </template>
@@ -413,7 +412,7 @@
                  this.sortDirection = 'asc';
              }
              this.page = 0;
-             this.refresh();
+             this.navigate({page: 1});
          },
          renderCell: function(item, col, index) {
              if (typeof(col) === 'string') {
@@ -649,10 +648,11 @@
              var params = {
                  page: page,
                  searchTerm: searchTerm,
-                 filters: JSON.stringify(filters),
+                 filters: encodeURIComponent(JSON.stringify(filters)),
                  sort: sort,
                  customFilter: self.customFilter
              };
+             console.log("FILTERS ", encodeURIComponent(params.filters));
              Object.keys(params).forEach(function(key) {
                  url = url.replace(new RegExp('{{\\s*' + key + '\\s*}}', 'g'), params[key] || '');
              });
@@ -661,7 +661,6 @@
          
          scrolify: function(tblAsJQueryObject, height){
              var self = this;
-
              var oTbl = tblAsJQueryObject;
 
              // for very large tables you can remove the four lines below
@@ -674,11 +673,18 @@
 
              // save original width
              oTbl.attr("data-item-original-width", oTbl.width());
+             
              oTbl.find('thead tr th').each(function(){
-                 $(this).attr("data-item-original-width",$(this).width());
-             }); 
+                 $(this).attr("data-item-original-width", $(this).width());
+
+             });
+             var i = 0;
              oTbl.find('tbody tr:eq(0) td').each(function(){
                  $(this).attr("data-item-original-width",$(this).width());
+                 $(this).attr("data-original-width-with-padding",$(this).outerWidth());
+                 self.columns[i].$widthWithPadding = $(this).outerWidth();
+                 console.log('set width', $(this).width(), self.columns[i].field, self.columns[i].title);
+                 i++;                 
              });                 
 
 
@@ -698,9 +704,13 @@
              newTbl.find('thead tr th').each(function(){
                  $(this).width($(this).attr("data-item-original-width"));
              });     
-             oTbl.width(oTbl.attr('data-item-original-width'));      
+             oTbl.width(oTbl.attr('data-item-original-width'));
+             i = 0;
              oTbl.find('tbody tr:eq(0) td').each(function(){
                  $(this).width($(this).attr("data-item-original-width"));
+                // $(this).width(self.columns[i].$width);
+                 //$(this).css({'width': self.columns[i].$width + 'px !important'});
+                 i++;
              });        
              $(this.$el).find(".scrollable-wrapper").on('scroll', function() {
                  if(($(this).scrollTop() + $(this).innerHeight() + 20) >= $(this)[0].scrollHeight) {
@@ -723,7 +733,7 @@
              this.filters = [];
              if (this.route.query.filters) { 
                  try {
-                     this.filters = JSON.parse(this.route.query.filters);
+                     this.filters = JSON.parse(decodeURIComponent(this.route.query.filters));
                  } catch(e) {
                      stallion.showError('Invalid "filters" in query');
                  }

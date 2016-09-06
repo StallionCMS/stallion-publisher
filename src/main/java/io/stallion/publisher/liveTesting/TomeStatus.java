@@ -17,5 +17,5 @@
 package io.stallion.publisher.liveTesting;
 
 public enum TomeStatus {
-    EBOOK, OUT_OF_PRINT, PRINT_ONLY, PUBLIC_DOMAIN
+    EBOOK, OUT_OF_PRINT, PRINT_ONLY, PUBLIC_DOMAIN, EXTENDED_PRINTING_SCENARIO
 }

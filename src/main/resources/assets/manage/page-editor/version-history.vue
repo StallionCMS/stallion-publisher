@@ -7,24 +7,24 @@
         <loading-div v-if="loading"></loading-div>
         <div v-if="!loading">
             <h3>Version history</h3>
-            <table class="table table-striped" >
+            <table class="table table-striped" style="width:100%;">
                 <thead>
                     <th></th>
                     <th>Date</th>
                     <th>Author</th>
-                    <th>Word Count</th>
+                    <th>#&nbsp;Words</th>
                     <th>Diff</th>
                 </thead>
                 <tbody>
                     <tr v-for='item in pager.items'>
                         <td>
-                            <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" href="/st-publisher/content/{{item.postId}}/view-version/{{item.id}}" target="_blank">view</a><br>
-                            <a style="width:100px;margin-bottom:.5em;" class="btn btn-default btn-xs" @click='restoreVersion(item)'>restore as draft</a><br>
+                            <a style="width:50px;margin-bottom:.5em;" class="btn btn-default btn-xs" href="/st-publisher/content/{{item.postId}}/view-version/{{item.id}}" target="_blank">view</a><br>
+                            <a style="width:50px;margin-bottom:.5em;" class="btn btn-default btn-xs" @click='restoreVersion(item)'>restore</a><br>
                         </td>
                         <td>{{ moment(item.versionDate * 1000).fromNow() }}</td>
                         <td>{{ item.versionAuthorName }}</td>
                         <td>{{ item.wordCount }}</td>
-                        <td>{{ item.diff }}</td>
+                        <td style="overflow:hidden;">{{ item.diff }}</td>
                     </tr>
                 </tbody>
             </table>

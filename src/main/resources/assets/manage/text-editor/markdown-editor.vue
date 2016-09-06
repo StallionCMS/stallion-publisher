@@ -183,11 +183,15 @@
          insertLink: function() {
              this.showInsertLinkModal = true;
          },
-         insertLinkCallback: function(url) {
+         insertLinkCallback: function(url, text) {
              var cm = this.cm;
              var state = this.simplemde.getState();
+             var selection = cm.getSelection();
+             if (selection) {
+                 text = '';
+             }
              //var options = this.simplemde.options;
-             var startEnd = ["[", "](" + url + ")"]
+             var startEnd = ["[", text + "](" + url + ")"]
 	     this._replaceSelection(cm, state.link, startEnd, '');
          },
          insertImage: function() {

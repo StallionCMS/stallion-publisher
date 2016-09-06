@@ -17,6 +17,7 @@
 package io.stallion.publisher.content;
 
 import io.stallion.Context;
+import io.stallion.assets.AssetsController;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.ModelBase;
@@ -78,7 +79,7 @@ public class ContentEndpoints implements EndpointResource {
     @Produces("application/json")
     public Object allContent(@QueryParam("page") Integer page) {
         page = or(page, 1);
-        Map ctx =  map(val("pager", ContentController.instance().filter("published", true).pager(page, 1000)));
+        Map ctx =  map(val("pager", ContentController.instance().publishedChain().pager(page, 1000)));
         return ctx;
     }
 
@@ -284,7 +285,8 @@ public class ContentEndpoints implements EndpointResource {
     @Path("/:postId/preview")
     @Produces("text/html")
     public String previewPost(@PathParam("postId") Long postId, @PathParam("versionId") Long versionId) {
-        return viewPostVersion(postId, 0L);
+        String out = viewPostVersion(postId, 0L);
+        return out;
     }
 
     @GET
@@ -336,6 +338,14 @@ public class ContentEndpoints implements EndpointResource {
         }
 
         String output = ((DisplayableModelController)item.getController()).render(item, ctx);
+        String previewJs = AssetsController.instance().resource("/manage/content-preview.js", "publisher");
+        String previewCss = AssetsController.instance().resource("/manage/content-preview.css", "publisher");
+
+        output = output.replace("</body>", "<script type=\"text/javascript\" src=\"" + previewJs  + "\"></script>\n</body>");
+        output = output.replace("</head>", "<link href=\"" + previewCss  + "\" rel=\"stylesheet\">\n</head>");
+        //output = output.replace("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">", "<meta name=\"viewport\" content=\"width=1200\" />");
+        //output = output.replace("</head>", "</head>");
+
         return output;
     }
 

@@ -35,7 +35,13 @@ var StallionApplicationRouter = null;
         // For demo purposes, we will just use an empty one
         // because we are using the HTML as the app template.
         // !! Note that the App is not a Vue instance.
-        var App = Vue.extend({})
+        var App = Vue.extend({
+            data: function() {
+                return {
+                    className: 'someclass'
+                }
+            }
+        })
         
         // Create a router instance.
         // You can pass in additional options here, but let's
@@ -124,10 +130,17 @@ var StallionApplicationRouter = null;
             console.log('routing!');
             transition.next();
             console.log('beforeEach! ');
+            if (transition.to.path.indexOf('/edit-content') === 0) {
+                $('#stallion-publisher-main-vue-app').addClass('st-editor-page');
+            }
+            
         });
 
         var after = function(myRouter) {
             return function(transition) {
+                if (transition.to.path.indexOf('/edit-content') !== 0) {
+                    $('#stallion-publisher-main-vue-app').removeClass('st-editor-page');
+                }
                 myRouter.app.$refs.sidebar.updatePath(transition.to.path);
                 console.log('afterEach! ', transition.to.path);
             };

@@ -13,6 +13,7 @@
      }
      td.title-cell {
          max-width: 300px;
+         min-width: 150px;
      }
      td.status-cell {
          width: 70px;
@@ -28,7 +29,7 @@
     <div class="tomes-table-vue">
         <h3 v-if="$loadingRouteData">Loading &hellip;</h3>
         <div v-if="!$loadingRouteData">
-            <st-data-table v-ref:tometable :table-definition="tableDefinition" :columns="columns" label="tome" :browser-url-template="'#!/tomes/{{page}}/{{searchTerm}}'" :data-url="'/st-publisher/testing-tomes/tomes'" :route="$route" table-class="table table-striped" :single-click-editing="true" >
+            <st-data-table v-ref:tometable :infinite-scroll="true" :table-definition="tableDefinition" :columns="columns" label="tome" :browser-url-template="'#!/tomes/{{page}}/{{searchTerm}}'" :data-url="'/st-publisher/testing-tomes/tomes'" :route="$route" table-class="table table-striped" :single-click-editing="true" >
                 <div class="filters-slot form-inline" slot="filters">
                     <select v-model="filterPrice" class="form-control price-filter" v-bind:class="{'empty-value': !filterPrice}" placeholder="Filter by price">
                         <option value="" selected> - Filter by price - </option>
@@ -70,7 +71,7 @@
              route: {},
              authors: [
                  "Mark Twain", "Charles Dickens", "Ernest Hemingway", "Louisa May Alcott", "Jane Austen", "Jonathan Swift", "Daniel Defoe",
-                 "Clive Cussler", "Francis Scott Fitzgerald", "JD Salinger"
+                 "Clive Cussler", "Francis Scott Fitzgerald", "JD Salinger", "Aesop", "Homer"
              ],
              columns: [
                  {
@@ -79,41 +80,6 @@
                          label: 'Edit',
                          event: 'edit-tome'
                      }]
-                 },
-                 {
-                     title: 'Unit Price',
-                     field: 'price',
-                     editableComponent: 'cell-text-editable',
-                     format: 'dollars',
-                     sortable: true
-                 },
-                 {
-                     title: 'Bulk Price',
-                     field: 'bulkPrice',
-                     format: 'dollars'                     
-                 },
-                 {
-                     title: 'Number Sold',
-                     field: 'numberSold',
-                     format: 'number'
-                 },
-                 {
-                     title: 'Published',
-                     format: 'epochSeconds:MMM Do YYYY',
-                     field: 'publishedAt'
-                 },
-                 {
-                     title: 'Updated At',
-                     render: function(item) {
-                         return moment(item.updatedAt * 1000).fromNow();
-                     }
-                 },
-                 {
-                     title: 'Title',
-                     field: 'title',
-                     className: 'title-cell',
-                     editableComponent: 'cell-text-editable',                     
-                     style: 'max-width: 300px; '
                  },
                  'author'
                  ,
@@ -136,6 +102,42 @@
                          }                         
                      ]
                          
+                 },
+                 {
+                     title: 'Title',
+                     field: 'title',
+                     className: 'title-cell',
+                     editableComponent: 'cell-text-editable',                     
+                     style: 'max-width: 300px; '
+                 },
+                 {
+                     title: 'Published',
+                     format: 'epochSeconds:MMM Do YYYY',
+                     field: 'publishedAt'
+                 },
+                 {
+                     title: 'Unit Price',
+                     field: 'price',
+                     editableComponent: 'cell-text-editable',
+                     format: 'dollars',
+                     sortable: true
+                 },
+                 {
+                     title: 'Bulk Price',
+                     field: 'bulkPrice',
+                     format: 'dollars'                     
+                 },
+                 {
+                     title: 'Number Sold',
+                     field: 'numberSold',
+                     format: 'number'
+                 },
+                 
+                 {
+                     title: 'Updated At',
+                     render: function(item) {
+                         return moment(item.updatedAt * 1000).fromNow();
+                     }
                  },
                  {
                      component: ToggleRow
@@ -171,7 +173,7 @@
                  self.$refs.tometable.clearFilter('author');
                  self.$refs.tometable.addFilter('author', val, 'any');
              }
-             self.$refs.tometable.refresh();
+             self.$refs.tometable.navigate({page: 1});             
          },
          filterPrice: function(cur, old) {
              var self = this;
@@ -190,7 +192,7 @@
                  default:
                      break;
              }
-             self.$refs.tometable.refresh();
+             self.$refs.tometable.navigate({page: 1});
          }
      },
      events: {

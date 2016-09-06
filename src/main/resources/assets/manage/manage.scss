@@ -31,6 +31,10 @@
     overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
     background-color: #f5f5f5;
     border-right: 1px solid #eee;
+    .settings-nav-item {
+        display: none;
+    }
+    
 }
 .main-manage-column {
     width: 100%;
@@ -108,10 +112,6 @@
     line-height: 1em;
 }
 
-.preview-iframe {
-    border: 1px solid #CCC;
-
-}
 
 .preview-iframe.seventy-five {
     -ms-zoom: 0.75;
@@ -147,35 +147,6 @@
 }
 
 
-.preview-iframe.dirty {
-    opacity: .2;
-}
-
-.preview-iframe.mobile {
-    max-width: 500px;
-}
-.menu-link-group {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    text-align: center;
-}
-.menu-link-group a, .menu-link-group a:hover, .menu-link-group a:active {
-    text-decoration: none;
-}
-.menu-link-group .active {
-    color: #888;
-}
-
-.preview-dirty-overlay {
-    position: absolute;
-    width: 75%;
-    padding: 40px 0px 0px 0px;
-    text-align: center;
-    background-color: transparent;
-    height: 200px;
-    z-index: 100;
-    font-size: 24px;
-}
 
 .CodeMirror {
     padding: 0px 10px 10px 0px;
@@ -337,4 +308,71 @@
 
 #stallion-publisher-main-vue-app .data-table-header {
     margin-top: 25px;
+}
+
+
+
+.st-editor-page {
+    
+    .publisher-sidebar-column {
+        width: 50px;
+        position: fixed;
+        top: 0px;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        display: block;
+        padding-top: 20px;
+        padding-left: 5px;
+        padding-right: 5px;
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+        background-color: #f5f5f5;
+        border-right: 1px solid #eee;
+        .stallion-logo {
+            max-width: 35px;
+        }
+        .config-menu-block {
+            display: none;
+        }
+        .show-website-block {
+            display: none;
+        }
+        .sidebar-menu-vue {
+            .nav li .new-thing-link {
+                display: none;
+            }
+            .nav li a {
+                width: 40px;
+                height: 40px;
+                overflow: hidden;
+                margin-left: 10px;
+                margin-right: 10px;
+                cursor: pointer;
+                border: 1px solid transparent;
+                border-radius: 3px;
+                .item-label {
+                    display: none;
+                }
+                .material-icons {
+                    
+                    font-size: 24;
+                    margin-right: 100px;
+                }
+            }
+            .nav li a:hover {
+                border-color: #999;
+            }
+        }
+        .settings-nav-item {
+            display: block;
+        }
+    }
+
+    .main-manage-column {
+        padding-left: 50px;
+        margin-top: -20px;
+        padding-top: 20px;
+        background-color: #f7f6f6;
+    }
 }

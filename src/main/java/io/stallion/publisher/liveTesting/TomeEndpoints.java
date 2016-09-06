@@ -32,6 +32,7 @@ import io.stallion.restfulEndpoints.MinRole;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
+import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.json.JSON;
 
 import javax.ws.rs.GET;
@@ -94,16 +95,23 @@ public class TomeEndpoints implements EndpointResource {
             ZonedDateTime baseYear = ZonedDateTime.of(1750, 1, 1, 0, 0, 0, 0, UTC);
             ZonedDateTime baseLatest = ZonedDateTime.of(2016, 1, 1, 0, 0, 0, 0, UTC);
             for (int x = 0; x<250; x++) {
+                String title = manyTitles[x % manyTitles.length];
+                if (x % 17 == 0) {
+                    title = "Unititled";
+                }
+                if (x % 19 == 0) {
+                    title = "TBD";
+                }
                 Tome tome = new Tome()
                         .setAuthor(authors[x % authors.length])
                         .setBulkPrice(((15000 + x) * 7) /11f)
-                        .setTitle(manyTitles[x % manyTitles.length])
+                        .setTitle(title)
                         .setPrice((10000 + (x % 10) * (x % 3) * 935)/1000f)
                         .setNumberSold(1000 + x * 17)
                         .setPublishedAt(baseYear.plusYears(x).plusDays(x).plusMinutes(101 * x))
                         .setUpdatedAt(baseLatest.plusDays(x).plusMinutes(101 * x * x))
                         .setLastSoldAt(baseLatest.plusDays(x).plusMinutes(93 * x * x));
-                int st = x % 4;
+                int st = x % 5;
                 switch(st) {
                     case 0:
                         tome.setStatus(TomeStatus.OUT_OF_PRINT);
@@ -116,6 +124,9 @@ public class TomeEndpoints implements EndpointResource {
                         break;
                     case 3:
                         tome.setStatus(TomeStatus.PUBLIC_DOMAIN);
+                        break;
+                    case 4:
+                        tome.setStatus(TomeStatus.EXTENDED_PRINTING_SCENARIO);
                         break;
                 }
                 TomeController.instance().save(tome);
@@ -140,7 +151,7 @@ public class TomeEndpoints implements EndpointResource {
     };
 
     protected String[] authors = {
-            "Mark Twain", "Charles Dickens", "Ernest Hemingway", "Louisa May Alcott", "Jane Austen", "Jonathan Swift", "Daniel Defoe",
+            "Mark Twain", "Homer", "Aesop", "Charles Dickens", "Ernest Hemingway", "Louisa May Alcott", "Jane Austen", "Jonathan Swift", "Daniel Defoe",
             "Clive Cussler", "Francis Scott Fitzgerald", "JD Salinger"
     };
 

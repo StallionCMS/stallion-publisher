@@ -35,8 +35,10 @@
          initSelect: function() {
              var self = this;
              var data = [{id: '', text: 'Pick a page'}];
+             var labelByUrl = {};
              var $select = $(self.$el).find('select');
              self.items.forEach(function(item) {
+                 labelByUrl[item.permalink] = item.title;
                  data.push({
                      id: item.permalink,
                      text: item.title
@@ -49,7 +51,7 @@
                  placeholder: 'Select an option'
              }).on('select2:select', function (evt) {
                  self.link = $select.val();
-                 self.callback({url: $select.val()});
+                 self.callback({url: $select.val(), text: labelByUrl[self.link]});
              });
              self.loading = false;
          }

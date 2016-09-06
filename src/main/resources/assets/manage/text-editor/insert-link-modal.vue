@@ -91,7 +91,7 @@
          },
          linkPicked: function(o) {
              this.link = o.url;
-             this.callback(this.link);
+             this.callback(this.link, (self.text || o.text));
              this.$refs.themodal.close();             
          },
          filePicked: function(file) {

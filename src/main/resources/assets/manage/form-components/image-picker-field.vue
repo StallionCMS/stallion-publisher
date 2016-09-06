@@ -1,11 +1,11 @@
 <template>
     <div class="image-picker">
-        <button class="btn btn-default"  v-on:click="showModal">Choose Image</button>
+        <button class="btn btn-default"  v-on:click="showModal">{{ value.thumbUrl ? labelSelected : label }}</button>
         <span v-if="value.thumbUrl">
             <img style="max-width: 40px; max-height: 40px;" v-bind:src="value.thumbUrl">
         </span>
         <span v-if="!value.thumbUrl">
-            No image selected.
+            
         </span>
         <modal-base v-if="modalShown" :shown.sync="modalShown" tag="image-selector" title="Pick an image" :callback="handleSelected"></modal-base>
     </div>
@@ -16,6 +16,12 @@
      props: {
          value: {
              twoWay: true
+         },
+         label: {
+             default: 'Choose Image'
+         },
+         labelSelected: {
+             default: 'Change Image'
          }
      },
      data: function() {

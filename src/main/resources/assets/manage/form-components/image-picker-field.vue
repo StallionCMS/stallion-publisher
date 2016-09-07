@@ -2,7 +2,7 @@
     <div class="image-picker">
         <button class="btn btn-default"  v-on:click="showModal">{{ value.thumbUrl ? labelSelected : label }}</button>
         <span v-if="value.thumbUrl">
-            <img style="max-width: 40px; max-height: 40px;" v-bind:src="value.thumbUrl">
+            <a target="_blank" :href="value.url"><img style="max-width: 40px; max-height: 40px;" v-bind:src="value.thumbUrl"></a>
         </span>
         <span v-if="!value.thumbUrl">
             

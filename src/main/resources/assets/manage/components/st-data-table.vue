@@ -755,6 +755,9 @@
              this.titleComputed = this.title || this.toTitleCase(this.labelPluralComputed);
              
          },
+         title: function(newTitle) {
+             this.titleComputed = newTitle;
+         },
          searchTerm: function(cur, prev) {
              if (this.loading) {
                  return;

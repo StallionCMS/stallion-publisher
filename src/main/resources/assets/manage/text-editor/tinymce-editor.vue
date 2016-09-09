@@ -31,6 +31,7 @@
          tinyOptions: Object,
          options: Object,
          name: String,
+         editorId: String,
          changeCallback: Function,
          onKeyPress: Function,
          onSetup: Function,
@@ -51,7 +52,7 @@
      },
      ready: function() {
          var self = this;
-         var id = 'tiny-' + stPublisher.generateUUID();
+         var id = self.editorId || 'tiny-' + stPublisher.generateUUID();
          $(this.$el).find('textarea').attr('id', id);
 
          var customOptions = this.tinyOptions || {};

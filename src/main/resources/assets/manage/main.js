@@ -123,7 +123,7 @@ var StallionApplicationRouter = null;
             },
             '/tomes/*any': {
                 component: vueComponents['tomes-table']
-            },
+            }
         });
 
         router.beforeEach(function(transition) {

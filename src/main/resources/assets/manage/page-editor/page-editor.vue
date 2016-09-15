@@ -262,7 +262,7 @@
                                 <div class="form-group">
                                     <label>Author</label>
                                     <div class="form-group">
-                                        <author-picker :value.sync="post.authorId"></author-picker>
+                                        <author-picker  :value.sync="post.authorId"></author-picker>
                                     </div>
                                 </div>
                             </div>

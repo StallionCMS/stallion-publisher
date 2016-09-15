@@ -50,7 +50,40 @@
                })
              ;
      },
+     watch: {
+         'selectValues': function(newValues, oldValues) {
+             var self = this;
+             var $select = $(this.$el);
+             newValues.forEach(function(val) {
+                 var value = val;
+                 var label = val;
+                 if (val.value) {
+                     value = val.value;
+                     label = val.label;
+                 }
+                 var $opt = $select.find('option[value="' + value + '"]');
+                 if ($opt.length) {
+                     return;
+                 } else {
+                     $select.append($('<option></option>').attr('value', value).html(label));
+                 }
+             });
+             $select.trigger('change');
+         }
+     },
      methods: {
+         addOption: function(option) {
+             var hasOption = false;
+             this.selectValues.forEach(function(existing) {
+                 if (existing === option || (existing.value === option) || (existing == option.value) || (existing.value == option.value)) {
+                     hasOption = true;
+                     return false;
+                 }
+             });
+             if (!hasOption) {
+                 this.selectValues.push(option);
+             }
+         },
          onEnter: function(evt) {
              evt.stopPropagation();
              evt.preventDefault();

@@ -31,8 +31,8 @@
                 </div>
                 <div class="modal-footer">
                     <slot name="footer">
-                        <button class="btn btn-primary btn-large st-button-submit" v-on:click="saveChanges">Save Changes</button>
-                        <a href="javascript:;" v-on:click="close" style="float:right;">Cancel</a>
+                        <button class="btn btn-primary btn-large st-button-submit" v-on:click="saveChanges">{{ confirmLabel }}</button>
+                        <a href="javascript:;" v-on:click="close" style="float:right;">{{ cancelLabel }}</a>
                     </slot>
                 </div>
             </div><!-- end .modal-content -->
@@ -52,6 +52,14 @@
          tag: '',
          large: false,
          small: false,
+         cancelLabel: {
+             type: String,
+             default: 'Cancel'
+         },
+         confirmLabel: {
+             type: String,
+             default: 'Save Changes'
+         },
          cssClass: '',
          callback: Function,
          saveLabel: 'Save'
@@ -99,13 +107,18 @@
              this.close();
          },
          saveChanges: function() {
+             var funcResult = null;
              if (this.$refs.bodycomponent && this.$refs.bodycomponent.saveChanges) {
                  var result = this.$refs.bodycomponent.saveChanges();
-                 this.callback(result);
+                 funcResult = this.callback(result);
              } else if (this.callback) {
-                 this.callback();
+                 funcResult = this.callback();
              }
-             this.close();
+             if (funcResult === false) {
+
+             } else {
+                 this.close();
+             }
          },
          close: function() {
              $(this.$el).modal('hide');

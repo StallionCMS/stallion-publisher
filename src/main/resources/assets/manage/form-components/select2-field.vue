@@ -10,6 +10,8 @@
          multiple: {
              default: false
          },
+         choices: Array,
+         config: Object,
          selectOptions: Object,
          selectValues: Array,
          className: '',
@@ -21,6 +23,13 @@
      data: function() {
          var self = this;
          var selectValues = [];
+         if (this.config && !this.selectOptions) {
+             this.selectOptions = this.config;
+         }
+         if (this.choices && !this.selectValues) {
+             this.selectValues = this.choices;
+         }
+         
          (this.selectValues || []).forEach(function(opt) {
              if (typeof(opt) === 'string') {
                  selectValues.push({

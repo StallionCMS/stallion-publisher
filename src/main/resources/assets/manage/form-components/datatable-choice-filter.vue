@@ -35,7 +35,7 @@
          syncFromRoute: function() {
              
          }
-     }
+     },
      watch: {
          value: function(val, old) {
              var self = this;

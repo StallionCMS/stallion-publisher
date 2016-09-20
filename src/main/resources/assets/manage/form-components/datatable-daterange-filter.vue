@@ -15,8 +15,8 @@
              required: true,
              type: String
          },
-         rangeStart,
-         rangeEnd,
+         rangeStart: String,
+         rangeEnd: String,
          syncOnChange: {
              default: true,
              type: Boolean

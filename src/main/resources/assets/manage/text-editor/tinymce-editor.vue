@@ -53,13 +53,20 @@
      ready: function() {
          var self = this;
          var id = self.editorId || 'tiny-' + stPublisher.generateUUID();
+         self.editorId = id;
          $(this.$el).find('textarea').attr('id', id);
 
+         if (window.tinymce && tinymce.EditorManager.get(this.editorId)) {
+             tinymce.EditorManager.get(this.editorId).destroy();
+         }
+
+         
          var customOptions = this.tinyOptions || {};
          
          requirejs([
              'tinyMCE'
          ], function (tinymce) {
+             console.log('initialize tinymce ', id);
              //var ele = $(this.$el).find('textarea').get(0);
              self.tinymce = tinymce;
              stPublisher.initStallionButtonsPlugin(tinymce);
@@ -73,7 +80,7 @@
                  menubar: false,
                  content_css: stPublisherAdminContext.siteUrl + '/st-resource/publisher/tinymce/tinymce-content.css?ts=' + self.ticks + ',' + stPublisherAdminContext.siteUrl + '/st-resource/publisher/public/contacts-always.css?vstring=' + self.ticks,
                  init_instance_callback : function(editor) {
-
+                     console.log('tiny init callback ', id);
                      self.editor = editor;
                      editor.vueTag = self;
                      $(self.$el).find('.loading-overlay').hide();
@@ -85,7 +92,7 @@
                      
                  },
                  setup: function(editor) {
-
+                     console.log('tinysetup ', id);
                      editor.on('change', function(e) {
                          if (self.changeCallback) {
                              self.changeCallback();
@@ -108,10 +115,25 @@
              Object.keys(customOptions).forEach(function(key) {
                  options[key] = customOptions[key];
              });
-             
+             console.log('call tiny init', id);
+             console.log('tinytarget ', $('#' + id), $('#' + id).length);
              tinymce.init(options);
 
          });         
+     },
+     beforeDestroy: function() {
+         console.log('before destroy tiny');
+     },
+     detached: function() {
+         if (window.tinymce && this.editorId) {
+             console.log('detach tiny', this.editorId);
+             tinymce.execCommand('mceRemoveControl', true, this.editorId);
+             tinymce.remove("#" + this.editorId);
+             if (tinymce.EditorManager.get(this.editorId)) {
+                 tinymce.EditorManager.get(this.editorId).destroy();
+             }
+         }
+         console.log('deatched tiny');
      },
      methods: {
          getData: function() {

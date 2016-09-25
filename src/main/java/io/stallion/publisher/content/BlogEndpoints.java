@@ -17,7 +17,9 @@
 package io.stallion.publisher.content;
 
 import io.stallion.Context;
+import io.stallion.dataAccess.Displayable;
 import io.stallion.dataAccess.file.TextItem;
+import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.dataAccess.filtering.Pager;
@@ -71,9 +73,12 @@ public class BlogEndpoints implements EndpointResource {
     }
 
     private FilterChain<Content> filterChain() {
+        // Always use the minute, so that we will cache results for a minute, otherwise
+        // will always be a different query, and thus caching will be ignored.
+        ZonedDateTime nowMinute = DateUtils.utcNow().withSecond(0).withNano(0);
         return posts().filterChain().filter("blogId", config.getId())
                 .filter("draft", false)
-                .filterBy("publishDate", DateUtils.utcNow(), FilterOperator.LESS_THAN_OR_EQUAL)
+                .filterBy("publishDate", nowMinute, FilterOperator.LESS_THAN_OR_EQUAL)
                 ;
     }
 
@@ -83,6 +88,42 @@ public class BlogEndpoints implements EndpointResource {
     public String listHome() throws Exception {
         return listHome(1);
     }
+
+    @GET
+    @Path("/cache-test")
+    @Produces("application/json")
+    public Object cacheTest() throws Exception {
+        //ZonedDateTime now = DateUtils.utcNow().withSecond(0).withNano(0);
+        //String ts = DateUtils.SQL_FORMAT.format(now);
+        //Object val = DateUtils.SQL_FORMAT.format(now);
+        //for (int x = 0; x < 100; x++) {
+
+        //}
+
+        FilterChain chain = filterChain().filter("publishDate", DateUtils.utcNow().minusYears(20), ">");
+        Object val = chain.pager(1, 100);
+        /*
+        String cacheKey = "test-cache-key-" + ts;
+        Object existing = FilterCache.get("cachetest", cacheKey);
+        FilterCache.set("cachetest", cacheKey, val);
+        String minuteAgoKey = "test-cache-key-" + DateUtils.SQL_FORMAT.format(now.minusMinutes(1));
+        String twoAgoKey = "test-cache-key-" + DateUtils.SQL_FORMAT.format(now.minusMinutes(2));
+        String threeAgoKey = "test-cache-key-" + DateUtils.SQL_FORMAT.format(now.minusMinutes(3));
+        String fiveAgoKey = "test-cache-key-" + DateUtils.SQL_FORMAT.format(now.minusMinutes(4));
+
+        Map o = map(
+                val("existing", existing),
+                val(cacheKey, FilterCache.get("cachetest", cacheKey)),
+                val(minuteAgoKey, FilterCache.get("cachetest", minuteAgoKey)),
+                val(twoAgoKey, FilterCache.get("cachetest", twoAgoKey)),
+                val(threeAgoKey, FilterCache.get("cachetest", threeAgoKey)),
+                val(fiveAgoKey, FilterCache.get("cachetest", fiveAgoKey))
+        );
+        */
+        return "not";
+    }
+
+
 
     @GET
     @Path("/page/:page/")
@@ -118,7 +159,7 @@ public class BlogEndpoints implements EndpointResource {
         context.put("blogUrl", Context.getSettings().getSiteUrl() + config.getSlug());
         ZonedDateTime buildTime = ZonedDateTime.of(2015, 1, 1, 12, 0, 0, 0, GeneralUtils.UTC);
         if (pager.getItems().size() > 0) {
-            TextItem item = (TextItem) pager.getItems().get(0);
+            Displayable item = (Displayable) pager.getItems().get(0);
             buildTime = item.getPublishDate().plusMinutes(1);
         }
         context.put("generator", Settings.instance().getMetaGenerator());

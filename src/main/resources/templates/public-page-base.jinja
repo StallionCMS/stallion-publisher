@@ -22,7 +22,7 @@
   <link rel="alternate" type="application/rss+xml" title="{{ rss_link.title }}" href="{{ rss_link.link }}" />
   {% endfor %}
   {% block builtin_head_bundles %}
-    {{ assets.assetBundle("publisher", "public.bundle.css") }}
+    {{ assets.bundle("publisher", "public.bundle.css") }}
   {% endblock %}
   {% block bundle_css %}
   {{ assets.bundle("site.bundle.css") }}
@@ -39,7 +39,7 @@
   {% block body_content %}
   {% endblock %}
   {%-- block builtin_footer_bundles --%}
-      {{ assets.assetBundle("publisher", "public.bundle.js") }}
+      {{ assets.bundle("publisher", "public.bundle.js") }}
 
   <script type="text/javascript">
 

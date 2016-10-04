@@ -45,7 +45,7 @@ public class PublisherSettingsBuilder {
         }
         Map map = map(val("builder", this));
         try {
-            String template = IOUtils.toString(getClass().getResource("/templates/wizard/publisher.toml.jinja").toURI());
+            String template = IOUtils.toString(getClass().getResource("/templates/wizard/publisher.toml.jinja").toURI(), UTF8);
             String content = templating.renderTemplate(template, map);
             FileUtils.write(file, content, "UTF-8");
         } catch (IOException |URISyntaxException e) {

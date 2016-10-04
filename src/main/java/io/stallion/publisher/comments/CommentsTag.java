@@ -20,7 +20,6 @@ import com.hubspot.jinjava.interpret.JinjavaInterpreter;
 import com.hubspot.jinjava.lib.tag.Tag;
 import com.hubspot.jinjava.tree.TagNode;
 import io.stallion.Context;
-import io.stallion.assets.Bundle;
 import io.stallion.dataAccess.Displayable;
 import io.stallion.dataAccess.file.TextItem;
 import io.stallion.publisher.PublisherSettings;

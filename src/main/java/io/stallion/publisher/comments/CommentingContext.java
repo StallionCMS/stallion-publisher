@@ -65,9 +65,6 @@ public class CommentingContext {
 
     private void requireAssets() {
         Log.info("add to per request footer js");
-        String commentsTagUrl = AssetsController.instance().resource("comment-riot-tag.tag", "publisher");
-        Context.getResponse().getPageFooterLiterals().addString("<script src=\"" + commentsTagUrl + "\" type=\"riot/tag\"></script>");
-        Context.getResponse().getPageFooterLiterals().addDefinedBundle("publisher:public.js");
 
     }
 

@@ -44,7 +44,7 @@ def run_selenium_for_build(build_number):
             if r.status_code == 200:
                 break
             time.sleep(.1)
-        local['selenium-nashorn']['selenium/test-users.js'] & FG
+        local['selenium-nashorn']['selenium/test-users.js', '-browser=chrome'] & FG
     finally:
         p.terminate()
         p.wait()

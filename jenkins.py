@@ -34,7 +34,7 @@ def run_selenium_for_build(build_number):
     print('Selenium command: selenium-nashorn selenium/test-users.js')
     p = subprocess.Popen([stallion_exec, 'serve', '-targetPath=' + app_target_path, '-logLevel=FINER', '-env=local', '-port=34515'])
     try: 
-        for x in xrange(0, 50):
+        for x in range(0, 50):
             try: 
                 r = requests.get('http://localhost:8090/')
             except:

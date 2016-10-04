@@ -28,7 +28,7 @@ exec java -classpath "$DIR/../jars/*"  -jar $0 "$@"
     os.chmod(out_file, 0o700)
     
 def run_selenium_for_build(build_number):
-    stallion_exec = os.environ['HOME'] + '/build-artifacts/' + build_number + '/stallion'
+    stallion_exec = os.environ['HOME'] + '/build-artifacts/' + build_number + '/stallion-publisher'
     app_target_path = os.getcwd() + '/src/test/resources/a_minimal_site'
     print('Serve command: %s serve -targetPath=%s -logLevel=FINER -env=local' % (stallion_exec, app_target_path))
     print('Selenium command: selenium-nashorn selenium/test-users.js')
@@ -52,7 +52,7 @@ def run_selenium_for_build(build_number):
     
 if '--build' in sys.argv:
     build()
-    run_selenium_for_build(os.environ['BUILD_NUMBER'])
+    #run_selenium_for_build(os.environ['BUILD_NUMBER'])
     mvn['compile', '-DskipTests=true', 'install', 'source:jar', 'deploy'] & FG
 elif '--selenium' in sys.argv:
     run_selenium_for_build(os.environ['BUILD_NUMBER'])

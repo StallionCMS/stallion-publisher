@@ -50,7 +50,7 @@ public class MainEndpoints implements EndpointResource {
         pageContext.put("user", Context.getUser());
         pageContext.put("useMarkdown", PublisherSettings.getInstance().isUseMarkdown());
         Map ctx = map(val("adminContextJson", Sanitize.htmlSafeJson(pageContext)));
-        return TemplateRenderer.instance().renderTemplate("publisher:manage-base.jinja", ctx);
+        return TemplateRenderer.instance().renderTemplate("publisher:app-base.jinja", ctx);
     }
 
 

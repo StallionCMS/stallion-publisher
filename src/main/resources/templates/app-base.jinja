@@ -1,8 +1,9 @@
 {% extends "stallion:common-base.jinja" %}
 {% block builtin_head_bundles %}
 
-<!--assets.compiledBundle("admin3.css") -->
-{{ assets.assetBundle("publisher", "manage.bundle.css") }}
+{{ assets.bundle("publisher", "publisher-ui-components.bundle.css") }}
+{{ assets.bundle("publisher", "app-screens.bundle.css") }}
+
 {% endblock %}
 
 {% block bundle_css %}
@@ -41,7 +42,8 @@
 {%-- endblock --%}
 {%-- block bundle_js --%}
 <!--assets.compiledBundle("admin3.js") -->
-{{ assets.assetBundle("publisher", "manage.bundle.js") }}
+{{ assets.bundle("publisher", "publisher-ui-components.bundle.js") }}
+{{ assets.bundle("publisher", "app-screens.bundle.js") }}
 {%-- endblock --%}
 
 {% block pre_end_body %}

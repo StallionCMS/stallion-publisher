@@ -69,22 +69,6 @@ public class PublisherPlugin extends StallionJavaPlugin {
                 "00110-create-table-stallion_publisher_global_modules",
                 "00120-create-table-stallion_publisher_site_settings",
                 "00130-create-table-stallion_publisher_global_module_versions"
-                /*
-                "00010-create-table-comments",
-                "00040-create-table-content_versions",
-                "00050-create-table-notifications",
-                "00060-create-table-blog_configs",
-                "00070-create-table-author_profiles",
-                "00080-create-table-uploaded_files",
-                "00100-create-table-subscriptions",
-                "00110-create-table-contents",
-                "00120-create-table-contacts",
-                "00130-create-table-form_submissions",
-                "00140-create-table-global_modules",
-                "00150-create-table-site_settings",
-                "00160-create-table-global_module_versions",
-                "00170-alter-uploaded_files-add-2"
-                */
         );
     }
 

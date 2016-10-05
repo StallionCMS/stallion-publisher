@@ -42,7 +42,7 @@
       {{ assets.bundle("publisher", "public.bundle.js") }}
 
   <script type="text/javascript">
-
+        console.log('pre require config');
         require.config({
             baseUrl: "/st-assets/",
             paths: {
@@ -51,11 +51,14 @@
             },
             waitSeconds: 15
         });
+        console.log('post require config');
       </script>
 
   {%-- endblock --%}
   {%-- block bundle_js --%}
+
       {{ assets.bundle("site.bundle.js") }}
+
   {%-- endblock --%}
   {%-- block per_request_footer_literals --%}
     {{ assets.pageFooterLiterals() }}

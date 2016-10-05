@@ -34,6 +34,9 @@ import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
+/**
+ * A Content object represents a page or blog post.
+ */
 @Table(name = "stallion_publisher_contents")
 public class Content extends StandardDisplayableModel {
     private Long authorId = 0L;
@@ -50,6 +53,10 @@ public class Content extends StandardDisplayableModel {
     private UploadedFile featuredImage = null;
 
 
+    /**
+     * The user id of the author of the blog post. (This is the id of the Stallion User record, not the author profile record)
+     * @return
+     */
     @Column
     public Long getAuthorId() {
         return authorId;
@@ -61,13 +68,20 @@ public class Content extends StandardDisplayableModel {
     }
 
 
+    /**
+     * A URL at which a draft or future-dated post can be previewed.
+     * @return
+     */
     public String getPreviewUrl() {
         return getPermalink() + "?stPreview=" + getPreviewKey();
     }
 
 
-
-
+    /**
+     * When the content was last updated, in millisecods since the epoch
+     *
+     * @return
+     */
     @Column
     public Long getUpdatedAt() {
         return updatedAt;
@@ -78,6 +92,10 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * Raw HTML that gets put in the head section of the web page
+     * @return
+     */
     @Column(columnDefinition = "longtext")
     public String getHeadHtml() {
         return headHtml;
@@ -88,6 +106,11 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * Raw HTML that gets dumped in the footer section of the web page
+     *
+     * @return
+     */
     @Column(columnDefinition = "longtext")
     public String getFooterHtml() {
         return footerHtml;
@@ -102,18 +125,27 @@ public class Content extends StandardDisplayableModel {
     //@JsonGetter("currentlyPublished")
     //private boolean currentlyPublished = false;
 
-
+    @Deprecated
     public boolean isCurrentlyPublished() {
         return getPublished();
     }
 
 
+    /**
+     * The ContentController instance
+     * @return
+     */
     @Override
     @JsonIgnore
     public ModelController getController() {
         return ContentController.instance();
     }
 
+    /**
+     * Widgets associated with the main HTML or markdown content
+     *
+     * @return
+     */
     @Column(columnDefinition = "longtext")
     @Converter(cls= JsonListConverter.class)
     public List<Map> getWidgets() {
@@ -125,6 +157,11 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * Was this post edited and saved after its initial creation
+     *
+     * @return
+     */
     @Column
     public Boolean getInitialized() {
         return initialized;
@@ -135,6 +172,11 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * Either "post", "page", etc.
+     *
+     * @return
+     */
     @Column
     public String getType() {
         return type;
@@ -146,6 +188,11 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * The primary key id of the blog this content is associated with, if any
+     *
+     * @return
+     */
     @Column
     public Long getBlogId() {
         return blogId;
@@ -156,6 +203,12 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * Get a page element by name
+     *
+     * @param name
+     * @return
+     */
     public PageElement getElement(String name) {
         for(PageElement el: getElements()) {
             if (name.equals(el.getName())) {
@@ -165,6 +218,12 @@ public class Content extends StandardDisplayableModel {
         return null;
     }
 
+    /**
+     * Get the values of saved PageElements. PageElements are extra elements, such as extra content areas,
+     * image areas, editable text lines, etc, that are defined by the template and also edited in the editor.
+     *
+     * @return
+     */
     @Column(columnDefinition = "longtext")
     @Converter(cls=PageElementListConverter.class)
     @JsonDeserialize(contentAs=PageElement.class)
@@ -178,6 +237,10 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * True if this is a scheduled post as opposed to a post that goes live as soon as it is a non-draft.
+     * @return
+     */
     @Column
     public Boolean getScheduled() {
         return scheduled;
@@ -188,6 +251,10 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * True if the end-user changed the slug, false if the slug was auto-generated from the title
+     * @return
+     */
     @Column
     public Boolean getSlugTouched() {
         return slugTouched;
@@ -198,6 +265,10 @@ public class Content extends StandardDisplayableModel {
         return this;
     }
 
+    /**
+     * The featured image information
+     * @return
+     */
     @Converter(cls= UploadedFileConverter.class)
     @Column(columnDefinition = "longtext")
     public UploadedFile getFeaturedImage() {

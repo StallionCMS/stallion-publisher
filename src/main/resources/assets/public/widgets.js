@@ -10,7 +10,9 @@
         gallery.initColumns();
         gallery.initGrid();
         gallery.initSlider();
+
         gallery.initPhotoswipe();
+
     }
     
     gallery.initColumns = function() {
@@ -121,6 +123,10 @@
     };
 
     gallery.initPhotoswipe = function() {
+        if ( $('.st-image-collection.with-slideshow').length === 0) {
+            return;
+        }
+        console.log('init photo swipe');
         require([ 
             'photoswipe', 
             'photoswipe_ui_default' 

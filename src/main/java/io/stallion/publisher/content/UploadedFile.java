@@ -20,6 +20,7 @@ import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.db.Converter;
 import io.stallion.dataAccess.db.converters.JsonMapConverter;
 import io.stallion.settings.Settings;
+import io.stallion.utils.json.JSON;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -325,5 +326,13 @@ public class UploadedFile extends ModelBase {
     public UploadedFile setExtra(Map extra) {
         this.extra = extra;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        return JSON.stringify(this).equals(JSON.stringify(obj));
     }
 }

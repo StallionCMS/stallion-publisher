@@ -34,6 +34,7 @@ See this [code file here for an example use](https://github.com/StallionCMS/stal
 
 And here is what the output of the above code looks like:
 
+<img src="https://raw.githubusercontent.com/StallionCMS/stallion-publisher/master/docs/datatable-example.png">
 
 
 #### modal-base
@@ -43,6 +44,8 @@ See the source code.
 [See an example here](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/resources/assets/text-editor/insert-link-modal.vue).
 
 And here is what the above example looks like:
+
+<img src="https://raw.githubusercontent.com/StallionCMS/stallion-publisher/master/docs/modal-example.png">
 
 #### autogrow-textarea
 

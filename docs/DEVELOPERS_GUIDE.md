@@ -8,19 +8,19 @@ The first place to start is with the ["boot" function in the PublisherPlugin cla
 
 Other important classes are:
 
-* UploadedFileEndpoints and UploadRequestProcessor which handle image and other file uploads from users of the content management system.
-* Content -- the main model for all pages, posts, and other content that users of the system write.
-* ContentEndpoints -- the endpoints handling the authoring of Content objects
-* ContentVersion and ContentVersionController -- handles saving past versions of the Content object
+* [UploadedFileEndpoints](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/java/io/stallion/publisher/content/UploadedFileEndpoints.java) and [UploadRequestProcessor](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/java/io/stallion/publisher/content/UploadRequestProcessor.java) which handle image and other file uploads from users of the content management system.
+* [Content](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/java/io/stallion/publisher/content/Content.java) -- the main model for all pages, posts, and other content that users of the system write.
+* [ContentEndpoints](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/java/io/stallion/publisher/content/ContentEndpoints.java) -- the endpoints handling the authoring of Content objects
+* [ContentVersion](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/java/io/stallion/publisher/content/ContentVersion.java) and [ContentVersionController](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/java/io/stallion/publisher/content/ContentsVersionController.java) -- handles saving past versions of the Content object
 
 The main packages in the Java project are:
 
-* io.stallion.publisher.content -- contains the code for composing and rendering a single page of content
-* io.stallion.publisher.contacts -- handles form submissions, and public visitors subcribing to things, such as comment thread updates
-* io.stallion.publisher.comments -- handles comment threads on pages and managing of comments.
+* [io.stallion.publisher.content](https://github.com/StallionCMS/stallion-publisher/tree/master/src/main/java/io/stallion/publisher/content) -- contains the code for composing and rendering a single page of content
+* [io.stallion.publisher.contacts](https://github.com/StallionCMS/stallion-publisher/tree/master/src/main/java/io/stallion/publisher/contacts) -- handles form submissions, and public visitors subcribing to things, such as comment thread updates
+* [io.stallion.publisher.comments](https://github.com/StallionCMS/stallion-publisher/tree/master/src/main/java/io/stallion/publisher/comments) -- handles comment threads on pages and managing of comments.
 
 
-### Important Vue Components
+### Useful Vue Components
 
 The UI uses the Vue Javascript framework exstensively. There are a number of Vue components that you might find useful to use in your app.
 
@@ -28,7 +28,7 @@ The UI uses the Vue Javascript framework exstensively. There are a number of Vue
 
 A fully featured datatable that integrates with the backend Stallion data controllers. Has support for paging, infinite scroll, sorting, searching, editing cells, and rendering custom cells.
 
-See the source code.
+[Source code](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/resources/assets/ui-components/st-data-table.vue)
 
 See this [code file here for an example use](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/resources/assets/app-screens/tomes-table.vue).
 
@@ -39,7 +39,7 @@ And here is what the output of the above code looks like:
 
 #### modal-base
 
-See the source code.
+[Source code](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/resources/assets/ui-components/modal-base.vue)
 
 [See an example here](https://github.com/StallionCMS/stallion-publisher/blob/master/src/main/resources/assets/text-editor/insert-link-modal.vue).
 

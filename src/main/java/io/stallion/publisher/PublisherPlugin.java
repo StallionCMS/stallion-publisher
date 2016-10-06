@@ -68,7 +68,8 @@ public class PublisherPlugin extends StallionJavaPlugin {
                 "00100-create-table-stallion_publisher_form_submissions",
                 "00110-create-table-stallion_publisher_global_modules",
                 "00120-create-table-stallion_publisher_site_settings",
-                "00130-create-table-stallion_publisher_global_module_versions"
+                "00130-create-table-stallion_publisher_global_module_versions",
+                "00140-alter-stallion_publisher_uploaded_files-add-1"
         );
     }
 

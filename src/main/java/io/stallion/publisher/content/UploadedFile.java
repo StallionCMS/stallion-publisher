@@ -17,13 +17,17 @@
 package io.stallion.publisher.content;
 
 import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.db.Converter;
+import io.stallion.dataAccess.db.converters.JsonMapConverter;
 import io.stallion.settings.Settings;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
+import java.util.Map;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.map;
 
 @Table(name="stallion_publisher_uploaded_files")
 public class UploadedFile extends ModelBase {
@@ -55,6 +59,8 @@ public class UploadedFile extends ModelBase {
     private Integer mediumWidth = 0;
     private Integer mediumHeight = 0;
     private String mediumRawUrl = "";
+
+    private Map extra = map();
 
     @Column(length = 100)
     public String getName() {
@@ -306,6 +312,18 @@ public class UploadedFile extends ModelBase {
 
     public UploadedFile setSmallHeight(Integer smallHeight) {
         this.smallHeight = smallHeight;
+        return this;
+    }
+
+
+    @Column(columnDefinition = "longtext")
+    @Converter(cls=JsonMapConverter.class)
+    public Map getExtra() {
+        return extra;
+    }
+
+    public UploadedFile setExtra(Map extra) {
+        this.extra = extra;
         return this;
     }
 }

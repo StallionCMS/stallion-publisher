@@ -37,12 +37,7 @@
                     </div>
                 </div>
                 <div v-if="widgetType">
-                    <embed-widget-configure v-ref:active v-if="widgetType==='embed'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert"></embed-widget-configure>
-                    <image-widget-configure v-ref:active v-if="widgetType==='image'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" ></image-widget-configure>
-                    <image-simple-configure v-ref:active v-if="widgetType==='image-simple'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" ></image-widget-configure>
-                    <image-collection-widget-configure v-ref:active v-if="widgetType==='image-collection'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='image-collection'"></image-collection-widget-configure>
-                    <html-widget-configure v-ref:active v-if="widgetType==='html'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='html'"></html-widget-configure>
-                    <html-form-widget-configure v-ref:active v-if="widgetType==='html-form'" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert" v-if="widgetType==='html-form'"></html-form-widget-configure>
+                    <component :is="widgetConfigureTag" v-ref:active :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert"></component>
                 </div>
             </div>
             <div slot="footer">
@@ -68,6 +63,8 @@
          widgetData: null
      },
      data: function() {
+
+         
          var activeWidgetData = {data:{type: this.widgetType}};
          if (this.widgetData && this.widgetData.type) {
              activeWidgetData = JSON.parse(JSON.stringify(this.widgetData));
@@ -76,13 +73,17 @@
          return {
              title: "Insert Widget",
              activeWidgetData: activeWidgetData,
-             okToInsert: false
+             okToInsert: false,
+             widgetConfigureTag: this.widgetTypeToTag(this.widgetType)
          }
      },
      created: function() {
 
      },
      methods: {
+         widgetTypeToTag: function(widgetType) {
+             return widgetType + '-widget-configure';
+         },
          doInsertCallback: function() {
 
          },

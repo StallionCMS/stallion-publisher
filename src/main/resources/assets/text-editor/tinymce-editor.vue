@@ -21,6 +21,7 @@
         <textarea :name="name" style="" class="tiny-target" v-model="html" ></textarea>
         <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
         <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback" :hide-internal-pages="options.hideInternalPages" :link="activeLinkUrl" :text="activeLinkText"></insert-link-modal>
+        <component v-if="customModalShown && customModalTag" v-ref:custommodal :is="customModalTag" :shown.sync="customModalShown" :callback="customModalCallback" :options="customModalOptions"></component>
     </div>
 </template>
 <script>
@@ -33,11 +34,20 @@
          name: String,
          editorId: String,
          changeCallback: Function,
+         pluginLoaders: Array,
+         extraPlugins: String,
          onKeyPress: Function,
          onSetup: Function,
          onInit: Function
      },
      data: function() {
+         if (this.options.pluginLoaders) {
+             this.pluginLoaders = this.options.pluginLoaders;
+         }
+         if (this.options.extraPlugins) {
+             this.extraPlugins = this.options.extraPlugins;
+         }
+         
          return {
              showWidgetModal: false,
              activeWidgetType: '',
@@ -46,6 +56,10 @@
              activeLinkUrl: '',
              tinymce: null,
              editor: null,
+             customModalTag: '',
+             customModalShown: false,
+             customModalOptions: {text: '', link: ''},
+             customModalCallback: null,
              showInsertLinkModal: false,
              ticks: new Date().getTime()
          }
@@ -71,11 +85,25 @@
              self.tinymce = tinymce;
              stPublisher.initStallionButtonsPlugin(tinymce);
              stPublisher.initHeadersPlugin(tinymce);
+             var extraPlugins = self.extraPlugins || '';
+             if (self.pluginLoaders) {
+                 self.pluginLoaders.forEach(function(loader) {
+                     if (!loader.name) {
+                         throw new Exception("Plugin loader needs field 'name'");
+                     }
+                     if (!loader.load) {
+                         throw new Exception("Plugin loader needs a field 'load' which is a function that take tinmce as its first argument");
+                     }
+                     extraPlugins += ' ' + loader.name;
+                     console.log('Initialize plugin ', loader.name);
+                     loader.load(tinymce);
+                 });
+             }
 
              var options = {
                  selector: '#' + id,
                  statusbar: false,
-                 plugins: 'autoresize textcolor colorpicker textpattern imagetools paste charmap example headers link',
+                 plugins: 'autoresize textcolor colorpicker textpattern imagetools paste charmap example headers link ' + extraPlugins,
                  toolbar1: 'bold italic | styleselect | bullist numlist outdent indent blockquote removeformat | undo redo | stlink stimage stinsert ',
                  menubar: false,
                  content_css: stPublisherAdminContext.siteUrl + '/st-resource/publisher/tinymce/tinymce-content.css?ts=' + self.ticks + ',' + stPublisherAdminContext.siteUrl + '/st-resource/publisher/public/contacts-always.css?vstring=' + self.ticks,

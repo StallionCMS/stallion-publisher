@@ -7,7 +7,7 @@
 <template>
     <div class="page-element-text">
         <div class="form-group">
-            <autogrow-text v-model="value"></autogrow-text>
+            <autogrow-text v-model="value" :placeholder="options.placeholder || ''"></autogrow-text>
         </div>
     </div>
 </template>
@@ -16,9 +16,11 @@
  module.exports = {
      props: {
          updateCallback: Function,
-         element: Object
+         element: Object,
+         options: Object
      },
      data: function() {
+         this.options = this.options || {};
          return {
              value: this.element.content || ''
          }

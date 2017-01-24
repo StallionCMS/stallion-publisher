@@ -106,8 +106,6 @@
              formatting: formatting
          };
      },
-     ready: function() {
-     },
      methods: {
          getData: function() {
              return this.formatting;

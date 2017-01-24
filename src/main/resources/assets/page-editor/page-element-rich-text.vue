@@ -9,7 +9,7 @@
 <template>
     <div class="page-element-rich-text-vue">
         <div class="form-group">
-            <tinymce-editor v-ref:editor :html="element.content" :widgets="element.widgets" :editor-id="'md-element-editor-' + element.name" :change-callback="markdownChanged" :tiny-options="options.tinyOptions" :name="element.name" :on-init="options.onInit" :on-setup="options.onSetup" :options="options.options"></tinymce-editor>
+            <tinymce-editor ref="editor" :html="element.content" :widgets="element.widgets" :editor-id="'md-element-editor-' + element.name" :change-callback="markdownChanged" :tiny-options="options.tinyOptions" :name="element.name" :on-init="options.onInit" :on-setup="options.onSetup" :options="options.options"></tinymce-editor>
         </div>
     </div>
 </template>

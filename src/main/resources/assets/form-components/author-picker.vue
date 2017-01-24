@@ -1,7 +1,7 @@
 
 
 <template>
-    <select class="form-control" name="authorSelect" v-model="value">
+    <select class="form-control" name="authorSelect">
         <option>Choose an author</option>
     </select>
 </template>
@@ -11,36 +11,50 @@
  module.exports = {
      props: {
          value: {
-             twoWay: true
+             default: function() {
+                 return '';
+             }
          }
      },
+     data: function() {
+         return {
 
-     compiled: function() {
+         }
+     },
+     mounted: function() {
          var self = this;
          
          stallion.request({
              url: '/st-publisher/content/active-authors',
              success: function(o) {
                  var data = [];
+                 data.push({
+                     id: 10,
+                     text: 'John doe',
+                     selected: false
+                 });                 
                  o.authors.forEach(function(au) {
+                     var isSelected = parseInt(this.value, 10) === au.author.id;
                      data.push({
                          id: au.author.id,
-                         text: au.user.displayName
+                         text: au.user.displayName,
+                         selected: isSelected
                      });
+                     
                  });
                  $(self.$el).select2({
                      width: '100%',
                      data: data
                  }).change(function() {
                      console.log('select2 change!');
-                     self.value = $(this).val();
+                     self.$emit('input', Number($(this).val()) || null);
                  });
              }
          });
      },
      watch: {
-         'value': function(a, b) {
-             console.log('author changed ', a, b);
+         'value': function(newValue, b) {
+             $(self.$el).val(newValue).change();
          }
      }
  };

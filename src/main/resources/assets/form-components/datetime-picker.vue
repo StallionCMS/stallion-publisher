@@ -97,10 +97,12 @@
  module.exports = {
      props: {
          value: {
-             twoWay: true
+             default: function() {
+                 return new Date().getTime() / 1000;
+             }
          }
      },
-     compiled: function() {
+     mounted: function() {
          var self = this;
          var tagsPattern = new RegExp('\\d+:\\d\\d(am|pm|AM|PM)');
          self.tagsPattern = tagsPattern;
@@ -131,9 +133,9 @@
                .on('change', function() {
                    // Not sure why this doesn't automatically update
                    self.value = $(this).val();
-                   if (self.change) {
-                       self.change($(this).val());
-                   }
+                   //if (self.change) {
+                   //    self.change($(this).val());
+                   //}
                })
              ;
 
@@ -163,7 +165,8 @@
              console.log('datetime changed ', datestamp, a, b);
              var m = moment.tz(datestamp, "YYYY-MM-DD H:m", self.timezone);
              console.log('New datetime: ', m.format(), m, m.valueOf());
-             this.value = m.valueOf() / 1000;
+             //this.value = m.valueOf() / 1000;
+             this.$emit('input', m.valueOf() / 1000);
          }
      },
      watch: {

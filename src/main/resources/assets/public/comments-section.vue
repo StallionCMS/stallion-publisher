@@ -4,8 +4,8 @@
 
 <template>
     <div class="comments-section-vue">
-        <comments-thread :comments="comments" :on-start-edit-comment="onStartEditComment" v-ref:thread></comments-thread>
-        <comment-form v-ref:form :thread-id="threadId" :parent-title="parentTitle" :parent-permalink="parentPermalink" :add-comment-callback="onAddComment" :edit-comment-callback="onSaveEditComment"></comment-form>
+        <comments-thread :comments="comments" :on-start-edit-comment="onStartEditComment" ref="thread"></comments-thread>
+        <comment-form ref="form" :thread-id="threadId" :parent-title="parentTitle" :parent-permalink="parentPermalink" :add-comment-callback="onAddComment" :edit-comment-callback="onSaveEditComment"></comment-form>
         
     </div>
 </template>

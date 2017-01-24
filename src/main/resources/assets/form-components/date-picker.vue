@@ -24,7 +24,7 @@
              twoWay: true
          }
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
          console.log('init pikaday');
          self.pikaday = new Pikaday({

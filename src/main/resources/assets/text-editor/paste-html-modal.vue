@@ -2,7 +2,7 @@
 
 <template>
     <div class="paste-html-modal">
-        <modal-base v-ref:themodal :shown="true" title="Paste Rich Content or HTML" :callback="saveCallback">
+        <modal-base ref="themodal" :shown="true" title="Paste Rich Content or HTML" :callback="saveCallback">
             <div slot="body">
                 <div class="row">
                     <div class="col-sm-6">
@@ -33,7 +33,7 @@
              markdown: ''
          }
      },
-     created: function() {
+     mounted: function() {
          console.log('pasteHtmlModal created');
      },
      methods: {

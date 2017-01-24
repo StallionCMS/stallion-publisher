@@ -1,6 +1,6 @@
 <template>
-    <select class="select2-field-vue select2-target {{ className }}" :multiple="multiple" v-model="value">
-        <option v-for="opt in selectValues" :value="opt.value">{{ opt.label }}</option>
+    <select :class="'select2-field-vue select2-target' + className" :multiple="multiple" v-model="value">
+        <option v-for="opt in selectOptions" :value="opt.value">{{ opt.label }}</option>
     </select>
 </template>
 
@@ -10,29 +10,33 @@
          multiple: {
              default: false
          },
-         choices: Array,
-         config: Object,
-         selectOptions: Object,
-         selectValues: Array,
+         choices: {
+             type: Array,
+             default: function() {
+                 return [];
+             }
+         },
+         config: {
+             type: Object,
+             default: function() {
+                 return {};
+             }
+         },
+         //selectOptions: Object,
+         //selectValues: Array,
          className: '',
          value: {
-             sync: true
-         },
-         change: Function
+             default: function() {
+                 return '';
+             }
+         }
      },
      data: function() {
          var self = this;
-         var selectValues = [];
-         if (this.config && !this.selectOptions) {
-             this.selectOptions = this.config;
-         }
-         if (this.choices && !this.selectValues) {
-             this.selectValues = this.choices;
-         }
-         
-         (this.selectValues || []).forEach(function(opt) {
+         var selectOptions = [];
+         (this.choices || []).forEach(function(opt) {
              if (typeof(opt) === 'string') {
-                 selectValues.push({
+                 selectOptions.push({
                      value: opt,
                      label: opt
                  });
@@ -40,19 +44,24 @@
                  selectValues.push(opt);
              }
          });
-         this.selectValues = selectValues;
-         this.options = this.options || {};
-         this.selectOptions = this.selectOptions || {};
+         this.selectOptions = selectOptions;
+         //this.selectValues = selectValues;
+         //this.options = this.options || {};
+         //this.selectOptions = this.selectOptions || {};
          return {};
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
-         console.log('selectOptions for select2 ', this.selectOptions);
+         console.log('config for select2 ', this.config);
          $(this.$el)
-               .select2(this.selectOptions)
+               .select2(this.config)
                .on('change', function() {
                    // Not sure why this doesn't automatically update
-                   self.value = $(this).val();
+                   var defaultval = '';
+                   if (self.multiple) {
+                       defaultVal = [];
+                   }
+                   self.$emit('input', $(self.$el).val() || defaultVal);
                    if (self.change) {
                        self.change($(this).val());
                    }
@@ -60,7 +69,7 @@
              ;
      },
      watch: {
-         'selectValues': function(newValues, oldValues) {
+         'selectOptions': function(newValues, oldValues) {
              var self = this;
              var $select = $(this.$el);
              newValues.forEach(function(val) {
@@ -89,6 +98,9 @@
                      return false;
                  }
              });
+             if (!option.value) {
+                 option = {value: option.value, label: option.label};
+             }
              if (!hasOption) {
                  this.selectValues.push(option);
              }

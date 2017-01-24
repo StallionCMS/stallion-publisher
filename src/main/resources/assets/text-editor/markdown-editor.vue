@@ -1,7 +1,7 @@
 
 
 <template>
-    <div class="markdown-editor" id="{{ editorId }}">
+    <div class="markdown-editor" :id="editorId">
         <textarea class="form-control"></textarea>
         <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
         <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback"></insert-link-modal>
@@ -42,7 +42,7 @@
              forceAllowChange: false
          };
      },
-     attached: function() {
+     mounted: function() {
          var self = this;
          console.log('markdown ', this.markdown);
          this.simplemde = new SimpleMDE({

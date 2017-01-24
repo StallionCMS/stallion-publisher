@@ -6,9 +6,9 @@
 
 <template>
     <div class="contacts-table-vue table-page">
-        <loading-div v-if='$loadingRouteData'></loading-div>
-        <div v-if="!$loadingRouteData">
-            <st-data-table v-ref:table :table-definition="tableDefinition" :columns="columns" :label="'contact'" :browser-url-template="'#!/contacts'" :data-url="'/st-publisher/contacts/list'" :route="$route" table-class="table">
+        <loading-div v-if="isLoading"></loading-div>
+        <div v-if="!isLoading">
+            <st-data-table ref="table" :columns="columns" :label="'contact'" :browser-url-template="'#!/contacts'" :data-url="'/st-publisher/contacts/list'" :route="$route" table-class="table">
             </st-data-table>
         </div>
     </div>
@@ -18,6 +18,7 @@
  module.exports = {
      data: function() {
          return {
+             isLoading: false,
              columns: [
                  {
                      actions: [

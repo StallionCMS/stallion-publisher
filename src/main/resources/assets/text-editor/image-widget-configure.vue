@@ -9,7 +9,7 @@
                 <a target="_blank" v-bind:href="image.url">{{image.url}}</a>
                 <a class="btn btn-default btn-sm" href="javascript:;" @click="tab='selector'">Change Image</a>
             </div>
-            <image-full-formatting v-ref:formatting name="formatting" :existing-formatting="formatting"></image-full-formatting>
+            <image-full-formatting ref="formatting" name="formatting" :existing-formatting="formatting"></image-full-formatting>
         </div>
     </div>
 </template>
@@ -36,7 +36,7 @@
              image: image
          }
      },
-     ready: function() {
+     mounted: function() {
          if (this.image) {
              this.okToInsert = true;
          }

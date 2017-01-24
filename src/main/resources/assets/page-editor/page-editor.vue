@@ -193,8 +193,8 @@
 
 <template>
     <div class="page-editor page-editor-vue">
-        <loading-div v-if="$loadingRouteData"></loading-div>
-        <div v-if="!$loadingRouteData">
+        <loading-div v-if="isLoading"></loading-div>
+        <div v-if="!isLoading">
             <div class="row">
                 <div class="col-xs-3 editor-header">
                     <div class="st-breadcrumbs">
@@ -229,8 +229,8 @@
                                 <div v-if="post.published">
                                     <label>Publication Date</label>
                                 </div>
-                                <div v-if="currentlyPublished || post.scheduled" class="form-group">
-                                    <datetime-picker :value.sync="post.publishDate"></datetime-picker>
+                                <div v-if="post.currentlyPublished || post.scheduled" class="form-group">
+                                    <datetime-picker v-model="post.publishDate"></datetime-picker>
                                 </div>
                                 
                                 <div class="form-group">
@@ -239,11 +239,11 @@
                                     <input type="text" class="form-control" v-model="post.slug" @paste="onUrlTouched" @keypress="onUrlTouched">
                                 </div>
                                 <div class="form-group">
-                                    <image-picker-field label="Choose featured image" label-selected="Change featured image" :value.sync="post.featuredImage"></image-picker-field> 
+                                    <image-picker-field label="Choose featured image" label-selected="Change featured image" v-model="post.featuredImage"></image-picker-field> 
                                 </div>
                             </div>
                             <div class="accordian-actions">
-                                <button @click="publishPost" class="btn-publish btn btn-primary btn-xl" disabled={{dirty}}>
+                                <button @click="publishPost" class="btn-publish btn btn-primary btn-xl" :disabled="dirty">
                                     <span v-if="!post.currentlyPublished">Publish</span>
                                     <span v-if="post.currentlyPublished">Update Published {{labelUpper}}</span>
                                 </button>
@@ -262,7 +262,7 @@
                                 <div class="form-group">
                                     <label>Author</label>
                                     <div class="form-group">
-                                        <author-picker  :value.sync="post.authorId"></author-picker>
+                                        <author-picker  v-model="post.authorId"></author-picker>
                                     </div>
                                 </div>
                             </div>
@@ -289,12 +289,12 @@
                 <div class="col-sm-7 col-md-5 col-xs-12 editor-column">
                     <div v-show="tab==='editor'">
                         <div class="spacer-bar" style="margin-top:0px;">
-                            <a class="preview-new-tab-link" href="/st-publisher/content/{{post.postId}}/view-latest-version" target="_blank"">Preview <i class="material-icons">open_in_new</i></a>
+                            <a class="preview-new-tab-link" :href="'/st-publisher/content/' + post.postId + '/view-latest-version'" target="_blank"">Preview <i class="material-icons">open_in_new</i></a>
                             <div class="autosave-label" style="">{{lastAutosaveAt}}</div>
                         </div>
                         <div v-show="contentEditable">
-                            <tinymce-editor :options="{hideInternalPages: true}" v-if="!useMarkdown" v-ref:maincontent :html="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></tinymce-editor>
-                            <markdown-editor v-if="useMarkdown" v-ref:maincontent editor-id="main-content-editor" :markdown="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></markdown-editor>
+                            <tinymce-editor :options="{hideInternalPages: true}" v-if="!useMarkdown" ref="maincontent" :html="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></tinymce-editor>
+                            <markdown-editor v-if="useMarkdown" ref="maincontent" editor-id="main-content-editor" :markdown="post.originalContent" :widgets="post.widgets" :change-callback="onMarkdownChange"></markdown-editor>
                         </div>
                         <div class="editable-page-element-wrapper" v-for="element in post.elements">
                             <label>Edit <em>{{element.name}}</em> section</label>
@@ -344,7 +344,7 @@
                                 </div>
                             </div>
                             <div v-show="dirty" class="preview-dirty-overlay">Blog post being edited.<br>Waiting to refresh preview.</div>
-                            <iframe sandbox="allow-forms allow-scripts" class="preview-iframe" v-bind:class="{'dirty': dirty}" style="width: 100%; height: 100%; min-height: 600px; " v-bind:src="'/st-publisher/content/' + contentId +  '/view-latest-version?t=' + now" name="previewIframe"></iframe>
+                            <iframe sandbox="allow-forms allow-scripts" v-bind:class="{'preview-iframe': true, 'dirty': dirty}" style="width: 100%; height: 100%; min-height: 600px; " v-bind:src="'/st-publisher/content/' + contentId +  '/view-latest-version?t=' + now" name="previewIframe"></iframe>
                         </div><!-- -end live preview column -->
                     </div><!-- end right-column-wrap -->
                 </div><!-- end col-md-4 -->
@@ -357,6 +357,7 @@
  module.exports = {
      data: function() {
          return {
+             isLoading: false,
              label: 'post',
              labelPlural: 'posts',
              labelUpper: 'Post',
@@ -384,29 +385,36 @@
              siteUrl: stPublisherAdminContext.siteUrl
          };
      },
-     route: {
-         data: function(transition) {
+     mounted: function() {
+         this.onRoute();
+     },
+     watch: {
+         '$route': function() {
+             this.onRoute();
+         }
+     },
+     methods: {
+         onRoute: function() {
+             console.log('page editor on route');
              var self = this;
              var contentId = parseInt(this.$route.params.contentId, 10);
              var data = {};
              var callback = function(o) {
-                 var data = {};
-                 data.post = JSON.parse(JSON.stringify(o.post));
-                 data.originalPost = o.post;
-                 data.versionId = o.post.id;
-                 data.contentId = contentId;
-                 data.shouldBeScheduled = o.post.scheduled;
-                 data.lastWidgetCount = o.post.widgets.length;
-                 data.contentEditable = o.contentEditable;
+                 self.post = JSON.parse(JSON.stringify(o.post));
+                 self.originalPost = o.post;
+                 self.versionId = o.post.id;
+                 self.contentId = contentId;
+                 self.shouldBeScheduled = o.post.scheduled;
+                 self.lastWidgetCount = o.post.widgets.length;
+                 self.contentEditable = o.contentEditable;
                  if (o.useMarkdown !== null && o.useMarkdown !== undefined) {
-                     data.useMarkdown = o.useMarkdown;
+                     self.useMarkdown = o.useMarkdown;
                  }
-                 transition.next(data);
+                 
              };
              this.loadContent(contentId, callback);
-         }
-     },
-     methods: {
+             
+         },
          loadContent: function(contentId, callback) {
              var self = this;
              self.postLoaded = false;
@@ -549,6 +557,9 @@
          },
          addComment: function() {
 
+         },
+         revertToDraft: function() {
+             alert('implement revertToDraft!');
          },
          restoreVersionCallback: function() {
              var self = this;

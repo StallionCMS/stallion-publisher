@@ -9,7 +9,7 @@
              twoWay: true
          }
      },
-     attached: function() {
+     mounted: function() {
          var self = this;
          //stallion.autoGrow({}, $(this.$el));
          this.simplemde = new SimpleMDE({

@@ -6,8 +6,8 @@
 
 <template>
     <div>
-        <loading-div v-if='$loadingRouteData'></loading-div>
-        <div v-if="!$loadingRouteData">
+        <loading-div v-if='isLoading'></loading-div>
+        <div v-if="!isLoading">
             <h3>Extra HTML and CSS</h3>
             <form @submit.prevent='save'>
                 <div class="form-group">
@@ -30,21 +30,25 @@
  module.exports = {
      data: function() {
          return {
+             isLoading: true,
              data: {
                  footerHtml: '',
                  headHtml: ''
              }
          };
      },
-     route: {
-         data: function(transition) {
-             var self = this;
-             this.fetchData(function() {
-                 transition.next();
-             });
+     created: function() {
+         this.onRoute();
+     },
+     watch: {
+         '$route': function() {
+             this.onRoute();
          }
      },
      methods: {
+         onRoute: function() {
+             this.fetchData();
+         },
          moment: moment,
          save: function() {
              stallion.request({
@@ -61,14 +65,13 @@
              var m = moment(date);
              return m.fromNow();
          },
-         fetchData: function(callback) {
+         fetchData: function() {
              var self = this;
              stallion.request({
                  url: '/st-publisher/config/site-settings',
                  success: function (o) {
                      self.data = o;
-                     
-                     if (callback) callback();
+                     self.isLoading = false;
                  }
              });
          }

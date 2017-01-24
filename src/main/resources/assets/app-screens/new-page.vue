@@ -76,8 +76,8 @@
 
 <template>
     <div class="new-page-vue">
-        <loading-div v-if="$loadingRouteData"></loading-div>
-        <div v-if='!$loadingRouteData'>
+        <loading-div v-if="isLoading"></loading-div>
+        <div v-if='!isLoading'>
             <h2>Create a new page</h2>
             <div class="recent-pages">
                 <h4>Clone a recent page</h4>
@@ -130,14 +130,23 @@
          return {
              templates: [],
              specialTemplates: [],
-             recentPages: []
+             recentPages: [],
+             isLoading: false
          }
      },
-     ready: function() {
-         var self = this;
+     created: function() {
+         this.onRoute();
      },
-     route: {
-         data: function(transition) {
+     watch: {
+         '$route': function() {
+             this.onRoute();
+         }
+     },
+     methods: {
+         onRoute: function() {
+             this.fetchData();
+         },
+         fetchData: function() {
              var self = this;
              stallion.request({
                  url: '/st-publisher/content/choose-page-template-context',
@@ -146,16 +155,13 @@
                      self.templates = o.templates;
                      self.specialTemplates = o.specialTemplates;
                      self.recentPages = o.recentPages;
-                     transition.next();
                      setTimeout(function() {
                          $(self.$el).find('.page-title').tooltip();
                      }, 1000);
                      
                  }
              });
-         }
-     },
-     methods: {
+         },
          onChooseTemplate: function(template) {
              this.createNewPageAndRedirect(0, template);
          },

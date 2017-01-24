@@ -1,8 +1,8 @@
 
 <template>
     <div>
-        <loading-div v-if="$loadingRouteData"></loading-div>
-        <div v-if="!$loadingRouteData">
+        <loading-div v-if="isLoading"></loading-div>
+        <div v-if="isLoading">
             <form @submit="blogFormSubmit">
                 <h2>Select a blog to post on:</h2>
                 <div class="radio" v-for="blog in blogs">
@@ -21,16 +21,29 @@
      data: function() {
          return {
              selectedBlogId: 0,
-             blogs: []
+             blogs: [],
+             isLoading: true
          }
      },
-     route: {
-         data: function(transition) {
+     created: function() {
+         this.onRoute();
+     },
+     watch: {
+         '$route': function() {
+             this.onRoute();
+         }
+     },
+     methods: {
+         onRoute: function() {
+             this.fetchData();
+         },
+         fetchData: function() {
              var self = this;
              stallion.request({
                  url: '/st-publisher/content/list-blogs',
                  method: 'GET',
                  success: function(o) {
+                     self.isLoading = true;
                      if (o.blogs && o.blogs.length === 1) {
                          self.createNewPostAndRedirect(o.blogs[0].id);
                      } else if (!o.blogs) {
@@ -43,13 +56,12 @@
                          if (!selectedBlogId) {
                              selectedBlogId = o.blogs[0].id;
                          }
-                         transition.next({blogs: o.blogs, selectedBlogId: selectedBlogId});
+                         self.blogs = o.blogs;
+                         self.selectedBlogId = selectedBlogId;
                      }
                  }
              });
-         }
-     },
-     methods: {
+         },
          blogFormSubmit: function() {
              this.createNewPostAndRedirect();
          },

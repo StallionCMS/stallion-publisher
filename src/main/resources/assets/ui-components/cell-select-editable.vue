@@ -39,13 +39,23 @@
          });
          return {
              options: options,
+             saving: false,
              value: this.item[this.col.field]
          };
      },
      methods: {
          submit: function() {
              //this.callback(this.item, this.field, this.value);
-             this.$dispatch('cell-value-updated', this.item, this.col.field, this.value, this.col);
+             var self = this;
+             var onSave = this.col.onSave;
+             if (!onSave) {
+                 onSave = function(func) { self.saving = false; func() }; 
+             }
+             this.saving = true;
+             onSave(function() {
+                 self.saving = false;
+                 self.$emit('cell-value-updated', self.item, self.col.field, self.value, self.col);
+             });
          }
      }
  };

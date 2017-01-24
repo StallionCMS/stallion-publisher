@@ -29,10 +29,7 @@
  module.exports = {
      props: {
          widgetData: Object,
-         insertCallback: Function,
-         okToInsert: {
-             twoWay: true
-         }
+         insertCallback: Function
      },
      data: function() {
          var tab = 'selector';
@@ -48,9 +45,9 @@
              image: image
          }
      },
-     ready: function() {
+     mounted: function() {
          if (this.image) {
-             this.okToInsert = true;
+
          }
      },
      methods: {
@@ -70,7 +67,6 @@
          selectImageCallback: function(image) {
              this.image = image;
              this.tab = 'formatting';
-             this.okToInsert = true;
          },
          buildHtml: function(image, data) {
              var $wrap = $('<div></div>')

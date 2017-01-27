@@ -67,6 +67,11 @@ var StallionApplicationRouter = null;
                 component: vueComponents['page-editor']
             },
             {
+                path: '/ui-demo',
+                name: 'ui-demo',
+                component: vueComponents['ui-demo']
+            },
+            {
                 path: '/pages',
                 name: 'pages',
                 component: vueComponents['contents-table']

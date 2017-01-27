@@ -37,7 +37,7 @@
                         {{moment(item.uploadedAt * 1000).fromNow()}}
                     </td>
                     <td>
-                        <a href="{{item.url}}" target="_blank">open</a>
+                        <a :href="item.url" target="_blank">open</a>
                     </td>
 
                 </tr>

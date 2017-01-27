@@ -26,7 +26,7 @@
          },
          after: Function
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
          var opts = this.options || {};
          if (!opts.dictDefaultMessage) {

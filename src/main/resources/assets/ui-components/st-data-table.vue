@@ -53,6 +53,11 @@
              margin-left: 20px;
          }
      }
+     .actions-slot, .filters-slot {
+         display: inline-block;
+         float: right;
+         margin-left: 20px;
+     }
      .cell-action-link {
          display: inline-block;
          margin-right: 5px;
@@ -182,8 +187,8 @@
                                 <a v-for="action in col.actions" :class="'cell-action-link ' + action.className" v-show="action.shown ? action.shown(item) : true " v-bind:href="action.getLink ? action.getLink(item) : 'javascript:;' " @click="action.click ? action.click(item, col, rowNumber, colNumber) : triggerItemEvent(action.event, item, col, rowNumber, colNumber)">{{ action.getLabel ? action.getLabel(item) : action.label }}</a>
                             </template>
                             <template v-if="!col.component && !col.actions && !col.getLink">
-                                <template v-if="col.allowHtml" v-html="renderCell(item, col, rowNumber, colNumber)">
-                                </template>
+                                <div v-if="col.allowHtml" v-html="renderCell(item, col, rowNumber, colNumber)">
+                                </div>
                                 <template v-else>
                                     {{ renderCell(item, col, rowNumber, colNumber) }}
                                 </template>
@@ -261,6 +266,7 @@
      },
      data: function() {
          var data = {
+             rawHtml: '<b>BOLD</b>',
              columnsComputed: [],
              labelPluralComputed: '',
              titleComputed: '',
@@ -419,7 +425,12 @@
              this.page = 0;
              this.navigate({page: 1});
          },
+         renderCell2: function(item, col, index) {
+             debugger;
+             return this.renderCell(item, col, index);
+         },
          renderCell: function(item, col, index) {
+
              if (typeof(col) === 'string') {
                  return item[col];
              } else if (col.render) {
@@ -502,7 +513,7 @@
              if (!event) {
                  return;
              }
-             this.$dispatch(event, item, col, rowNumber, colNumber);
+             this.$emit(event, item, col, rowNumber, colNumber);
          },
          refresh: function() {
              this.loading = true;

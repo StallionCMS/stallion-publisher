@@ -41,7 +41,7 @@
                      label: opt
                  });
              } else {
-                 selectValues.push(opt);
+                 selectOptions.push(opt);
              }
          });
          this.selectOptions = selectOptions;
@@ -57,7 +57,7 @@
                .select2(this.config)
                .on('change', function() {
                    // Not sure why this doesn't automatically update
-                   var defaultval = '';
+                   var defaultVal = '';
                    if (self.multiple) {
                        defaultVal = [];
                    }
@@ -92,7 +92,7 @@
      methods: {
          addOption: function(option) {
              var hasOption = false;
-             this.selectValues.forEach(function(existing) {
+             this.selectOptions.forEach(function(existing) {
                  if (existing === option || (existing.value === option) || (existing == option.value) || (existing.value == option.value)) {
                      hasOption = true;
                      return false;
@@ -102,7 +102,7 @@
                  option = {value: option.value, label: option.label};
              }
              if (!hasOption) {
-                 this.selectValues.push(option);
+                 this.selectOptions.push(option);
              }
          },
          onEnter: function(evt) {

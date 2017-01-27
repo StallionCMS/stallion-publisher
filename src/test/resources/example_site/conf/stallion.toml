@@ -16,7 +16,7 @@ healthCheckSecret = "GLPtBF68VjNPaGb65XGY"
 [database]
 url = "jdbc:mysql://localhost:3306/stallion_publisher_local?autoReconnect=true"
 username = "root"
-password = ""
+password = "tombrady12patriots"
 
 
 # Email settings, for sending outbound emails

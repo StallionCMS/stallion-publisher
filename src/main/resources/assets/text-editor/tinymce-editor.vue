@@ -47,10 +47,14 @@
      },
      data: function() {
          if (this.options.pluginLoaders) {
-             this.pluginLoaders = this.options.pluginLoaders;
+             this.pluginLoadersComputed = this.options.pluginLoaders;
+         } else {
+             this.pluginLoadersComputed = this.options.pluginLoaders;             
          }
          if (this.options.extraPlugins) {
-             this.extraPlugins = this.options.extraPlugins;
+             this.extraPluginsComputed = this.options.extraPlugins;
+         } else {
+             this.extraPluginsComputed = this.extraPlugins;
          }
          
          return {
@@ -91,9 +95,9 @@
              self.tinymce = tinymce;
              stPublisher.initStallionButtonsPlugin(tinymce);
              stPublisher.initHeadersPlugin(tinymce);
-             var extraPlugins = self.extraPlugins || '';
-             if (self.pluginLoaders) {
-                 self.pluginLoaders.forEach(function(loader) {
+             var extraPlugins = self.extraPluginsComputed || '';
+             if (self.pluginLoadersComputed) {
+                 self.pluginLoadersComputed.forEach(function(loader) {
                      if (!loader.name) {
                          throw new Exception("Plugin loader needs field 'name'");
                      }

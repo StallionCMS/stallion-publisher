@@ -29,7 +29,7 @@
     <div class="tomes-table-vue">
         <h3 v-if="isLoading">Loading &hellip;</h3>
         <div v-if="!isLoading">
-            <st-data-table ref="tometable" :infinite-scroll="true" :columns="columns" label="tome" :browser-url-template="'#!/tomes/{{page}}/{{searchTerm}}'" :data-url="'/st-publisher/testing-tomes/tomes'" :route="$route" table-class="table table-striped" :single-click-editing="true" >
+            <st-data-table ref="tometable" :infinite-scroll="true" :columns="columns" label="tome" :browser-url-template="'#!/tomes/{{page}}/{{searchTerm}}'" :data-url="'/st-publisher/testing-tomes/tomes'" :route="$route" table-class="table table-striped" :single-click-editing="true" :extra-data-fields="['checkedoutBooks', 'maxCheckouts']"  >
                 <div class="filters-slot form-inline" slot="filters">
                     <select v-model="filterPrice" class="form-control price-filter" v-bind:class="{'empty-value': !filterPrice}" placeholder="Filter by price">
                         <option value=""> - Filter by price - </option>
@@ -41,7 +41,7 @@
                     </select2-field>
                 </div>
                 <div class="actions-slot" slot="actions">
-                    
+                    <span>Checked out: {{ $refs.tometable ? $refs.tometable.checkedoutBooks : 'NA' }} / {{ $refs.tometable ? $refs.tometable.maxCheckouts : 'NA' }}</span>
                     <button class="btn btn-primary">Add Tome</button>
                 </div>
             </st-data-table>
@@ -104,6 +104,14 @@
                          }                         
                      ]
                          
+                 },
+                 {
+                     title: 'Snowman',
+                     className: 'the-circle',
+                     allowHtml: true,
+                     render: function(item) {
+                         return '<a class="btn btn-default" href="javascript:;">\u2603</a>'
+                     }
                  },
                  {
                      title: 'Title',

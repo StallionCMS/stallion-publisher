@@ -79,7 +79,7 @@ public class TomeEndpoints implements EndpointResource {
         } else if (!empty(sort)) {
             chain = chain.sortBy(sort, SortDirection.ASC);
         }
-        return map(val("pager", chain.pager(page, 40)));
+        return map(val("checkedoutBooks", 3), val("maxCheckouts", 7), val("pager", chain.pager(page, 40)));
     }
 
 

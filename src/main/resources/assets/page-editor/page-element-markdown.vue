@@ -29,9 +29,6 @@
 
          }
      },
-     ready: function() {
-         
-     },
      methods: {
          markdownChanged: function() {
              var data = this.$refs.editor.getData();

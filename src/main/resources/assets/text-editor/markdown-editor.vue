@@ -4,8 +4,8 @@
     <div class="markdown-editor" :id="editorId">
         <textarea class="form-control"></textarea>
         <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
-        <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback"></insert-link-modal>
-        <paste-html-modal v-if="showPasteHtmlModal" :shown.sync="showPasteHtmlModal" :callback="pasteRichContentCallback"></paste-html-modal>
+        <insert-link-modal v-if="showInsertLinkModal" v-on:close="showInsertLinkModal=false" :callback="insertLinkCallback"></insert-link-modal>
+        <paste-html-modal v-if="showPasteHtmlModal" v-on:close="showPasteHtmlModal=false" :callback="pasteRichContentCallback"></paste-html-modal>
     </div>
 </template>
 

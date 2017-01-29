@@ -171,7 +171,7 @@
                 </tr>
             </tbody>
             <tbody v-if="!loading && items.length">
-                <tr v-for="(item, rowNumber) in items" v-if="!item.$hidden" track-by="id" :class="'data-table-row-index-' + rowNumber + ' data-table-row-id-' + item.id">
+                <tr v-for="(item, rowNumber) in items" v-if="!item.$hidden" v-bind:key="item.id" :class="'data-table-row-index-' + rowNumber + ' data-table-row-id-' + item.id">
                     <td v-for="(col, colNumber) in columnsComputed" @click="onCellClicked(item, col, rowNumber, colNumber, $event)" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)" v-bind:class="[col.editableComponent? 'cell-editable': '', col.className]" v-if="!col.hidden" :style="col.$widthWithPadding ? 'width: ' + (col.$widthWithPadding) + 'px;': ''">
                         <template v-if="item.$isEditing === colNumber">
                             <component :is="col.editableComponent" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber" :callback="onEditCallback" :refresh="refresh" :cancel="cancelEdit" v-on:cell-value-updated="onEditCallback"></component>
@@ -652,7 +652,7 @@
              }
              var url = this.browserUrlTemplate;
              if (url.indexOf('#/') === 0) {
-                 url = url.substr(2);
+                 url = url.substr(1);
              }
              var params = {
                  page: page,

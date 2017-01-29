@@ -8,7 +8,7 @@
 
 <script>
  module.exports = {
-     ready: function() {
+     mounted: function() {
 
      }
  }

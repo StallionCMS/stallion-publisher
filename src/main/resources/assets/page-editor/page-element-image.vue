@@ -7,7 +7,7 @@
 <template>
     <div class="page-element-text">
         <div class="form-group">
-            <image-picker-field :value.sync="element.data.image"></image-picker-field>
+            <image-picker-field :model="element.data.image"></image-picker-field>
         </div>
     </div>
 </template>
@@ -26,9 +26,6 @@
          return {
 
          }
-     },
-     ready: function() {
-         
      },
      methods: {
 

@@ -42,7 +42,7 @@
              columns: [
                  {
                      component: {
-                         template: '<div><a class="btn btn-default btn-xs" target="blank" href="{{ item.permalink }}">View</a> <a v-if="!item.approved" @click="approve" class="btn btn-default btn-xs" href="javascript:;" @click="approve">Approve</a> <a v-if="!item.deleted" class="btn btn-default btn-xs" href="javascript:;" @click="deleteComment">Delete</a> ',
+                         template: '<div><a class="btn btn-default btn-xs" target="blank" :href="item.permalink">View</a> <a v-if="!item.approved" @click="approve" class="btn btn-default btn-xs" href="javascript:;" @click="approve">Approve</a> <a v-if="!item.deleted" class="btn btn-default btn-xs" href="javascript:;" @click="deleteComment">Delete</a> ',
                          methods: {
                              approve: function() {
                                  var self = this;

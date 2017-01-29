@@ -5,7 +5,7 @@
 </style>
 <template>
     <div class="datatable-daterange-filter-vue">
-        <date-picker :value.sync="rangeStart" ></date-picker> to <date-picker :value.sync="rangeEnd"></date-picker>
+        <date-picker :value="value.rangeStart" @input="onInput" ></date-picker> to <date-picker :value="value.rangeEnd" @input="onInput"></date-picker>
     </div>
 </template>
 <script>
@@ -15,8 +15,14 @@
              required: true,
              type: String
          },
-         rangeStart: String,
-         rangeEnd: String,
+         value: {
+             default: function() {
+                 return {
+                     rangeStart: (new Date().getTime() / 10000) - 86400,
+                     rangeEnd: (new Date().getTime() / 10000) - 86400
+                 }
+             }
+         },
          syncOnChange: {
              default: true,
              type: Boolean
@@ -27,30 +33,43 @@
          }
      },
      data: function() {
-         return {};
+         return {
+             rangeStartLocal: (this.value && this.value.rangeStart) ? this.value.rangeStart : defaultValue,
+             rangeStartEnd: (this.value && this.value.rangeEnd) ? this.value.rangeEnd : defaultValue
+         };
      },
      methods: {
          toDatatable: function() {
              dt.clearFilter(this.fieldName);
-             dt.addFilter(this.fieldName, moment(this.rangeStart).format('YYYY-MM-DD') + ' 00:00:00', '>');
-             dt.addFilter(this.fieldName, moment(this.rangeEnd).format('YYYY-MM-DD') + ' 23:59:59', '<=');
+             dt.addFilter(this.fieldName, moment(this.rangeStartLocal).format('YYYY-MM-DD') + ' 00:00:00', '>');
+             dt.addFilter(this.fieldName, moment(this.rangeEndLocal).format('YYYY-MM-DD') + ' 23:59:59', '<=');
              self.datatable.navigate({page: 1});
              return;
+         },
+         onStartInput: function(newVal) {
+             this.rangeStartLocal = newVal;
+             this.$emit({rangeStart: this.rangeStartLocal, rangeEnd: this.rangeEndLocal});
+             if (this.syncOnChange) {
+                 this.toDatatable();
+             }
+         },
+         onEndInput: function(newVal) {
+             this.rangeEndLocal = newVal;
+             this.$emit({rangeStart: this.rangeStartLocal, rangeEnd: this.rangeEndLocal});
+             if (this.syncOnChange) {
+                 this.toDatatable();
+             }
          },
          syncFromRoute: function() {
              
          }
      },
      watch: {
-         rangeEnd: function(val, old) {
-             if (this.syncOnChange) {
-                 this.toDatatable();
-             }
+         'value.rangeEnd': function(val, old) {
+             
          },
-         rangeStart: function(val, old) {
-             if (this.syncOnChange) {
-                 this.toDatatable();
-             }
+         'value.rangeStart': function(val, old) {
+             
          }
      }
  }

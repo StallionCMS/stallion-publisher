@@ -5,9 +5,7 @@
 <script>
  module.exports = {
      props: {
-         value: {
-             twoWay: true
-         }
+         value: ''
      },
      mounted: function() {
          var self = this;
@@ -21,7 +19,7 @@
          });
          this.simplemde.codemirror.on("change", function(){
              //console.log(self.simplemde.value());
-             self.value = self.simplemde.value();
+             self.$emit('input', self.simplemde.value());
          });         
      },
      methods: {

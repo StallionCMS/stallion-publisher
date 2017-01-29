@@ -1,15 +1,15 @@
 <template>
     <div class="image-collection-field">
         <button class="btn btn-default"  v-on:click="showModal">Edit Image Collection</button>
-        <span v-if="value.images">
-            {{ value.images.length }} image(s) in collection.
+        <span v-if="data.images">
+            {{ data.images.length }} image(s) in collection.
         </span>
-        <span v-if="!value.images">
+        <span v-if="!data.images">
             No images in collection.
         </span>
-        <modal-base v-if="modalShown" :shown.sync="modalShown" title="Image Collection" :callback="finishConfigure">
+        <modal-base v-if="modalShown" :close="modalShown=false" title="Image Collection" :callback="finishConfigure">
             <div slot="body">
-                <image-collection-configure ref="collection" :data="value"></image-collection-configure>
+                <image-collection-configure ref="collection" :data="data"></image-collection-configure>
             </div>
         </modal-base>
     </div>
@@ -18,17 +18,17 @@
 <script>
  module.exports = {
      props: {
-         value: {
-             twoWay: true
-         },
-         onChange: Function
+         value: null,
      },
      data: function() {
-         if (!this.value) {
-             this.value = {}
-         }
          return {
+             data: this.value || {},
              modalShown: false
+         }
+     },
+     watch: {
+         'value': function(newData) {
+             this.data = newData;
          }
      },
      methods: {
@@ -36,10 +36,7 @@
              this.modalShown = true;
          },
          finishConfigure: function(imageInfo) {
-             this.value = this.$refs.collection.getData();
-             if (this.onChange) {
-                 this.onChange(this.value);
-             }
+             this.$emit('input', this.$refs.collection.getData());
          }
      }
  };

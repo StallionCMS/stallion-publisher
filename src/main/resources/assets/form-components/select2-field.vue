@@ -58,8 +58,8 @@
                  selected = true;
              }
              selectOptions.push({
-                 value: opt,
-                 label: opt,
+                 value: value,
+                 label: label,
                  selected: selected
              });
          });

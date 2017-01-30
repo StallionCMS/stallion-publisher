@@ -1,5 +1,5 @@
 <template>
-    <select :class="'select2-field-vue select2-target' + className" :multiple="multiple" >
+    <select :class="'select2-field-vue select2-target ' + className" :multiple="multiple" >
         <option v-for="opt in selectOptions" :selected="opt.selected" :value="opt.value">{{ opt.label }}</option>
     </select>
 </template>

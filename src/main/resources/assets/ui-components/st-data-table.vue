@@ -23,11 +23,13 @@
              height: 40px;
              padding-top: 5px;
              float: right;
-         }    
+             margin-right: 5px;
+         }
          
          .btn.search-button {
              display: inline-block;
              margin-left: -1px;
+             margin-right: 0px;
              float: left;
          }
          .cancel-search {
@@ -136,9 +138,8 @@
                         </div>
                     </form>
                 </slot>
-                </slot>
                 <slot name="actions">
-
+                    
                 </slot>
                 <slot name="filters">
                     

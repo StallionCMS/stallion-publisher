@@ -1,6 +1,6 @@
 <template>
-    <select class="select2-field-vue select2-target {{ className }}" :multiple="multiple" v-model="value">
-        <option v-for="opt in selectValues" :value="opt.value">{{ opt.label }}</option>
+    <select :class="'select2-field-vue select2-target ' + className" :multiple="multiple" >
+        <option v-for="opt in selectOptions" :selected="opt.selected" :value="opt.value">{{ opt.label }}</option>
     </select>
 </template>
 
@@ -10,57 +10,91 @@
          multiple: {
              default: false
          },
-         choices: Array,
-         config: Object,
-         selectOptions: Object,
-         selectValues: Array,
+         choices: {
+             type: Array,
+             default: function() {
+                 return [];
+             }
+         },
+         config: {
+             type: Object,
+             default: function() {
+                 return {};
+             }
+         },
+         defaultValue: {
+             default: function() {
+                 return null;
+             }
+         },
+         //selectOptions: Object,
+         //selectValues: Array,
          className: '',
          value: {
-             sync: true
-         },
-         change: Function
+             default: function() {
+                 return '';
+             }
+         }
      },
      data: function() {
          var self = this;
-         var selectValues = [];
-         if (this.config && !this.selectOptions) {
-             this.selectOptions = this.config;
-         }
-         if (this.choices && !this.selectValues) {
-             this.selectValues = this.choices;
-         }
-         
-         (this.selectValues || []).forEach(function(opt) {
-             if (typeof(opt) === 'string') {
-                 selectValues.push({
-                     value: opt,
-                     label: opt
-                 });
-             } else {
-                 selectValues.push(opt);
+         var selectOptions = [];
+         var choices = JSON.parse(JSON.stringify(this.choices));
+         (this.choices || []).forEach(function(opt) {
+             var selected = false;
+             var value = opt;
+             var label = opt;
+             if (typeof(opt) !== 'string') {
+                 value = opt.value;
+                 label = opt.label;
              }
+             if (self.multiple && self.value && self.value.length != undefined) {
+                 if ($.inArray(value, self.value) > -1) {
+                     console.log('inArray(value, self.value) ', value, self.value);
+                     selected = true;
+                 }
+             } else if (self.value == value) {
+                 console.log('self.value == value ', self.value, value);
+                 selected = true;
+             }
+             selectOptions.push({
+                 value: value,
+                 label: label,
+                 selected: selected
+             });
          });
-         this.selectValues = selectValues;
-         this.options = this.options || {};
-         this.selectOptions = this.selectOptions || {};
+         this.selectOptions = selectOptions;
+         //this.selectValues = selectValues;
+         //this.options = this.options || {};
+         //this.selectOptions = this.selectOptions || {};
          return {};
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
-         console.log('selectOptions for select2 ', this.selectOptions);
+         console.log('config for select2 ', this.config);
          $(this.$el)
-               .select2(this.selectOptions)
-               .on('change', function() {
+               .select2(this.config)
+               .on('change', function(evt, msg) {
                    // Not sure why this doesn't automatically update
-                   self.value = $(this).val();
-                   if (self.change) {
-                       self.change($(this).val());
+                   var defaultVal = this.defaultValue;
+                   if (this.defaultValue === null && self.multiple) {
+                       defaultVal = [];
                    }
+                   console.log('select changed, new val is ', $(self.$el).val());
+                   if (msg === 'dontTriggerInput') {
+                       // Skip
+                   } else {
+                       self.$emit('input', $(self.$el).val() || defaultVal);
+                   }
+                   
                })
              ;
      },
      watch: {
-         'selectValues': function(newValues, oldValues) {
+         'value': function(newValue) {
+             $(this.$el).val(newValue).trigger('change', 'dontTriggerInput');
+         },
+         'selectOptions': function(newValues, oldValues) {
              var self = this;
              var $select = $(this.$el);
              newValues.forEach(function(val) {
@@ -83,14 +117,17 @@
      methods: {
          addOption: function(option) {
              var hasOption = false;
-             this.selectValues.forEach(function(existing) {
+             this.selectOptions.forEach(function(existing) {
                  if (existing === option || (existing.value === option) || (existing == option.value) || (existing.value == option.value)) {
                      hasOption = true;
                      return false;
                  }
              });
+             if (!option.value) {
+                 option = {value: option.value, label: option.label};
+             }
              if (!hasOption) {
-                 this.selectValues.push(option);
+                 this.selectOptions.push(option);
              }
          },
          onEnter: function(evt) {

@@ -27,21 +27,21 @@
 
 <template>
     <div class="tomes-table-vue">
-        <h3 v-if="$loadingRouteData">Loading &hellip;</h3>
-        <div v-if="!$loadingRouteData">
-            <st-data-table v-ref:tometable :infinite-scroll="true" :table-definition="tableDefinition" :columns="columns" label="tome" :browser-url-template="'#!/tomes/{{page}}/{{searchTerm}}'" :data-url="'/st-publisher/testing-tomes/tomes'" :route="$route" table-class="table table-striped" :single-click-editing="true" >
+        <h3 v-if="isLoading">Loading &hellip;</h3>
+        <div v-if="!isLoading">
+            <st-data-table ref="tometable" :infinite-scroll="true" :columns="columns" label="tome" :browser-url-template="'/tomes'" :data-url="'/st-publisher/testing-tomes/tomes'" :route="$route" table-class="table table-striped" :single-click-editing="true" :extra-data-fields="['checkedoutBooks', 'maxCheckouts']"  >
                 <div class="filters-slot form-inline" slot="filters">
                     <select v-model="filterPrice" class="form-control price-filter" v-bind:class="{'empty-value': !filterPrice}" placeholder="Filter by price">
-                        <option value="" selected> - Filter by price - </option>
+                        <option value=""> - Filter by price - </option>
                         <option value="<12">less than $12</option>
                         <option value=">12<20">$12 to $20</option>
                         <option value=">20">greater than A$20</option>
                     </select>
-                    <select2-field :class-name="authors-filter form-control" :value.sync="filterAuthors" :select-values="authors" :select2-options="{'placeholder': 'Filter by author', 'width': 320}" :multiple="true">
+                    <select2-field :class-name="'authors-filter form-control'" v-model="filterAuthors" :choices="authors" :config="{'placeholder': 'Filter by author', 'width': 320}" :multiple="true">
                     </select2-field>
                 </div>
                 <div class="actions-slot" slot="actions">
-                    
+                    <span>Checked out: {{ $refs.tometable ? $refs.tometable.checkedoutBooks : 'NA' }} / {{ $refs.tometable ? $refs.tometable.maxCheckouts : 'NA' }}</span>
                     <button class="btn btn-primary">Add Tome</button>
                 </div>
             </st-data-table>
@@ -66,6 +66,7 @@
      data: function() {
          console.log('normal get data');
          return {
+             isLoading: false,
              filterAuthors: [],
              filterPrice: '',
              route: {},
@@ -81,8 +82,9 @@
                          event: 'edit-tome'
                      }]
                  },
-                 'author'
-                 ,
+                 {
+                     field: 'author'
+                 },
                  {
                      title: 'Status',
                      field: 'status',
@@ -102,6 +104,14 @@
                          }                         
                      ]
                          
+                 },
+                 {
+                     title: 'Snowman',
+                     className: 'the-circle',
+                     allowHtml: true,
+                     render: function(item) {
+                         return '<a class="btn btn-default" href="javascript:;">\u2603</a>'
+                     }
                  },
                  {
                      title: 'Title',
@@ -145,12 +155,8 @@
              ]
          };
      },
-     route: {
-         data: function(transition) {
-             console.log('route new data get');
-             transition.next({route: this.$route});
-         },
-         activate: function() {
+     created: function() {
+         this.onRoute();
          var self = this;
          $(this.$el).find('.authors-filter').select2({
              width: 300,
@@ -159,15 +165,20 @@
              console.log('filter authors select changed val is: ', $(this).val());
              var val = $(this).val();
          });
-         ;
+     },
+     methods: {
+         onRoute: function() {
 
          }
      },
      watch: {
+         '$route': function() {
+             this.onRoute();
+         },
          filterAuthors: function(val, old) {
              var self = this;
              console.log('authors changed ', val);
-             if (!val) {
+             if (!val || !val.length) {
                  self.$refs.tometable.clearFilter('author');
              } else {
                  self.$refs.tometable.clearFilter('author');

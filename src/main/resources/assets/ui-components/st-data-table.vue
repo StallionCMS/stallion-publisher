@@ -23,11 +23,13 @@
              height: 40px;
              padding-top: 5px;
              float: right;
-         }    
+             margin-right: 5px;
+         }
          
          .btn.search-button {
              display: inline-block;
              margin-left: -1px;
+             margin-right: 0px;
              float: left;
          }
          .cancel-search {
@@ -52,6 +54,11 @@
              text-align: right;
              margin-left: 20px;
          }
+     }
+     .actions-slot, .filters-slot {
+         display: inline-block;
+         float: right;
+         margin-left: 20px;
      }
      .cell-action-link {
          display: inline-block;
@@ -125,15 +132,14 @@
                 <slot name="search">
                     <form @submit.prevent="doSearch" class="table-search form-inline">
                         <div class="input-group search-input-group">
-                            <input type="text" class="form-control search-field" placeholder="Search for {{ label }}" v-model="searchTerm">
+                            <input type="text" class="form-control search-field" :placeholder="'Search for ' + label" v-model="searchTerm">
                             <span v-show="searchTerm && searchTerm.length >= 3" @click="navigate({page: 1, searchTerm: ''})" class="cancel-search">✕</span>
                             <button type="submit" class="btn btn-primary input-group-addon search-button"><i class="material-icons">search</i></button>
                         </div>
                     </form>
                 </slot>
-                </slot>
                 <slot name="actions">
-
+                    
                 </slot>
                 <slot name="filters">
                     
@@ -141,35 +147,35 @@
             </slot>
         </div>
         <div class="table-wrap">
-        <table class="st-data-table table {{ tableClass }}">
+        <table :class="'st-data-table table ' + tableClass">
             <colgroup>
-                <col v-for="col in columns" :style="col.style"></col>
+                <col v-for="col in columnsComputed" :style="col.style"></col>
             </colgroup>
             <thead>
                 <tr>
-                    <th v-bind:class="[sortField===col.field ? 'sorted' : '', sortDirection==='desc' ? 'sorted-desc': '', col.sortable ? 'sortable' : '', sortDirection==='asc' ? 'sorted-asc': '', 'header-' + col.className, 'st-header-cell']" v-for="col in columns" @click="sortColumn(col)" v-if="!col.hidden">{{ col.title }}</th>
+                    <th v-bind:class="[sortFieldComputed===col.field ? 'sorted' : '', sortDirectionComputed==='desc' ? 'sorted-desc': '', col.sortable ? 'sortable' : '', sortDirectionComputed==='asc' ? 'sorted-asc': '', 'header-' + col.className, 'st-header-cell']" v-for="col in columnsComputed" @click="sortColumn(col)" v-if="!col.hidden">{{ col.title }}</th>
                 </tr>
             </thead>
             <tbody v-if="loading">
                 <tr>
-                    <td  colspan="{{ columns.length }}">
+                    <td  :colspan="columnsComputed.length">
                         Loading data &hellip;
                     </td>
                 </tr>
             </tbody>
             <tbody v-if="!loading && !items.length">
                 <tr>
-                    <td colspan="{{ columns.length }}">
+                    <td :colspan="columnsComputed.length">
                         <div v-if="searchTerm">No {{ labelPluralComputed }} found matching search term "{{ searchTerm }}".</div>
                         <div v-else>No {{ labelPluralComputed }} found.</div>
                     </td>
                 </tr>
             </tbody>
             <tbody v-if="!loading && items.length">
-                <tr v-for="(rowNumber, item) in items" v-if="!item.$hidden" track-by="id" class="data-table-row-index-{{ rowNumber }} data-table-row-id-{{ item.id }}">
-                    <td v-for="(colNumber, col) in columns" @click="onCellClicked(item, col, rowNumber, colNumber, $event)" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)" v-bind:class="[col.editableComponent? 'cell-editable': '', col.className]" v-if="!col.hidden" :style="col.$widthWithPadding ? 'width: ' + (col.$widthWithPadding) + 'px;': ''">
+                <tr v-for="(item, rowNumber) in items" v-if="!item.$hidden" v-bind:key="item.id" :class="'data-table-row-index-' + rowNumber + ' data-table-row-id-' + item.id">
+                    <td v-for="(col, colNumber) in columnsComputed" @click="onCellClicked(item, col, rowNumber, colNumber, $event)" @dblclick="onCellDoubleClicked(item, col, rowNumber, colNumber, $event)" v-bind:class="[col.editableComponent? 'cell-editable': '', col.className]" v-if="!col.hidden" :style="col.$widthWithPadding ? 'width: ' + (col.$widthWithPadding) + 'px;': ''">
                         <template v-if="item.$isEditing === colNumber">
-                            <component :is="col.editableComponent" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber" :callback="onEditCallback" :refresh="refresh" :cancel="cancelEdit"></component>
+                            <component :is="col.editableComponent" :item="item" :col="col" :row-number="rowNumber" :col-number="colNumber" :callback="onEditCallback" :refresh="refresh" :cancel="cancelEdit" v-on:cell-value-updated="onEditCallback"></component>
                         </template>
                         <template v-if="item.$isEditing !== colNumber">
                             <template v-if="col.component">
@@ -179,12 +185,11 @@
                                 <a v-bind:href="col.getLink(item)">{{ col.getLabel(item) }}</a>
                             </template>
                             <template v-if="col.actions">
-                                <a v-for="action in col.actions" class="cell-action-link {{ action.className }}" v-show="action.shown ? action.shown(item) : true " v-bind:href="action.getLink ? action.getLink(item) : 'javascript:;' " @click="action.click ? action.click(item, col, rowNumber, colNumber) : triggerItemEvent(action.event, item, col, rowNumber, colNumber)">{{ action.getLabel ? action.getLabel(item) : action.label }}</a>
+                                <a v-for="action in col.actions" :class="'cell-action-link ' + action.className" v-show="action.shown ? action.shown(item) : true " v-bind:href="action.getLink ? action.getLink(item) : 'javascript:;' " @click="action.click ? action.click(item, col, rowNumber, colNumber) : triggerItemEvent(action.event, item, col, rowNumber, colNumber)">{{ action.getLabel ? action.getLabel(item) : action.label }}</a>
                             </template>
                             <template v-if="!col.component && !col.actions && !col.getLink">
-                                <template v-if="col.allowHtml">
-                                    {{{ renderCell(item, col, rowNumber, colNumber) }}}
-                                </template>
+                                <div v-if="col.allowHtml" v-html="renderCell(item, col, rowNumber, colNumber)">
+                                </div>
                                 <template v-else>
                                     {{ renderCell(item, col, rowNumber, colNumber) }}
                                 </template>
@@ -193,20 +198,20 @@
                     </td>
                 </tr>
                 <tr v-if="!hasMore">
-                    <td colspan="{{ columns.length }}">
+                    <td :colspan="columnsComputed.length">
                         All matching {{ labelPluralComputed }} have been loaded.
                     </td>
                 </tr>
                 <tr v-if="isScrolling">
-                    <td colspan="{{ columns.length }}">
+                    <td :colspan="columnsComputed.length">
                         Fetching additional {{ labelPluralComputed }} &hellip;
                     </td>
                 </tr>
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="{{ columns.length }}">
-                        <data-table-pager :make-link="makePageLink" v-if="pager!==null && !infiniteScroll" :page="page" :pager="pager" :base-path="'!/posts'" :page="page"></data-table-pager>
+                    <td :colspan="columnsComputed.length">
+                        <!-- <data-table-pager :make-link="makePageLink" v-if="pager!==null && !infiniteScroll" :page="page" :pager="pager" :base-path="'!/posts'" ></data-table-pager>-->
                     </td>
                 </tr>
             </tfoot>
@@ -252,117 +257,118 @@
                  return [];
              }
          },
-         isAttached: true,
-         initialDataLoaded: false,
+         
          labelPlural: '',
-         labelPluralCompueted: '',
-         searchTerm: String,
          sortDirection: String,
          sortField: String,
-         customFilter: String,
-         page: Number,
          route: Object,
          title: String,
-         titleComputed: String,         
-         filters: Array,
-         filterBys: Array,
          infiniteScroll: true
      },
      data: function() {
-         var self = this;
-
-         if (!this.loadData && !this.dataUrl) {
-             console.log("either load-data callback function is required or 'data-url' property must be passed in.");
-             return;
-         }
-
-         // Set defaults
-
-         
-         var columnsNew = [];
-         var index = 0;
-         this.columns.forEach(function(col) {
-             col.$index = index;
-             index++;
-             if (col.component && col.component.template) {
-                 if (!col.component.props) {
-                     col.component.props = {item: Object};
-                 }
-                 col.component = Vue.extend(col.component);
-             }
-             if (col === '__row_selector') {
-                 columnsNew.push({
-                     isRowSelector: true
-                 });
-             } else if (typeof(col) === 'string') {
-                 columnsNew.push({
-                     field: col,
-                     title: self.toTitleCase(col)
-                 });
-             } else {
-                 if (!col.title && col.field) {
-                     col.title = self.toTitleCase(col.field);
-                 }
-                 columnsNew.push(col);
-             }
-         });
-         this.columns = columnsNew;
-         this.labelPluralComputed = this.labelPlural || this.label + 's';
-         this.titleComputed = this.title || this.toTitleCase(this.labelPluralComputed);
-         this.sortField = this.sortField || '';
-         this.sortDirection = this.sortDirection || '';
-         this.searchTerm = this.searchTerm || '';
-         this.filters = this.filters || [];
-         this.page = this.page || 1;
-
-         // If route exists, parse from route
-         if (this.route) {
-             this.updateFromRoute();
-         }
-
-         // Build the data object
-
-
-         
          var data = {
+             rawHtml: '<b>BOLD</b>',
+             columnsComputed: [],
+             labelPluralComputed: '',
+             titleComputed: '',
+             customFilter: '',
+             filters: [],
+             filterBys: [],
+             page: 1,
+             searchTerm: '',
+             initialDataLoaded: false,
+             isAttached: false,
+             sortFieldComputed: '',
+             sortDirectionComputed: '',
              items: [],
              loading: true,
              hasMore: false,
              isScrolling: false,
              scrollPage: 1,
-             pager: {}
+             pager: {}             
          };
 
-         this.extraDataFields.forEach(function(field) {
-             data[field] = '';
-         });
+         if (this.extraDataFields) {
+             this.extraDataFields.forEach(function(field) {
+                 data[field] = '';
+             });
+         }
 
          data.filtersByField = {};
-         this.filters.forEach(function(filter) {
-             data.filtersByField[filter.name] = filter.value;
-         });
+         if (this.filters) {
+             this.filters.forEach(function(filter) {
+                 data.filtersByField[filter.name] = filter.value;
+             });
+         }
          return data;
-
      },
      created: function() {
-         console.log('created, load initial data');
+         this.initFromProps();
          if (!this.route) {
              this.loadInitialData();
          }
      },
-     compiled: function() {
-     },
-     ready: function() {
-     },
-     attached: function() {
+     mounted: function() {
          var self = this;
          this.isAttached = true;
          if (this.initialDataLoaded) {
              this.afterAttachedAndLoaded();
          }
      },
-
      methods: {
+         initFromProps: function() {
+             var self = this;
+             if (!this.loadData && !this.dataUrl) {
+                 console.log("either load-data callback function is required or 'data-url' property must be passed in.");
+                 return;
+             }
+             // Set defaults
+
+             
+             var columnsNew = [];
+             var index = 0;
+             this.columns.forEach(function(col) {
+                 var col = $.extend({}, col);
+                 col.$index = index;
+                 index++;
+                 if (col.component && col.component.template) {
+                     if (!col.component.props) {
+                         col.component.props = {item: Object};
+                     }
+                     col.component = Vue.extend(col.component);
+                 }
+                 if (col === '__row_selector') {
+                     columnsNew.push({
+                         isRowSelector: true
+                     });
+                 } else if (typeof(col) === 'string') {
+                     columnsNew.push({
+                         field: col,
+                         title: self.toTitleCase(col)
+                     });
+                 } else {
+                     if (!col.title && col.field) {
+                         col.title = self.toTitleCase(col.field);
+                     }
+                     columnsNew.push(col);
+                 }
+             });
+             this.columnsComputed = columnsNew;
+             this.labelPluralComputed = this.labelPlural || this.label + 's';
+             this.titleComputed = this.title || this.toTitleCase(this.labelPluralComputed);
+             this.sortFieldComputed = this.sortField || '';
+             this.sortDirectionComputed = this.sortDirection || '';
+             this.searchTerm = this.searchTerm || '';
+             this.filters = this.filters || [];
+             this.page = this.page || 1;
+
+             // If route exists, parse from route
+             if (this.route) {
+                 this.updateFromRoute();
+             }
+
+
+         },
          noop: function() {
 
          },
@@ -379,48 +385,63 @@
                  }
              }, 50);
          },
-         onEditCallback: function(item, field, value) {
+         onEditCallback: function(item, field, value, col, d) {
+             item.$isEditing = false;
+             if (field) {
+                 item[field] = value;
+             }
+             Vue.set(this.items, item.$index, item);
+             return true;
          },
          onCellDoubleClicked: function(item, col, rowNumber, colNumber, $event) {
              if (col.editableComponent && !this.singleClickEditing) {
                  item.$isEditing = colNumber;
-                 this.items.$set(rowNumber, item)
+                 Vue.set(this.items, rowNumber, item)
              }
          },
          onCellClicked: function(item, col, rowNumber, colNumber, $event) {
              if (col.editableComponent && this.singleClickEditing) {
                  item.$isEditing = colNumber;
-                 this.items.$set(rowNumber, item)
+                 Vue.set(this.items, rowNumber, item);
              }
          },
          cancelEdit: function(item, col) {
              item.$isEditing = false;
-             this.items.$set(item.$index, item)
+             Vue.set(this.items, item.$index, item)
          },
          sortColumn: function(col) {
              if (!col.sortable) {
                  return;
              }
-             if (col.field === this.sortField) {
-                 if (this.sortDirection === 'asc') {
-                     this.sortDirection = 'desc';
+             if (col.field === this.sortFieldComputed) {
+                 if (this.sortDirectionComputed === 'asc') {
+                     this.sortDirectionComputed = 'desc';
                  } else {
-                     this.sortDirection = 'asc';
+                     this.sortDirectionComputed = 'asc';
                  }
              } else {
-                 this.sortField = col.field;
-                 this.sortDirection = 'asc';
+                 this.sortFieldComputed = col.field;
+                 this.sortDirectionComputed = 'asc';
              }
              this.page = 0;
              this.navigate({page: 1});
          },
+         renderCell2: function(item, col, index) {
+             debugger;
+             return this.renderCell(item, col, index);
+         },
          renderCell: function(item, col, index) {
+
              if (typeof(col) === 'string') {
                  return item[col];
              } else if (col.render) {
                  return col.render(item, col, index);
              } else {
                  var format = col.format || '';
+                 if (!col.field) {
+                     console.log('column does not have field attribute ', col.field);
+                     return '!error!';
+                 }
                  var value = item[col.field];
                  var index = col.field.indexOf('.');
                  if (value === undefined && index > -1) {
@@ -493,10 +514,9 @@
              if (!event) {
                  return;
              }
-             this.$dispatch(event, item, col, rowNumber, colNumber);
+             this.$emit(event, item, col, rowNumber, colNumber);
          },
          refresh: function() {
-             console.log('refresh!!!');             
              this.loading = true;
              this.loadInitialData();
          },
@@ -565,8 +585,8 @@
                  if (this.searchTerm.length > 2) {
                      url += '&search=' + encodeURIComponent(this.searchTerm);
                  }
-                 if (this.sortField) {
-                     var sort = this.sortField;
+                 if (this.sortFieldComputed) {
+                     var sort = this.sortFieldComputed;
                      if (this.sortDirection.toLowerCase() == 'desc') {
                          sort = '-' + sort;
                      }
@@ -591,9 +611,7 @@
                              item.$hidden = false;
                          });
                          self.extraDataFields.forEach(function(field) {
-                             console.log('check extra data field ', field);
                              if (o[field] !== undefined) {
-                                 console.log('set extra ', field, o[field]);
                                  self[field] = o[field];
                              }
                          });
@@ -602,16 +620,13 @@
                  });
              }
          },
-         makePageLink: function(page) {
-             return this.makeUrl(page, this.searchTerm, this.filters, this.sortField, this.sortDirection);
+         makePageLinkInfo: function(page) {
+             return this.makeUrlInfo(page, this.searchTerm, this.filters, this.sortFieldComputed, this.sortDirection);
          },
          hardRefresh: function() {
-             var url = this.makePageLink(this.page) + '&t=' + new Date().getTime();
-             var parts = url.split('?');
-             StallionApplicationRouter.go({
-                 path: parts[0],
-                 query: parts[1]
-             });
+             var info = this.makePageLinkInfo(this.page);
+             info.query.t = Date().getTime();
+             StallionApplicationRouter.go(info);
          },
          navigate: function(newOpts) {
              var self = this;
@@ -619,19 +634,15 @@
              Object.keys(newOpts).forEach(function(name) {
                  self[name] = newOpts[name];
              });
-             var url = this.makePageLink(this.page);
-             console.log('URL ', url);
-             if (url.indexOf('#!') === 0) {
-                 url = url.substr(2);
-             }
-             var parts = url.split('\\?');
-             
-             StallionApplicationRouter.go({
-                 path: parts[0],
-                 query: parts[1]
-             });
+             var info = this.makePageLinkInfo(this.page);
+             //if (url.indexOf('#') === 0) {
+             //    url = url.substr(2);
+             //}
+             //var parts = url.split('?');
+             //console.log('path ', parts[0], 'query', parts[1]);
+             StallionApplicationRouter.push(info);
          }, 
-         makeUrl: function(page, searchTerm, filters, sortField, sortDirection) {
+         makeUrlInfo: function(page, searchTerm, filters, sortField, sortDirection) {
              var self = this;
              var sort = '';
              if (sortField) {
@@ -640,23 +651,24 @@
                      sort = '-' + sort;
                  }
              }
-             var template = this.browserUrlTemplate;
-             if (template.indexOf('?') === -1) {
-                 template += '?search={{searchTerm}}&filters={{filters}}&sort={{sort}}&page={{page}}&customFilter={{customFilter}}';
+             var url = this.browserUrlTemplate;
+             if (url.indexOf('#/') === 0) {
+                 url = url.substr(1);
              }
-             var url = template;
              var params = {
                  page: page,
-                 searchTerm: searchTerm,
+                 search: searchTerm,
                  filters: encodeURIComponent(JSON.stringify(filters)),
                  sort: sort,
                  customFilter: self.customFilter
              };
-             console.log("FILTERS ", encodeURIComponent(params.filters));
-             Object.keys(params).forEach(function(key) {
-                 url = url.replace(new RegExp('{{\\s*' + key + '\\s*}}', 'g'), params[key] || '');
-             });
-             return url;
+             //Object.keys(params).forEach(function(key) {
+             //    url = url.replace(new RegExp('{{\\s*' + key + '\\s*}}', 'g'), params[key] || '');
+             //});
+             return {
+                 path: url,
+                 query: params,
+             }
          },
          
          scrolify: function(tblAsJQueryObject, height){
@@ -682,8 +694,7 @@
              oTbl.find('tbody tr:eq(0) td').each(function(){
                  $(this).attr("data-item-original-width",$(this).width());
                  $(this).attr("data-original-width-with-padding",$(this).outerWidth());
-                 self.columns[i].$widthWithPadding = $(this).outerWidth();
-                 console.log('set width', $(this).width(), self.columns[i].field, self.columns[i].title);
+                 self.columnsComputed[i].$widthWithPadding = $(this).outerWidth();
                  i++;                 
              });                 
 
@@ -719,15 +730,14 @@
              });
          },
          updateFromRoute: function() {
-             console.log('update from route');
              this.page = parseInt(this.route.params.page || this.route.query.page || 1, 10) || 1;
              this.searchTerm = this.route.params.search || this.route.query.search || '',
-             this.sortField = this.route.params.sort || this.route.query.sort || '';
-             if (this.sortField.indexOf('-') === 0) {
-                 this.sortDirection = 'desc';
-                 this.sortField = this.sortDirection.substr(1);
+             this.sortFieldComputed = this.route.params.sort || this.route.query.sort || '';
+             if (this.sortFieldComputed.indexOf('-') === 0) {
+                 this.sortDirectionComputed = 'desc';
+                 this.sortFieldComputed = this.sortDirectionComputed.substr(1);
              } else {
-                 this.sortDirection = 'asc';
+                 this.sortDirectionComputed = 'asc';
              }
              this.customFilter = this.route.query.customFilter || '';
              this.filters = [];
@@ -746,8 +756,16 @@
          }
      },
      watch: {
+         columns: function() {
+             this.initFromProps();
+         },
+         browserUrlTemplate: function() {
+             this.initFromProps();
+         },
+         dataUrl: function() {
+             this.initFromProps();
+         },
          route: function(cur, prev) {
-             console.log('route changed');
              this.updateFromRoute();
          },
          label: function() {
@@ -776,12 +794,11 @@
              if (field) {
                  item[field] = value;
              }
-             this.items.$set(item.$index, item);             
+             Vue.set(this.items, item.$index, item);             
              return true;
              
          },
          'clear-filters': function() {
-             console.log('clear filters');
              this.clearFiltersAndRefresh();
          }
          

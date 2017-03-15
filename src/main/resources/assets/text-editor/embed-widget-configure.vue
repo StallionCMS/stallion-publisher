@@ -27,10 +27,7 @@
  module.exports = {
      props: {
          insertCallback: Function,
-         widgetData: Object,
-         okToInsert: {
-             twoWay: true
-         }
+         widgetData: Object
      },
      data: function() {
          this.widgetData.data = this.widgetData.data || {};
@@ -40,10 +37,7 @@
              tab: 'embedLink'
          }
      },
-     ready: function() {
-         if (this.embedCode) {
-             this.okToInsert = true;
-         }
+     mounted: function() {
      },
      methods: {
          getWidgetData: function() {
@@ -76,7 +70,7 @@
          },
          'embedCode': function(embedCode) {
              if (embedCode) {
-                 this.okToInsert = true;
+
              }
          }
      }

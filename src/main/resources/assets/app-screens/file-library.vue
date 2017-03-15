@@ -19,9 +19,9 @@
 
 <template>
     <div class="file-library-vue table-page">
-        <loading-div v-if="$loadingRouteData"></loading-div>
-        <div v-if="!$loadingRouteData">
-            <st-data-table v-ref:table :table-definition="tableDefinition" :title="'File Library'" :columns="columns" :label="'file'" :browser-url-template="'#!/files'" :data-url="'/st-publisher/files/library'" :route="$route" table-class="table">
+        <loading-div v-if="isLoading"></loading-div>
+        <div v-if="!isLoading">
+            <st-data-table ref="table" :title="'File Library'" :columns="columns" :label="'file'" :browser-url-template="'#!/files'" :data-url="'/st-publisher/files/library'" :route="$route" table-class="table">
                 <div class="actions-slot" slot="actions">
                     <a href="#/file-upload" class="btn btn-primary btn-xl">Upload new file</a>
                 </div>
@@ -38,6 +38,7 @@
      },
      data: function() {
          return {
+             isLoading: false,
              columns: [
                  {
                      label: 'Open',
@@ -68,12 +69,13 @@
              ]
          }
      },
-     route: {
-         data: function() {
-         }
-     },
      created: function() {
 
+     },
+     watch: {
+         '$route': function() {
+             this.isPicker = false;
+         }
      },
      methods: {
          pickFile: function(file) {

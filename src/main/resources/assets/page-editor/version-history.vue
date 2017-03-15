@@ -18,7 +18,7 @@
                 <tbody>
                     <tr v-for='item in pager.items'>
                         <td>
-                            <a style="width:50px;margin-bottom:.5em;" class="btn btn-default btn-xs" href="/st-publisher/content/{{item.postId}}/view-version/{{item.id}}" target="_blank">view</a><br>
+                            <a style="width:50px;margin-bottom:.5em;" class="btn btn-default btn-xs" :href="'/st-publisher/content/' + item.postId + '/view-version/' + item.id" target="_blank">view</a><br>
                             <a style="width:50px;margin-bottom:.5em;" class="btn btn-default btn-xs" @click='restoreVersion(item)'>restore</a><br>
                         </td>
                         <td>{{ moment(item.versionDate * 1000).fromNow() }}</td>
@@ -51,7 +51,7 @@
              loadAll: true
          }
      },
-     ready: function() {
+     mounted: function() {
          this.loadVersions();
      },
      methods: {

@@ -30,9 +30,6 @@
              elementClone: JSON.parse(JSON.stringify(this.element || {}))
          }
      },
-     ready: function() {
-         
-     },
      methods: {
          update: function(content, rawContent, data, widgets) {
              this.element.content = content;

@@ -7,7 +7,7 @@
 <template>
     <div class="page-element-text">
         <div class="form-group">
-            <markdown-editor v-ref:editor :markdown="element.rawContent" :widgets="element.widgets" :editor-id="'md-element-editor-' + element.name" :change-callback="markdownChanged"></markdown-editor>
+            <markdown-editor ref="editor" :markdown="element.rawContent" :widgets="element.widgets" :editor-id="'md-element-editor-' + element.name" :change-callback="markdownChanged"></markdown-editor>
         </div>
     </div>
 </template>
@@ -28,9 +28,6 @@
          return {
 
          }
-     },
-     ready: function() {
-         
      },
      methods: {
          markdownChanged: function() {

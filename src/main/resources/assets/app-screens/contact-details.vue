@@ -6,10 +6,8 @@
 
 <template>
     <div class="contact-details-vue">
-        <loading-div v-if="$loadingRouteData"></loading-div>
-        <div v-if="!$loadingRouteData">
+        <div>
             <h2>{{ contact.displayName }}</h2>
-            
         </div>
     </div>
 </template>

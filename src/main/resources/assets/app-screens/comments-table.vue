@@ -10,9 +10,9 @@
 
 <template>
     <div class="comments-table-vue  table-page">
-        <loading-div v-if="$loadingRouteData"></loading-div>
-        <div v-if="!$loadingRouteData">
-            <st-data-table v-ref:table :table-definition="tableDefinition" :columns="columns" :label="'comment'" :browser-url-template="'#!/comments'" :data-url="'/st-publisher/comments/list'" :route="$route" table-class="table">
+        <loading-div v-if="isLoading"></loading-div>
+        <div v-if="!isLoading">
+            <st-data-table ref="table" :columns="columns" :label="'comment'" :browser-url-template="'#!/comments'" :data-url="'/st-publisher/comments/list'" :route="$route" table-class="table">
                 <div slot="actions" class="table-actions" style="">
                     <select class="form-control" v-model="customFilter">
                         <option value="">All Comments</option>
@@ -38,10 +38,11 @@
          var self = this;
          return {
              customFilter: '',
+             isLoading: true,
              columns: [
                  {
                      component: {
-                         template: '<div><a class="btn btn-default btn-xs" target="blank" href="{{ item.permalink }}">View</a> <a v-if="!item.approved" @click="approve" class="btn btn-default btn-xs" href="javascript:;" @click="approve">Approve</a> <a v-if="!item.deleted" class="btn btn-default btn-xs" href="javascript:;" @click="deleteComment">Delete</a> ',
+                         template: '<div><a class="btn btn-default btn-xs" target="blank" :href="item.permalink">View</a> <a v-if="!item.approved" @click="approve" class="btn btn-default btn-xs" href="javascript:;" @click="approve">Approve</a> <a v-if="!item.deleted" class="btn btn-default btn-xs" href="javascript:;" @click="deleteComment">Delete</a> ',
                          methods: {
                              approve: function() {
                                  var self = this;
@@ -95,13 +96,11 @@
              ]
          };
      },
-     route: {
-         data: function() {
-
-         }
-     },
      methods: {
          
+     },
+     created: function() {
+         this.isLoading = false;
      },
      watch: {
          'customFilter': function(customFilter, b) {

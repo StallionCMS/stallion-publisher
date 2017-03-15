@@ -17,19 +17,23 @@
               id="my-awesome-dropzone">
         </form>        
         <div class="p">
-            <a  href="#!/files" class="btn btn-default btn-xl">Return to File Library</a>
+            <a  href="#/files" class="btn btn-default btn-xl">Return to File Library</a>
         </div>
 </template>
 
 <script>
  module.exports = {
-     ready: function() {
-
+     mounted: function() {
+         this.onRoute();
      },
-     route: {
-         activate: function() {
+     watch: {
+         '$route': function() {
+             this.onRoute();
+         }
+     },
+     methods: {
+         onRoute: function() {
              console.log('file uploader loading!');
-             
              this.dropzone = new Dropzone($(this.$el).find('.st-file-dropzone').get(0), {
                  dictDefaultMessage: "Drag one more more files here. Or click to open a file picker.",
                  init: function() {

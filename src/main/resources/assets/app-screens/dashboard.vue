@@ -7,5 +7,9 @@
 </template>
 
 <script>
-
+ module.exports = {
+     created: function() {
+         console.log('load dashboard vue');
+     }
+ };
 </script>

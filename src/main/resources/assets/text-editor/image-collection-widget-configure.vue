@@ -2,7 +2,7 @@
 
 <template>
     <div class="image-collection-widget-configure">
-        <image-collection-configure v-ref:collection :ok-to-insert="okToInsert" :data="widgetData.data"></image-collection-configure>
+        <image-collection-configure ref="collection" :data="widgetData.data"></image-collection-configure>
     </div>
 </template>
 
@@ -10,17 +10,11 @@
  module.exports = {
      props: {
          widgetData: Object,
-         insertCallback: Function,
-         okToInsert: {
-             twoWay: true
-         }
+         insertCallback: Function
      },
      data: function() {
          return {
          }
-     },
-     attached: function() {
-         
      },
      methods: {
          getWidgetData: function() {

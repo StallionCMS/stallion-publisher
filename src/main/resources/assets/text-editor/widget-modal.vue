@@ -2,7 +2,7 @@
 
 <template>
     <div class="widget-modal">
-        <modal-base v-ref:themodal :shown.sync="shown" :large="true" :title="title" >
+        <modal-base ref="themodal" v-on:close="$emit('close')" :large="true" :title="title" >
             <div slot="body">
                 <div v-if="!widgetType">
                     <div class="widget-option">
@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div v-if="widgetType">
-                    <component :is="widgetConfigureTag" v-ref:active :widget-data="activeWidgetData" :insert-callback="doInsertCallback" :ok-to-insert.sync="okToInsert"></component>
+                    <component :is="widgetConfigureTag" ref="active" :widget-data="activeWidgetData" :insert-callback="doInsertCallback" ></component>
                 </div>
             </div>
             <div slot="footer">
@@ -51,9 +51,6 @@
 <script>
  module.exports = {
      props: {
-         shown: {
-             twoWay: true
-         },
          callback: Function,
          insertLabel: {
              type: String,
@@ -73,7 +70,7 @@
          return {
              title: "Insert Widget",
              activeWidgetData: activeWidgetData,
-             okToInsert: false,
+             okToInsert: true,
              widgetConfigureTag: this.widgetTypeToTag(this.widgetType)
          }
      },

@@ -1,5 +1,5 @@
 /vendor/jquery-1.11.3.js
-/vendor/vue.js
+/vendor/vue2.js
 /vendor/stallion.js
 /vendor/stallion.css
 /public/comments-public.css

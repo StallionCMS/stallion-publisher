@@ -15,9 +15,6 @@
      props: {
          widgetData: Object,
          insertCallback: Function,
-         okToInsert: {
-             twoWay: true
-         }
      },
      data: function() {
          var html = '';
@@ -27,9 +24,6 @@
          return {
              html: html
          }
-     },
-     ready: function() {
-         this.okToInsert = true;
      },
      methods: {
          getWidgetData: function() {

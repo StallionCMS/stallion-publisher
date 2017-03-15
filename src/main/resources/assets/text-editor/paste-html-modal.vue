@@ -2,7 +2,7 @@
 
 <template>
     <div class="paste-html-modal">
-        <modal-base v-ref:themodal :shown="true" title="Paste Rich Content or HTML" :callback="saveCallback">
+        <modal-base ref="themodal" @close="$emit('close')" title="Paste Rich Content or HTML" :callback="saveCallback">
             <div slot="body">
                 <div class="row">
                     <div class="col-sm-6">
@@ -22,9 +22,6 @@
 <script>
  module.exports = {
      props: {
-         shown: {
-             twoWay: true
-         },
          callback: Function
      },
      data: function() {
@@ -33,7 +30,7 @@
              markdown: ''
          }
      },
-     created: function() {
+     mounted: function() {
          console.log('pasteHtmlModal created');
      },
      methods: {

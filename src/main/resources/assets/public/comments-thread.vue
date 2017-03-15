@@ -6,7 +6,7 @@
 
 <template>
     <div class="comments-thread-vue">
-        <div v-for="comment in comments" class="st-new-comment-outer" track-by="id">
+        <div v-for="comment in comments" class="st-new-comment-outer" v-bind:key="comment.id">
             <div :class="{'st-comment': true, 'st-comment-rejected': !comment.approved, 'st-comment-pending': comment.pending}"  :data-comment-id="comment.id" :id="'st-comment-' + comment.id">
                 <a :name="'st-comment-' + comment.id"></a>    
                 <div class="comment-body-wrap">
@@ -20,7 +20,7 @@
                             <span v-if="!comment.authorWebSite">{{comment.authorDisplayName}}</span>
                             commented at {{dateFormat(comment.createdTicks, ST_COMMENT_CREATED_FORMAT)}}
                         </div>
-                        <div class="st-comment-body">{{{ comment.bodyHtml }}}</div>
+                        <div class="st-comment-body" v-html="comment.bodyHtml"></div>
                         <div v-if="comment.editable && !comment.adminable"  class="moderation-actions">
                             <button class="edit-button" @click="edit">Edit</button>
                         </div>
@@ -36,8 +36,8 @@
     </div>
 </template>
 
-<script>
- module.exports = {
+<script> 
+module.exports = {
      props: {
          onStartEditComment: Function,
          comments: Array
@@ -84,7 +84,7 @@
              this.comments.forEach(function(cmt) {
                  i++;
                  if (cmt.id === comment.id) {
-                     self.comments.$set(i, comment);
+                     Vue.set(self.comments, i, comment);
                      return false;
                  }
              });

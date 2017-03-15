@@ -6,9 +6,9 @@
 
 <template>
     <div class="settings-global-modules-vue table-page">
-        <loading-div v-if='$loadingRouteData'></loading-div>
-        <div v-if="!$loadingRouteData">
-            <st-data-table v-ref:table :table-definition="tableDefinition" :columns="columns" :label="'global module'" :browser-url-template="'#!/settings/global-modules'" :data-url="'/st-publisher/global-modules/list'" :route="$route" table-class="table">
+        <loading-div v-if='isLoading'></loading-div>
+        <div v-if="!isLoading">
+            <st-data-table ref="table" :columns="columns" :label="'global module'" :browser-url-template="'#!/settings/global-modules'" :data-url="'/st-publisher/global-modules/list'" :route="$route" table-class="table">
                 <div class="actions-slot" slot="actions">
                 </div>
             </st-data-table>
@@ -20,6 +20,7 @@
  module.exports = {
      data: function() {
          return {
+             isLoading: false,
              columns: [
                  {
                      actions: [{

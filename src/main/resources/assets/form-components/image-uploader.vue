@@ -13,8 +13,9 @@
      props: {
          callback: Function
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
+         console.log('form-components/image-uploader.mounted');
          self.dropzone = new Dropzone($(self.$el).find('.image-dropzone').get(0), {
              dictDefaultMessage: "Drag one more more files here. Or click to open a file picker.",
              uploadMultiple: false,

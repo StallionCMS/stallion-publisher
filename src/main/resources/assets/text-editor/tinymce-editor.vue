@@ -19,16 +19,21 @@
     <div class="tinymce-editor-vue">
         <div class="loading-overlay">Loading editor &hellip;</div>
         <textarea :name="name" style="" class="tiny-target" v-model="html" ></textarea>
-        <widget-modal v-if="showWidgetModal" :shown.sync="showWidgetModal" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
-        <insert-link-modal v-if="showInsertLinkModal" :shown.sync="showInsertLinkModal" :callback="insertLinkCallback" :hide-internal-pages="options.hideInternalPages" :link="activeLinkUrl" :text="activeLinkText"></insert-link-modal>
-        <component v-if="customModalShown && customModalTag" v-ref:custommodal :is="customModalTag" :shown.sync="customModalShown" :callback="customModalCallback" :options="customModalOptions"></component>
+        <widget-modal v-if="showWidgetModal" v-on:close="showWidgetModal=false" :widget-type="activeWidgetType" :widget-data="activeWidgetData" :callback="insertWidgetCallback"></widget-modal>
+        <insert-link-modal v-if="showInsertLinkModal" v-on:close="showInsertLinkModal=false" v-on:input="insertLinkCallback" :hide-internal-pages="options.hideInternalPages" :link="activeLinkUrl" :text="activeLinkText"></insert-link-modal>
+        <component v-if="customModalShown && customModalTag" ref="custommodal" :is="customModalTag" v-on:close="customModalShown = false" :callback="customModalCallback" :options="customModalOptions"></component>
     </div>
 </template>
 <script>
  module.exports = {
      props: {
          html: String,
-         widgets: Array,
+         widgets: {
+             type: Array,
+             default: function() {
+                 return [];
+             }
+         },
          tinyOptions: Object,
          options: Object,
          name: String,
@@ -42,10 +47,14 @@
      },
      data: function() {
          if (this.options.pluginLoaders) {
-             this.pluginLoaders = this.options.pluginLoaders;
+             this.pluginLoadersComputed = this.options.pluginLoaders;
+         } else {
+             this.pluginLoadersComputed = this.options.pluginLoaders;             
          }
          if (this.options.extraPlugins) {
-             this.extraPlugins = this.options.extraPlugins;
+             this.extraPluginsComputed = this.options.extraPlugins;
+         } else {
+             this.extraPluginsComputed = this.extraPlugins;
          }
          
          return {
@@ -56,6 +65,7 @@
              activeLinkUrl: '',
              tinymce: null,
              editor: null,
+             editorIdComputed: this.editorId,
              customModalTag: '',
              customModalShown: false,
              customModalOptions: {text: '', link: ''},
@@ -64,14 +74,14 @@
              ticks: new Date().getTime()
          }
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
          var id = self.editorId || 'tiny-' + stPublisher.generateUUID();
-         self.editorId = id;
+         self.editorIdComputed = id;
          $(this.$el).find('textarea').attr('id', id);
 
-         if (window.tinymce && tinymce.EditorManager.get(this.editorId)) {
-             tinymce.EditorManager.get(this.editorId).destroy();
+         if (window.tinymce && tinymce.EditorManager.get(this.editorIdComputed)) {
+             tinymce.EditorManager.get(this.editorIdComputed).destroy();
          }
 
          
@@ -85,9 +95,9 @@
              self.tinymce = tinymce;
              stPublisher.initStallionButtonsPlugin(tinymce);
              stPublisher.initHeadersPlugin(tinymce);
-             var extraPlugins = self.extraPlugins || '';
-             if (self.pluginLoaders) {
-                 self.pluginLoaders.forEach(function(loader) {
+             var extraPlugins = self.extraPluginsComputed || '';
+             if (self.pluginLoadersComputed) {
+                 self.pluginLoadersComputed.forEach(function(loader) {
                      if (!loader.name) {
                          throw new Exception("Plugin loader needs field 'name'");
                      }
@@ -122,12 +132,15 @@
                  setup: function(editor) {
                      console.log('tinysetup ', id);
                      editor.on('change', function(e) {
+                         self.$emit('input');
+                         self.$emit('change');
                          if (self.changeCallback) {
                              self.changeCallback();
                          }
                      });
 
                      if (self.onKeyPress) {
+                         self.$emit('input');
                          editor.on('keypress', function(e) {
                              if (self.onKeyPress) {
                                  self.onKeyPress(e);
@@ -152,7 +165,7 @@
      beforeDestroy: function() {
          console.log('before destroy tiny');
      },
-     detached: function() {
+     deactivated: function() {
          if (window.tinymce && this.editorId) {
              console.log('detach tiny', this.editorId);
              tinymce.execCommand('mceRemoveControl', true, this.editorId);

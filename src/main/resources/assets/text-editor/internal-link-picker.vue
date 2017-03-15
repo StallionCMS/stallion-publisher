@@ -21,7 +21,7 @@
              link: ''
          }
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
          stallion.request({
              url: '/st-publisher/content/all-live-contents',

@@ -7,7 +7,7 @@
 <template>
     <div class="page-element-text">
         <div class="form-group">
-            <image-collection-field :on-change="collectionUpdated" :value.sync="element.data"></image-collection-field>
+            <image-collection-field :on-change="collectionUpdated" v-model="element.data"></image-collection-field>
         </div>
     </div>
 </template>
@@ -27,7 +27,7 @@
 
          }
      },
-     ready: function() {
+     created: function() {
          
      },
      methods: {

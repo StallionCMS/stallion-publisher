@@ -20,17 +20,16 @@
 <script>
  module.exports = {
      props: {
-         value: {
-             twoWay: true
-         }
+         value: 0
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
          console.log('init pikaday');
          self.pikaday = new Pikaday({
              field: $(self.$el).find('[name="datepicker"]').get(0),
              onSelect: function(date) {
                  console.log('new date picked', self.pikaday.toString());
+                 self.date = self.pikaday.toString();
              }             
          });
 
@@ -44,9 +43,9 @@
      methods: {
          changed: function(a, b) {
              console.log('date changed ', a, b);
-             var m = moment(this.date);
+             var m = moment(this.date, 'YYYY-MM-DD');
              console.log(m.format(), m, m.valueOf());
-             this.value = m.valueOf()
+             this.$emit('input', m.valueOf());
          }
      },
      watch: {

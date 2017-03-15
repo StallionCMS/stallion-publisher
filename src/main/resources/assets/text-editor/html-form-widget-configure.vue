@@ -15,18 +15,15 @@
  
  module.exports = {
      props: {
-         insertCallback: Function,
-         okToInsert: {
-             twoWay: true
-         }
+         insertCallback: Function
      },
      data: function() {
          return {
              html: FORM_HTML
          }
      },
-     ready: function() {
-         this.okToInsert = true;
+     mounted: function() {
+
      },
      methods: {
          getWidgetData: function() {

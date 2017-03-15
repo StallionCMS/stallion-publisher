@@ -10,11 +10,11 @@
     <div id="sidebar-menu" class="sidebar-menu-vue">
         <ul class="nav nav-sidebar">
             <!--<li class="dashboard"><a href="#/"><span class="icon-map2"></span> Overview <span class="sr-only">(current)</span></a></li>-->
-            <li :class="{'active': active.posts}" class="newPost posts"><a class="partial-width" href="#/posts" title="Posts Dashboard"><i class="material-icons">note</i> <span class="item-label">Posts</span></a> <a class="new-thing-link" v-link="{ path: '/new-post' }">new post</a></li>
+            <li :class="{'active': active.posts}" class="newPost posts"><a class="partial-width" href="#/posts" title="Posts Dashboard"><i class="material-icons">note</i> <span class="item-label">Posts</span></a> <a class="new-thing-link" href="#/new-post">new post</a></li>
             <li :class="{'active': active.pages}"  class="pages newPage">
                 <a class="partial-width" href="#/pages" title="Pages Dashboard">
                     <i class="material-icons">description</i> <span class="item-label">Pages</span></a>
-                <a class="new-thing-link" v-link="{ path: '/new-page' }">new page</a>
+                <a class="new-thing-link" href="#/new-page">new page</a>
             </li>
             <li :class="{'active': active.comments}" class="comments"><a href="#/comments"><i class="material-icons">forum</i> <span class="item-label">Comments</span></a></li>
             <li :class="{'active': active.contacts}" class="contacts"><a href="#/contacts"><span class="icon-users"></span> <span class="item-label">Contacts</span></a></li>
@@ -33,7 +33,7 @@
         </div>
         <div class="p show-website-block">
             <br><br>
-            <a href="{{ siteUrl }}" target="_blank">Open your web site <span class="icon-new-tab"></span></a>
+            <a :href="siteUrl" target="_blank">Open your web site <span class="icon-new-tab"></span></a>
         </div>
     </div>
 </template>

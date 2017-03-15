@@ -9,7 +9,7 @@
                 <a target="_blank" v-bind:href="image.url">{{image.url}}</a>
                 <a class="btn btn-default btn-sm" href="javascript:;" @click="tab='selector'">Change Image</a>
             </div>
-            <image-full-formatting v-ref:formatting name="formatting" :existing-formatting="formatting"></image-full-formatting>
+            <image-full-formatting ref="formatting" name="formatting" :existing-formatting="formatting"></image-full-formatting>
         </div>
     </div>
 </template>
@@ -18,10 +18,7 @@
  module.exports = {
      props: {
          widgetData: Object,
-         insertCallback: Function,
-         okToInsert: {
-             twoWay: true
-         }
+         insertCallback: Function
      },
      data: function() {
          var tab = 'selector';
@@ -36,10 +33,7 @@
              image: image
          }
      },
-     ready: function() {
-         if (this.image) {
-             this.okToInsert = true;
-         }
+     mounted: function() {
      },
      methods: {
          getWidgetData: function() {
@@ -59,7 +53,7 @@
          selectImageCallback: function(image) {
              this.image = image;
              this.tab = 'formatting';
-             this.okToInsert = true;
+             //this.okToInsert = true;
          },
          buildHtml: function(image, data) {
              var $wrap = $('<div></div>')

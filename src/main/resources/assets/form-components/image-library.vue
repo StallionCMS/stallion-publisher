@@ -6,9 +6,9 @@
 <template>
     <div>
         <h3>Image Library</h3>
-        <h3 v-if="$loadingRouteData">Loading &hellip;</h3>
-        <h3 v-if="!$loadingRouteData && !items.length">No posts yet</h3>
-        <table v-if="!$loadingRouteData && items.length" class="table comments-table">
+        <h3 v-if="isLoading">Loading &hellip;</h3>
+        <h3 v-if="!isLoading && !items.length">No posts yet</h3>
+        <table v-if="!isLoading && items.length" class="table comments-table">
             <thead>
                 <tr>
                     <th></th>
@@ -37,7 +37,7 @@
                         {{moment(item.uploadedAt * 1000).fromNow()}}
                     </td>
                     <td>
-                        <a href="{{item.url}}" target="_blank">open</a>
+                        <a :href="item.url" target="_blank">open</a>
                     </td>
 
                 </tr>
@@ -53,13 +53,14 @@
      },
      data: function() {
          return {
+             isLoading: false,
              pager: null,
              page: 1,
              withDeleted: true,
              items: [],
          }
      },
-     created: function() {
+     mounted: function() {
          this.fetchData();
      },
      methods: {

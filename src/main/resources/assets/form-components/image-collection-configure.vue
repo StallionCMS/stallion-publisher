@@ -66,10 +66,7 @@
 <script>
  module.exports = {
      props: {
-         data: Object,
-         okToInsert: {
-             twoWay: true
-         }
+         data: Object
      },
      data: function() {
          var data = JSON.parse(JSON.stringify(this.data || {}));
@@ -86,12 +83,7 @@
              galleryOnClick: data.galleryOnClick === undefined ? true : data.galleryOnClick
          }
      },
-     ready: function() {
-         if (this.images) {
-             this.okToInsert = true;
-         }
-     },
-     attached: function() {
+     mounted: function() {
          var self = this;
          var listEle = $(this.$el).find('.included-images-list').get(0);
          Sortable.create(listEle, {
@@ -124,7 +116,6 @@
              }
              self.images.push(img);
              self.screen = 'collection';
-             self.okToInsert = true;
          },
          deleteImage: function(index) {
              var self = this;

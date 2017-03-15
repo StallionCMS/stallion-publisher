@@ -182,7 +182,7 @@
          },
          
      },
-     ready: function() {
+     mounted: function() {
          var self = this;
          self.renderCaptcha();
          stallion.autoGrow({}, $(this.$el).find('textarea'));

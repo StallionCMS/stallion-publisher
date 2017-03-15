@@ -6,9 +6,9 @@
 
 <template>
     <div class="settings-author-vue table-page">
-        <loading-div v-if="$loadingRouteData"></loading-div>
-        <div v-if="!$loadingRouteData">
-            <st-data-table v-ref:table :table-definition="tableDefinition" :columns="columns" :label="'author'" :browser-url-template="'#!/settings/authors'" :data-url="'/st-publisher/authors/list'" :route="$route" table-class="table">
+        <loading-div v-if="isLoading"></loading-div>
+        <div v-if="!isLoading">
+            <st-data-table ref="table" :columns="columns" :label="'author'" :browser-url-template="'#!/settings/authors'" :data-url="'/st-publisher/authors/list'" :route="$route" table-class="table">
                 <div class="actions-slot" slot="actions">
                     <a href="#!/settings/author/new" class="btn btn-primary btn-lg">New Author</a>
                 </div>
@@ -21,6 +21,7 @@
  module.exports = {
      data: function() {
          return {
+             isLoading: false,
              columns: [
                  {
                      actions: [{

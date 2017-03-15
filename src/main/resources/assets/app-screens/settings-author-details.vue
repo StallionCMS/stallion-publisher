@@ -36,23 +36,25 @@
  module.exports = {
      data: function() {
          return {
+             isLoading: true,
              profile: {},
              user: {},
              userId: 0
          }
      },
-     route: {
-         data: function(transition) {
-             if (this.$route.params.userId) {
-                 this.userId = this.$route.params.userId;
-                 this.fetchData(transition);
-             } else {
-                 transition.next();
-             }
-         }
+     created: function() {
+         this.onRoute();
      },
      methods: {
-         fetchData: function(transition) {
+         onRoute: function() {
+             if (this.$route.params.userId) {
+                 this.userId = this.$route.params.userId;
+                 this.fetchData();
+             } else {
+                 this.isLoading = false;
+             }
+         },
+         fetchData: function() {
              var self = this;
              stallion.request({
                  url: '/st-publisher/authors/get/' + this.userId,
@@ -60,9 +62,7 @@
                  success: function(o) {
                      self.profile = o.profile;
                      self.user = o.user;
-                     if (transition) {
-                         transition.next();
-                     }
+                     self.isLoading = false;
                  }
              });
          },

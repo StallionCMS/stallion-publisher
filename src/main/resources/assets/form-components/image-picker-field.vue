@@ -1,13 +1,13 @@
 <template>
     <div class="image-picker">
-        <button class="btn btn-default"  v-on:click="showModal">{{ value.thumbUrl ? labelSelected : label }}</button>
-        <span v-if="value.thumbUrl">
-            <a target="_blank" :href="value.url"><img style="max-width: 40px; max-height: 40px;" v-bind:src="value.thumbUrl"></a>
+        <button class="btn btn-default"  v-on:click="showModal">{{ image.thumbUrl ? labelSelected : label }}</button>
+        <span v-if="image.thumbUrl">
+            <a target="_blank" :href="image.url"><img style="max-width: 40px; max-height: 40px;" v-bind:src="image.thumbUrl"></a>
         </span>
-        <span v-if="!value.thumbUrl">
+        <span v-if="!image.thumbUrl">
             
         </span>
-        <modal-base v-if="modalShown" :shown.sync="modalShown" tag="image-selector" title="Pick an image" :callback="handleSelected"></modal-base>
+        <modal-base v-if="modalShown" v-on:close="modalShown=false" tag="image-selector" title="Pick an image" :callback="handleSelected"></modal-base>
     </div>
 </template>
     
@@ -15,7 +15,9 @@
  module.exports = {
      props: {
          value: {
-             twoWay: true
+             default: function() {
+                 return {};
+             }
          },
          label: {
              default: 'Choose Image'
@@ -25,11 +27,13 @@
          }
      },
      data: function() {
-         if (!this.value) {
-             this.value = {}
-         }
          return {
              modalShown: false
+         }
+     },
+     computed: {
+         image: function() {
+             return this.value || {};
          }
      },
      methods: {
@@ -38,7 +42,8 @@
          },
          handleSelected: function(imageInfo) {
              console.log('handleSelected ', imageInfo);
-             this.value = imageInfo;
+             //this.value = imageInfo;
+             this.$emit('input', imageInfo);
          }
      }
  };

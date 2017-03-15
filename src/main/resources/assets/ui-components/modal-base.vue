@@ -12,8 +12,8 @@
 </style>
 
 <template>
-    <div class="modal-base-vue modal {{cssClass}}" role="dialog" aria-labelledby="myLargeModalLabel">
-        <div class="modal-dialog  {{ modalClass }}" role="document">
+    <div :class="'modal-base-vue modal ' + cssClass + ' ' + classProp" role="dialog" aria-labelledby="myLargeModalLabel">
+        <div :class="'modal-dialog ' + modalClass" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <slot name="header">
@@ -25,7 +25,7 @@
                 </div><!-- end .modal-header -->
                 <div class="modal-body">
                     <slot name="body">
-                        <component v-ref:bodyComponent :is="tag" :callback="modalCallback">
+                        <component ref="bodyComponent" :is="tag" :callback="modalCallback">
                         </component>
                     </slot>
                 </div>
@@ -45,8 +45,7 @@
  module.exports = {
      props: {
          shown: {
-             twoWay: true,
-             default: false
+             default: true
          },
          title: null,
          tag: '',
@@ -60,6 +59,7 @@
              type: String,
              default: 'Save Changes'
          },
+         'class': '',
          cssClass: '',
          callback: Function,
          saveLabel: 'Save'
@@ -70,7 +70,12 @@
              modalClass: ''
          }
      },
-     compiled: function() {
+     computed: {
+         classProp: function() {
+             return this['class'] || '';
+         }
+     },
+     mounted: function() {
          console.log('compiled modal');
          var self = this;
          console.log('tag ', this.tag);
@@ -84,29 +89,30 @@
          $ele.on("dragover", function(e) { e.preventDefault();  e.stopPropagation(); });
          $ele.on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
          $ele.modal({
-             show: false,
+             show: true,
              backdrop: true,
              width: 800
          });
          $ele.on('hidden.bs.modal', function(e) {
-             self.shown = false;
+             console.log('hide modal!!');
+             self.$emit('close')
          });
-     },
-     attached: function() {
-         console.log('attached modal ', this.shown);
-         if (this.shown) {
-             $(this.$el).modal('show');
-         }
+         //console.log('attached modal ', this.shown);
+         //if (this.shown) {
+         //    $(this.$el).modal('show');
+         //}
      },
      methods: {
          open: function() {
-             this.shown = true;
+             
          },
          modalCallback: function() {
+             console.log('callback');
              this.callback.apply(this, arguments);
              this.close();
          },
          saveChanges: function() {
+             console.log('save changes!');
              var funcResult = null;
              if (this.$refs.bodycomponent && this.$refs.bodycomponent.saveChanges) {
                  var result = this.$refs.bodycomponent.saveChanges();
@@ -121,11 +127,13 @@
              }
          },
          close: function() {
+             console.log('methods.close');
              $(this.$el).modal('hide');
          }
      },
      watch: {
          shown: function(newVal, old) {
+             console.log('shown changed!');
              if (newVal) {
                  $(this.$el).modal('show');
              } else {
